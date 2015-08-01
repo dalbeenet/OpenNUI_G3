@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}"
+	ProjectSection(ProjectDependencies) = postProject
+		{37346467-4A72-4E8E-B942-6E31638707A2} = {37346467-4A72-4E8E-B942-6E31638707A2}
+		{65A082DC-494F-4576-B661-11BE002FF2E9} = {65A082DC-494F-4576-B661-11BE002FF2E9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvee_master", "libvee_master\libvee_master.vcxproj", "{65A082DC-494F-4576-B661-11BE002FF2E9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libopennui_master_G3", "libopennui_master_G3\libopennui_master.vcxproj", "{37346467-4A72-4E8E-B942-6E31638707A2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}.Debug|Win32.Build.0 = Debug|Win32
+		{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}.Release|Win32.ActiveCfg = Release|Win32
+		{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}.Release|Win32.Build.0 = Release|Win32
+		{65A082DC-494F-4576-B661-11BE002FF2E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{65A082DC-494F-4576-B661-11BE002FF2E9}.Debug|Win32.Build.0 = Debug|Win32
+		{65A082DC-494F-4576-B661-11BE002FF2E9}.Release|Win32.ActiveCfg = Release|Win32
+		{65A082DC-494F-4576-B661-11BE002FF2E9}.Release|Win32.Build.0 = Release|Win32
+		{37346467-4A72-4E8E-B942-6E31638707A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{37346467-4A72-4E8E-B942-6E31638707A2}.Debug|Win32.Build.0 = Debug|Win32
+		{37346467-4A72-4E8E-B942-6E31638707A2}.Release|Win32.ActiveCfg = Release|Win32
+		{37346467-4A72-4E8E-B942-6E31638707A2}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

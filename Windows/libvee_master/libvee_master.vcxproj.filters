@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vee">
+      <UniqueIdentifier>{cb2c0b93-d607-4d22-a2e1-bd48d6f738d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\lock_impl">
+      <UniqueIdentifier>{2e47f054-d75e-4e34-b52c-81740f63cf51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\voost">
+      <UniqueIdentifier>{91e4a008-5478-481d-9e8f-53a78f8c1713}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\voost\shared_memory">
+      <UniqueIdentifier>{67d10081-b505-43ee-874e-982f4877cbe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\voost\net">
+      <UniqueIdentifier>{37a26972-6e47-42a2-accd-ab4fbe588f26}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\vee\vee.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\flag.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\macro.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\lock.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\tuple_unpacker.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\type_parser.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\actor.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\delegate.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\queue.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\scheduler.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\signal_channel.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\object_pool.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\shared_memory.h">
+      <Filter>vee\voost</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\net.h">
+      <Filter>vee\voost</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="voost\shared_memory\shared_memory_impl.cpp">
+      <Filter>vee\voost\shared_memory</Filter>
+    </ClCompile>
+    <ClCompile Include="lock\lock_impl.cpp">
+      <Filter>vee\lock_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="xmain.cpp" />
+    <ClCompile Include="voost\net\tcp_client_impl.cpp">
+      <Filter>vee\voost\net</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
