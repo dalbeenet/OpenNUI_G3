@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvee_master", "libvee_mas
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libopennui_master_G3", "libopennui_master_G3\libopennui_master.vcxproj", "{37346467-4A72-4E8E-B942-6E31638707A2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_device_template", "opennui_device_template\opennui_device_template.vcxproj", "{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{37346467-4A72-4E8E-B942-6E31638707A2}.Debug|Win32.Build.0 = Debug|Win32
 		{37346467-4A72-4E8E-B942-6E31638707A2}.Release|Win32.ActiveCfg = Release|Win32
 		{37346467-4A72-4E8E-B942-6E31638707A2}.Release|Win32.Build.0 = Release|Win32
+		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Debug|Win32.Build.0 = Debug|Win32
+		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Release|Win32.ActiveCfg = Release|Win32
+		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

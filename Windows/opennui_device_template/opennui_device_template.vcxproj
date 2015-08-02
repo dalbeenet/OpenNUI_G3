@@ -10,42 +10,20 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\vee\actor.h" />
-    <ClInclude Include="..\vee\delegate.h" />
-    <ClInclude Include="..\vee\flag.h" />
-    <ClInclude Include="..\vee\object_pool.h" />
-    <ClInclude Include="..\vee\queue.h" />
-    <ClInclude Include="..\vee\macro.h" />
-    <ClInclude Include="..\vee\lock.h" />
-    <ClInclude Include="..\vee\scheduler.h" />
-    <ClInclude Include="..\vee\signal_channel.h" />
-    <ClInclude Include="..\vee\tuple_unpacker.h" />
-    <ClInclude Include="..\vee\type_parser.h" />
-    <ClInclude Include="..\vee\vee.h" />
-    <ClInclude Include="..\vee\voost\net.h" />
-    <ClInclude Include="..\vee\voost\shared_memory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="lock\lock_impl.cpp" />
-    <ClCompile Include="voost\net\tcp_client_impl.cpp" />
-    <ClCompile Include="xmain.cpp" />
-    <ClCompile Include="voost\shared_memory\shared_memory_impl.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{65A082DC-494F-4576-B661-11BE002FF2E9}</ProjectGuid>
+    <ProjectGuid>{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>libvee_master</RootNamespace>
+    <RootNamespace>opennui_device_template</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -63,19 +41,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\lib\x32\</OutDir>
+    <OutDir>$(SolutionDir)\bin\x32\debug\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\debug\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-mt-gd-1_0</TargetName>
+    <TargetName>$(ProjectName)-x32d</TargetName>
+    <TargetExt>.nuimodule</TargetExt>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\lib\x32\</OutDir>
+    <TargetName>$(ProjectName)-x32d</TargetName>
+    <TargetExt>.nuimodule</TargetExt>
     <IntDir>$(SolutionDir)\obj\x32\release\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-mt-1_0</TargetName>
+    <OutDir>$(SolutionDir)\bin\x32\release\</OutDir>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -83,15 +63,12 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;OPENNUI_DEVICE_TEMPLATE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-gd-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -101,18 +78,18 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;OPENNUI_DEVICE_TEMPLATE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-    <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="module_main.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

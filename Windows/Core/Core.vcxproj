@@ -44,12 +44,12 @@
     <OutDir>$(SolutionDir)\bin\x32\debug\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\debug\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\x32\release\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\release\$(ProjectName)\</IntDir>
   </PropertyGroup>
