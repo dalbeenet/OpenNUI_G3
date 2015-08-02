@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\opennui\opennui.h" />
     <ClInclude Include="..\opennui\sdkver.h" />
     <ClInclude Include="..\opennui\datadef.h" />
   </ItemGroup>

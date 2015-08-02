@@ -12,5 +12,8 @@
     <ClInclude Include="..\opennui\datadef.h">
       <Filter>opennui</Filter>
     </ClInclude>
+    <ClInclude Include="..\opennui\opennui.h">
+      <Filter>opennui</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
