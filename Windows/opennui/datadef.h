@@ -71,7 +71,6 @@ public:
         etc,
     };
     virtual ~opennui_device() = default;
-    virtual void   on_load()  _OPENNUI_INTERFACE;
     virtual state  open()     _OPENNUI_INTERFACE;
     virtual state  suspend()  _OPENNUI_INTERFACE;
     virtual state  release()  _OPENNUI_INTERFACE;
@@ -89,11 +88,32 @@ public:
     virtual bool acquire_body_frame(const unsigned char* dst)  _OPENNUI_INTERFACE;
 };
 
+class opennui_plugin abstract
+{
+public:
+    using string = std::string;
+    enum class state: int
+    {
+        unloaded = 0,
+        unknown,
+        opened,
+        suspended,
+        error
+    };
+    virtual ~opennui_plugin() = default;
+    virtual state  open()     _OPENNUI_INTERFACE;
+    virtual state  suspend()  _OPENNUI_INTERFACE;
+    virtual state  release()  _OPENNUI_INTERFACE;
+    virtual state  state()     const _OPENNUI_INTERFACE;
+    virtual string name()      const _OPENNUI_INTERFACE;
+    virtual string vendor()    const _OPENNUI_INTERFACE;
+    virtual string decription() const _OPENNUI_INTERFACE;
+};
+
 #define _OVERRIDE_OPENNUI_INTERFACE override
 #define DEFINE_OPENNUI_DEVICE(class_name) \
     public:\
-        virtual ~##class_name()   _OVERRIDE_OPENNUI_INTERFACE;\
-        virtual void   on_load()  _OVERRIDE_OPENNUI_INTERFACE;\
+        virtual ~##class_name();\
         virtual state  open()     _OVERRIDE_OPENNUI_INTERFACE;\
         virtual state  suspend()  _OVERRIDE_OPENNUI_INTERFACE;\
         virtual state  release()  _OVERRIDE_OPENNUI_INTERFACE;\
