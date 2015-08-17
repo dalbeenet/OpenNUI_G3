@@ -2,40 +2,57 @@
 #define _VEE_VOOST_NET_H_
 
 #include <vee/macro.h>
-#include <boost/asio.hpp>
-#include <exception>
+#include <vee/exception.h>
+#include <memory>
 
-_VEE_BEGIN
-_VOOST_BEGIN
+namespace vee {
+namespace voost {
+namespace net {
 
-extern const char* local_ip;
+using port_t = unsigned short;
+using size_t = unsigned int;
+using byte = unsigned char;
 
-typedef ::boost::asio::ip::tcp::endpoint tcp_endpoint;
-typedef ::boost::asio::ip::udp::endpoint udp_endpoint;
-
-inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
-{
-    return ::boost::asio::ip::address::from_string(str);
-}
-
-class tcp_client
+class net_stream abstract
 {
 public:
-    tcp_client(::boost::asio::io_service& io_service);
-    ~tcp_client();
-    //TODO: copy ctor and move ctor
-    //TODO: operator = 
-    bool connect(::boost::asio::ip::tcp::endpoint& endpoint);
-    ::std::size_t write(char* buffer, ::std::size_t len);
-    ::std::size_t read(char* buffer, ::std::size_t len);
-    bool is_open() const;
-    void close();
-protected:
-    ::boost::asio::io_service& _io_service;
-    ::boost::asio::ip::tcp::socket _socket;
+    virtual ~net_stream() = default;
+    virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
+    virtual void disconnect() = 0;
+    virtual size_t write(void* buffer, size_t len) throw(...) = 0;
+    virtual size_t read(void* buffer, size_t len) throw(...) = 0;
 };
 
-_VOOST_END
-_VEE_END
+namespace tcp {
+
+enum class error_code: int
+{
+    connection_failure = 1,
+    send_failure,
+    recv_failure,
+    invalid_data,
+    user,
+};
+
+class tcp_server_controller abstract
+{
+public:
+    virtual ~tcp_server_controller() = default;
+    virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
+    virtual void close() = 0;
+};
+
+::std::shared_ptr<tcp_server_controller> create_server(unsigned short port);
+::std::shared_ptr<net_stream> create_stream();
+
+} // namespace tcp
+
+namespace udp {
+
+} // namespace udp
+
+} // namespace net
+} // namespace voost
+} // namespace vee
 
 #endif // !_VEE_VOOST_NET_H_

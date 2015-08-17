@@ -14,7 +14,6 @@
     <ClInclude Include="..\vee\actor.h" />
     <ClInclude Include="..\vee\delegate.h" />
     <ClInclude Include="..\vee\flag.h" />
-    <ClInclude Include="..\vee\object_pool.h" />
     <ClInclude Include="..\vee\queue.h" />
     <ClInclude Include="..\vee\macro.h" />
     <ClInclude Include="..\vee\lock.h" />
@@ -25,12 +24,15 @@
     <ClInclude Include="..\vee\vee.h" />
     <ClInclude Include="..\vee\voost\net.h" />
     <ClInclude Include="..\vee\voost\shared_memory.h" />
+    <ClInclude Include="..\vee\voost\stream.h" />
+    <ClInclude Include="..\vee\voost\xnet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp" />
-    <ClCompile Include="voost\net\tcp_client_impl.cpp" />
+    <ClCompile Include="voost\net\stream.cpp" />
+    <ClCompile Include="voost\net\xnet.cpp" />
+    <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
     <ClCompile Include="xmain.cpp" />
-    <ClCompile Include="voost\shared_memory\shared_memory_impl.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{65A082DC-494F-4576-B661-11BE002FF2E9}</ProjectGuid>
@@ -67,7 +69,7 @@
     <IntDir>$(SolutionDir)\obj\x32\debug\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-mt-gd-1_0</TargetName>
+    <TargetName>$(ProjectName)-vc120-gd-1_0</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -75,7 +77,7 @@
     <IntDir>$(SolutionDir)\obj\x32\release\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-mt-1_0</TargetName>
+    <TargetName>$(ProjectName)-vc120-1_0</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,6 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
