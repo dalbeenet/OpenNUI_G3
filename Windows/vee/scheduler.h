@@ -10,8 +10,8 @@ template <class FTy>
 class scheduler
 {
 public:
-    scheduler(unsigned int count, unsigned int mailbox_size):
-        actor_group(count, mailbox_size)
+    scheduler(unsigned int init_actors, unsigned int mailbox_size):
+        actor_group(init_actors, mailbox_size)
     {
         
     }
