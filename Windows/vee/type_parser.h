@@ -15,7 +15,7 @@ namespace vee {
     struct function_type_parser < RTy(Args ...) >
     {
         typedef RTy return_type;
-        typedef std::tuple<Args ...> argspack_type;
+        typedef std::tuple<Args ...> argstuple_type;
         template <int INDEX>
         struct argtype
         {

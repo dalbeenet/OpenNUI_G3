@@ -6,7 +6,7 @@ using namespace std;
 namespace xkernel { 
 namespace scheduler {
 
-using scheduler_t = vee::scheduler<void(task_id, void* arg)>;
+using scheduler_t = vee::scheduler<void(::std::int64_t*)>;
 unique_ptr<scheduler_t> scheduler_ptr(nullptr);
 
 void initialize(unsigned int init_actors, unsigned int mailbox_size)
@@ -24,6 +24,16 @@ void dispose()
         scheduler_ptr.release();
         scheduler_ptr = nullptr;
     }
+}
+
+void request(task_t& task, ::std::int64_t* arg)
+{
+    scheduler_ptr->request(task, arg);
+}
+
+void request(task_t&& task, ::std::int64_t* arg)
+{
+    scheduler_ptr->request(::std::move(task), arg);
 }
 
 } // namespace scheduler 

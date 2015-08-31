@@ -31,9 +31,10 @@ class actor < RTy(Args ...) >
         exit_ok,
     };
 public:
-    typedef vee::delegate<RTy(Args ...)> delegate;
-    typedef std::tuple<Args ...> argstuple;
-    typedef std::pair<delegate, argstuple> mail;
+    using delegate_t = vee::delegate<RTy(Args ...)>;
+    using argstuple_t = std::tuple<Args ...>;
+    using mail_t = std::pair<delegate_t, argstuple_t>;
+
     actor(std::size_t mailbox_size):
         _queue_size(mailbox_size),
         _mailbox(mailbox_size),
@@ -41,7 +42,7 @@ public:
     {
         _spawn();
     }
-    actor(vee::syncronized_ringqueue<mail>* mailbox_ptr):
+    actor(vee::syncronized_ringqueue<mail_t>* mailbox_ptr):
         _queue_size(mailbox_ptr->capacity()),
         _mailbox(0),
         _mailbox_ptr(&mailbox_ptr)
@@ -56,13 +57,11 @@ public:
     template <class Delegate, typename ...FwdArgs>
     inline int request(Delegate&& _delegate, FwdArgs&& ... args)
     {
-        return this->request(std::forward<Delegate>(_delegate), std::make_tuple(args ...));
+        return this->request_with_argstuple(std::forward<Delegate>(_delegate), std::make_tuple(args ...));
     }
     template <class Delegate, class ArgsTuple>
-    int request(Delegate&& _delegate, ArgsTuple&& _tuple)
+    int request_with_argstuple(Delegate&& _delegate, ArgsTuple&& _tuple)
     {
-        /*_setup_delegate(std::forward<Delegate>(_delegate));
-        _setup_argspack(std::forward<ArgsTuple>(_tuple));*/
         if (!_workable || _state.load() == DEAD)
         {
             return -1;
@@ -159,15 +158,15 @@ protected:
     }
     bool _epoch()
     {
-        mail current_job;
+        mail_t current_job;
         while (true)
         {
             if (!(_mailbox_ptr->dequeue(current_job)))
             {
                 return false;
             }
-            delegate& e = current_job.first;
-            argstuple& args = current_job.second;
+            delegate_t& e = current_job.first;
+            argstuple_t& args = current_job.second;
             e(args);
             int old_counter = --_mailbox_counter;
             if (old_counter == 0)
@@ -191,8 +190,8 @@ private:
     void operator=(actor < RTy(Args ...) >&&) = delete;
 private:
     vee::signal_channel<sigid> _sigch;
-    vee::syncronized_ringqueue<mail> _mailbox;
-    vee::syncronized_ringqueue<mail>* _mailbox_ptr;
+    vee::syncronized_ringqueue<mail_t> _mailbox;
+    vee::syncronized_ringqueue<mail_t>* _mailbox_ptr;
     std::atomic<int> _mailbox_counter = 0;
     std::thread _thread;
     std::atomic<int> _state = SPAWN;

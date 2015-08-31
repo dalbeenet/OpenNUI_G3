@@ -230,6 +230,14 @@ private:
     _indexing_container_t _idx_container;
 };
 
+template <class FTy>
+delegate<FTy> make_delegate(std::function<FTy> f)
+{
+    delegate<FTy> e;
+    e += f;
+    return e;
+}
+
 _VEE_END
 
 #endif // _VEE_DELEGATE_H_
