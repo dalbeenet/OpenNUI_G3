@@ -12,12 +12,12 @@ Desc    : Entry point of nui framework core
 
 using namespace vee;
 
-void __cdecl f1(int64_t*)
+void __cdecl f1(void*)
 {
     puts(__FUNCSIG__);
 }
 
-void __stdcall f2(int64_t*)
+void __stdcall f2(void*)
 {
     puts(__FUNCSIG__);
 }
@@ -26,8 +26,8 @@ int main()
 {
     //TODO: Scheduler test
     xkernel::scheduler::initialize();
-    xkernel::scheduler::request(vee::make_delegate<void(int64_t*)>(f1), nullptr);
-    xkernel::scheduler::request(vee::make_delegate<void(int64_t*)>(f2), nullptr);
+    xkernel::scheduler::request(f1, nullptr);
+    xkernel::scheduler::request(f2, nullptr);
     getch();
     xkernel::scheduler::dispose();
     return 0;

@@ -3,11 +3,11 @@
 
 #include <kernel/xkernel/parameters.h>
 #include <vee/delegate.h>
-#include <cstdint>
 
 namespace xkernel {
 
-using task_t = ::vee::delegate<void(::std::int64_t*)>;
+using task_sig = void(void*);
+using task_t = ::vee::delegate<task_sig>;
 
 enum class task_id
 {
@@ -23,9 +23,11 @@ void initialize(unsigned int init_actors = parameters::INITIAL_ACTORS, unsigned 
 void dispose();
 
 // Request task to scheduler (Reference delegate)
-void request(task_t& task, ::std::int64_t* arg);
+void request(task_t& task, void* arg);
 // Request task to scheduler (RReference delegate)
-void request(task_t&& task, ::std::int64_t* arg);
+void request(task_t&& task, void* arg);
+// Request task to scheduler (Function type)
+void request(std::function<task_sig> function, void* arg);
 
 } // namespace scheduler
 
