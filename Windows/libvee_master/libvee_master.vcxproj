@@ -25,13 +25,16 @@
     <ClInclude Include="..\vee\voost\net.h" />
     <ClInclude Include="..\vee\voost\shared_memory.h" />
     <ClInclude Include="..\vee\voost\stream.h" />
+    <ClInclude Include="..\vee\voost\timer.h" />
     <ClInclude Include="..\vee\voost\xnet.h" />
+    <ClInclude Include="..\vee\voost\xtimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp" />
     <ClCompile Include="voost\net\stream.cpp" />
     <ClCompile Include="voost\net\xnet.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
+    <ClCompile Include="voost\timer\xtimer.cpp" />
     <ClCompile Include="xmain.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -93,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-gd-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-sgd-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -114,7 +117,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-s-1_58.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

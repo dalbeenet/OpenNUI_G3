@@ -7,7 +7,6 @@ Desc    : Entry point of nui framework core
 
 #include <iostream>
 #include <kernel/kernel.h>
-#include <vee/delegate.h>
 #include <conio.h>
 
 using namespace vee;

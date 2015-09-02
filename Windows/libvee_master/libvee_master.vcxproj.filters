@@ -16,6 +16,9 @@
     <Filter Include="vee\voost\net">
       <UniqueIdentifier>{37a26972-6e47-42a2-accd-ab4fbe588f26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\voost\timer">
+      <UniqueIdentifier>{8523041c-4ba5-4db2-9f7f-cce9b409bc6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vee\vee.h">
@@ -54,14 +57,20 @@
     <ClInclude Include="..\vee\voost\shared_memory.h">
       <Filter>vee\voost</Filter>
     </ClInclude>
-    <ClInclude Include="..\vee\voost\net.h">
-      <Filter>vee\voost</Filter>
-    </ClInclude>
     <ClInclude Include="..\vee\voost\stream.h">
       <Filter>vee\voost</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\voost\xtimer.h">
+      <Filter>vee\voost\timer</Filter>
+    </ClInclude>
     <ClInclude Include="..\vee\voost\xnet.h">
-      <Filter>vee\voost</Filter>
+      <Filter>vee\voost\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\net.h">
+      <Filter>vee\voost\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\timer.h">
+      <Filter>vee\voost\timer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="voost\net\xnet.cpp">
       <Filter>vee\voost\net</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\timer\xtimer.cpp">
+      <Filter>vee\voost\timer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
