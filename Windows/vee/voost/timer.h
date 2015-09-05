@@ -1,6 +1,9 @@
 #ifndef _VEE_VOOST_TIMER_H_
 #define _VEE_VOOST_TIMER_H_
 
+#include <vee/delegate.h>
+#include <memory>
+
 namespace vee {
 namespace voost {
 namespace timer {
@@ -33,12 +36,16 @@ class async_timer abstract
 {
 public:
     using timer_tick = unsigned int;
-    using delegate_t = delegate<void(timer_tick)>;
+    using delegate_t = vee::delegate<void(timer_tick)>;
     virtual ~async_timer() = default;
+    virtual bool run(const unsigned int time_period_ms, const delegate_t& callback) = 0;
     virtual bool run(const second_type time_period, const delegate_t& callback) = 0;
     virtual bool run(const millisecond_type time_period, const delegate_t& callback) = 0;
     virtual bool stop() = 0;
+    virtual bool is_running() const = 0;
 };
+
+std::shared_ptr<async_timer> create_timer();
 
 } // namespace timer
 } // namespace voost
