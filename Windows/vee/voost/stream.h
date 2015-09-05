@@ -1,13 +1,11 @@
 #ifndef _VEE_VOOST_STREAM_H_
 #define _VEE_VOOST_STREAM_H_
 #include <vee/voost/net.h>
-#include <boost/asio.hpp>
+#include <vee/voost/asio.h>
 
 namespace vee {
 namespace voost {
 namespace net {
-
-extern ::boost::asio::io_service net_io_service;
 
 namespace tcp {
 
@@ -20,8 +18,7 @@ class tcp_server: public tcp_server_controller
 public:
     using socket_t = ::boost::asio::ip::tcp::socket;
     using endpoint = ::boost::asio::ip::tcp::endpoint;
-    tcp_server(unsigned short port);
-    tcp_server(unsigned short port, ::boost::asio::io_service& io_service);
+    tcp_server(unsigned short port, ::boost::asio::io_service& io_service = io_service_sigleton::get().io_service());
     tcp_server(tcp_server&& other);
     virtual ~tcp_server();
     virtual void close() override;

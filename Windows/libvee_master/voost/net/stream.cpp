@@ -10,15 +10,6 @@ static inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
     return ::boost::asio::ip::address::from_string(str);
 }
 
-tcp_server::tcp_server(unsigned short port):
-_host_io_service(::vee::voost::net::net_io_service),
-_socket(_host_io_service),
-_endpoint(boost::asio::ip::tcp::v4(), port),
-_acceptor(_host_io_service, _endpoint)
-{
-
-}
-
 tcp_server::tcp_server(unsigned short port, ::boost::asio::io_service& io_service):
 _host_io_service(io_service),
 _socket(_host_io_service),
@@ -56,7 +47,7 @@ void tcp_server::close()
 }
 
 tcp_stream::tcp_stream():
-_host_io_service(::vee::voost::net::net_io_service),
+_host_io_service(io_service_sigleton::get().io_service()),
 _socket(_host_io_service)
 {
 

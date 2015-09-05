@@ -23,11 +23,9 @@ std::shared_ptr<async_timer> create_timer()
 
 namespace xtimer {
 
-io_service_wrapper g_wrapper;
-
-xasync_timer::xasync_timer(io_service_wrapper& io_service_wrapper):
-_io_service(io_service_wrapper.io_service),
-_timer(io_service_wrapper.io_service)
+xasync_timer::xasync_timer(io_service_t& io_service):
+_io_service(io_service),
+_timer(io_service)
 {
 
 }

@@ -63,14 +63,14 @@
     <ClInclude Include="..\vee\voost\xtimer.h">
       <Filter>vee\voost\timer</Filter>
     </ClInclude>
-    <ClInclude Include="..\vee\voost\xnet.h">
-      <Filter>vee\voost\net</Filter>
-    </ClInclude>
     <ClInclude Include="..\vee\voost\net.h">
       <Filter>vee\voost\net</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\voost\timer.h">
       <Filter>vee\voost\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\asio.h">
+      <Filter>vee\voost</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,11 +84,9 @@
     <ClCompile Include="voost\net\stream.cpp">
       <Filter>vee\voost\net</Filter>
     </ClCompile>
-    <ClCompile Include="voost\net\xnet.cpp">
-      <Filter>vee\voost\net</Filter>
-    </ClCompile>
     <ClCompile Include="voost\timer\xtimer.cpp">
       <Filter>vee\voost\timer</Filter>
     </ClCompile>
+    <ClCompile Include="voost\asio_impl.cpp" />
   </ItemGroup>
 </Project>
