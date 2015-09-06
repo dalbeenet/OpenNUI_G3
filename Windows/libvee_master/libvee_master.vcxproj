@@ -35,7 +35,6 @@
     <ClCompile Include="voost\net\stream.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
     <ClCompile Include="voost\timer\xtimer.cpp" />
-    <ClCompile Include="xmain.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{65A082DC-494F-4576-B661-11BE002FF2E9}</ProjectGuid>

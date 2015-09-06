@@ -13,10 +13,13 @@
     <Filter Include="vee\voost\shared_memory">
       <UniqueIdentifier>{67d10081-b505-43ee-874e-982f4877cbe9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vee\voost\net">
+    <Filter Include="vee\voost\asio">
+      <UniqueIdentifier>{caabec4d-6661-48b4-b1cf-f0441c8a6f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\voost\asio\net">
       <UniqueIdentifier>{37a26972-6e47-42a2-accd-ab4fbe588f26}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vee\voost\timer">
+    <Filter Include="vee\voost\asio\timer">
       <UniqueIdentifier>{8523041c-4ba5-4db2-9f7f-cce9b409bc6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -61,32 +64,33 @@
       <Filter>vee\voost</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\voost\xtimer.h">
-      <Filter>vee\voost\timer</Filter>
+      <Filter>vee\voost\asio\timer</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\voost\net.h">
-      <Filter>vee\voost\net</Filter>
+      <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\voost\timer.h">
-      <Filter>vee\voost\timer</Filter>
+      <Filter>vee\voost\asio\timer</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\voost\asio.h">
-      <Filter>vee\voost</Filter>
+      <Filter>vee\voost\asio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">
       <Filter>vee\lock_impl</Filter>
     </ClCompile>
-    <ClCompile Include="xmain.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp">
       <Filter>vee\voost\shared_memory</Filter>
     </ClCompile>
     <ClCompile Include="voost\net\stream.cpp">
-      <Filter>vee\voost\net</Filter>
+      <Filter>vee\voost\asio\net</Filter>
     </ClCompile>
     <ClCompile Include="voost\timer\xtimer.cpp">
-      <Filter>vee\voost\timer</Filter>
+      <Filter>vee\voost\asio\timer</Filter>
     </ClCompile>
-    <ClCompile Include="voost\asio_impl.cpp" />
+    <ClCompile Include="voost\asio_impl.cpp">
+      <Filter>vee\voost\asio</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
