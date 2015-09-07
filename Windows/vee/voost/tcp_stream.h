@@ -11,7 +11,7 @@ namespace tcp {
 class tcp_server;
 class tcp_stream;
 
-class tcp_server: public tcp_server_controller
+class tcp_server: public server_interface
 {
     DISALLOW_COPY_AND_ASSIGN(tcp_server);
 public:
@@ -22,6 +22,7 @@ public:
     virtual ~tcp_server();
     virtual void close() override;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
+    inline io_service_t& get_io_service() const { return _host_io_service; }
 protected:
     ::boost::asio::io_service& _host_io_service;
     ::boost::asio::ip::tcp::endpoint _endpoint;
@@ -44,6 +45,8 @@ public:
     virtual void disconnect() override;
     virtual net::size_t write(void* buffer, net::size_t len) throw(...) override;
     virtual net::size_t read(void* buffer, net::size_t len) throw(...) override;
+    inline io_service_t& get_io_service() const { return _host_io_service; }
+
 public:
     ::boost::asio::io_service& _host_io_service;
     socket_t _socket;

@@ -120,9 +120,9 @@ void tcp_stream::disconnect()
     _socket.close();
 }
 
-::std::shared_ptr<tcp_server_controller> create_server(unsigned short port)
+::std::shared_ptr<server_interface> create_server(unsigned short port)
 {
-    ::std::shared_ptr<tcp_server_controller> server = ::std::make_shared<tcp_server>(port);
+    ::std::shared_ptr<server_interface> server = ::std::make_shared<tcp_server>(port);
     return server;
 }
 

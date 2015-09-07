@@ -8,7 +8,27 @@ namespace net {
 namespace ws {
 
 //class ws_stream;
-//class ws_server;
+class websocket_server;
+
+class websocket_server: public server_interface
+{
+    DISALLOW_COPY_AND_ASSIGN(websocket_server);
+public:
+    using tcp_server = tcp::tcp_server;
+    using tcp_stream = tcp::tcp_stream;
+    using socket_t = ::boost::asio::ip::tcp::socket;
+    using endpoint = ::boost::asio::ip::tcp::endpoint;
+    using io_service_t = ::boost::asio::io_service;
+    websocket_server(unsigned short port, io_service_t& io_service = io_service_sigleton::get().io_service());
+    websocket_server(websocket_server&& other);
+    virtual ~websocket_server();
+    virtual void close() override;
+    virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
+    inline io_service_t& get_io_service() const { return _host_io_service; }
+protected:
+    ::boost::asio::io_service& _host_io_service;
+    tcp_server _tcp_server;
+};
 
 //class ws_server: public tcp::tcp_server
 //{

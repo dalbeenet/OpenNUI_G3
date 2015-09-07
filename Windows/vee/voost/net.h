@@ -34,15 +34,15 @@ enum class error_code: int
     user,
 };
 
-class tcp_server_controller abstract
+class server_interface abstract
 {
 public:
-    virtual ~tcp_server_controller() = default;
+    virtual ~server_interface() = default;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
     virtual void close() = 0;
 };
 
-::std::shared_ptr<tcp_server_controller> create_server(unsigned short port);
+::std::shared_ptr<server_interface> create_server(unsigned short port);
 ::std::shared_ptr<net_stream> create_stream();
 
 } // namespace tcp
@@ -56,6 +56,14 @@ namespace ws {
 enum class error_code: int
 {
     bad_request = 400,
+};
+
+class server_interface abstract
+{
+public:
+    virtual ~server_interface() = default;
+    virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
+    virtual void close() = 0;
 };
 
 ::std::shared_ptr<net_stream> create_stream();
