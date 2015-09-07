@@ -22,6 +22,9 @@
     <Filter Include="vee\voost\asio\timer">
       <UniqueIdentifier>{8523041c-4ba5-4db2-9f7f-cce9b409bc6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\exception">
+      <UniqueIdentifier>{57e36143-cd10-4979-81d3-9aeb01af4e65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vee\vee.h">
@@ -60,9 +63,6 @@
     <ClInclude Include="..\vee\voost\shared_memory.h">
       <Filter>vee\voost</Filter>
     </ClInclude>
-    <ClInclude Include="..\vee\voost\stream.h">
-      <Filter>vee\voost</Filter>
-    </ClInclude>
     <ClInclude Include="..\vee\voost\xtimer.h">
       <Filter>vee\voost\asio\timer</Filter>
     </ClInclude>
@@ -75,6 +75,12 @@
     <ClInclude Include="..\vee\voost\asio.h">
       <Filter>vee\voost\asio</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\voost\tcp_stream.h">
+      <Filter>vee\voost\asio\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\ws_stream.h">
+      <Filter>vee\voost\asio\net</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">
@@ -83,14 +89,18 @@
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp">
       <Filter>vee\voost\shared_memory</Filter>
     </ClCompile>
-    <ClCompile Include="voost\net\stream.cpp">
-      <Filter>vee\voost\asio\net</Filter>
-    </ClCompile>
     <ClCompile Include="voost\timer\xtimer.cpp">
       <Filter>vee\voost\asio\timer</Filter>
     </ClCompile>
     <ClCompile Include="voost\asio_impl.cpp">
       <Filter>vee\voost\asio</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\net\tcp_stream.cpp">
+      <Filter>vee\voost\asio\net</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\net\ws_stream.cpp" />
+    <ClCompile Include="exception\exception_impl.cpp">
+      <Filter>vee\exception</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

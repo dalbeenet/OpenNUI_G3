@@ -6,3 +6,9 @@
 /Windows/OpenNUI_G3.sdf
 /Windows/obj/x32/debug
 /Windows/bin/x32/debug
+/Windows/bin/x32/release
+/Windows/obj/x32/release/libvee_master/libvee_master.tlog
+/Windows/obj/x32/release/Core/Core.tlog
+/Windows/obj/x32/release/Core
+/Windows/obj/x32/release/libopennui_master_G3/libopenn.37346467.tlog
+/Windows/obj/x32/release

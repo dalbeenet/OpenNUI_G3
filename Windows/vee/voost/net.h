@@ -51,6 +51,17 @@ namespace udp {
 
 } // namespace udp
 
+namespace ws {
+
+enum class error_code: int
+{
+    bad_request = 400,
+};
+
+::std::shared_ptr<net_stream> create_stream();
+
+} // namespace ws
+
 } // namespace net
 } // namespace voost
 } // namespace vee

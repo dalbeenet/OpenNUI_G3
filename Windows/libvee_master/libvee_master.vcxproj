@@ -25,14 +25,17 @@
     <ClInclude Include="..\vee\voost\asio.h" />
     <ClInclude Include="..\vee\voost\net.h" />
     <ClInclude Include="..\vee\voost\shared_memory.h" />
-    <ClInclude Include="..\vee\voost\stream.h" />
+    <ClInclude Include="..\vee\voost\tcp_stream.h" />
     <ClInclude Include="..\vee\voost\timer.h" />
+    <ClInclude Include="..\vee\voost\ws_stream.h" />
     <ClInclude Include="..\vee\voost\xtimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="exception\exception_impl.cpp" />
     <ClCompile Include="lock\lock_impl.cpp" />
     <ClCompile Include="voost\asio_impl.cpp" />
-    <ClCompile Include="voost\net\stream.cpp" />
+    <ClCompile Include="voost\net\tcp_stream.cpp" />
+    <ClCompile Include="voost\net\ws_stream.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
     <ClCompile Include="voost\timer\xtimer.cpp" />
   </ItemGroup>
@@ -71,7 +74,7 @@
     <IntDir>$(SolutionDir)\obj\x32\debug\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-gd-1_0</TargetName>
+    <TargetName>$(ProjectName)-vc120-sgd-1_0</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -79,7 +82,7 @@
     <IntDir>$(SolutionDir)\obj\x32\release\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_58_0);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_58_0_LIB)\x32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-vc120-1_0</TargetName>
+    <TargetName>$(ProjectName)-vc120-s-1_0</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
