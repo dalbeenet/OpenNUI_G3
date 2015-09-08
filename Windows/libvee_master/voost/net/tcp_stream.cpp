@@ -92,10 +92,10 @@ void tcp_stream::connect(const char* ip_addr, port_t port) throw(...)
     }
 }
 
-net::size_t tcp_stream::write(void* buffer, net::size_t len) throw(...)
+net::size_t tcp_stream::write(void* buffer, net::size_t buf_capacity) throw(...)
 {
     ::boost::system::error_code error;
-    net::size_t write_len = (net::size_t)_socket.write_some(::boost::asio::buffer(buffer, len), error);
+    net::size_t write_len = (net::size_t)_socket.write_some(::boost::asio::buffer(buffer, buf_capacity), error);
     if (error)
     {
         throw ::vee::exception("Send failure!", (int)error_code::send_failure);
@@ -103,11 +103,11 @@ net::size_t tcp_stream::write(void* buffer, net::size_t len) throw(...)
     return write_len;
 }
 
-net::size_t tcp_stream::read(void* buffer, net::size_t len) throw(...)
+net::size_t tcp_stream::read(void* buffer, net::size_t buf_capacity) throw(...)
 {
     ::boost::system::error_code error;
-    memset(buffer, 0, len);
-    net::size_t read_len = (net::size_t)_socket.read_some(::boost::asio::buffer(buffer, len), error);
+    memset(buffer, 0, buf_capacity);
+    net::size_t read_len = (net::size_t)_socket.read_some(::boost::asio::buffer(buffer, buf_capacity), error);
     if (error)
     {
         throw ::vee::exception("Recv failure!", (int)error_code::recv_failure);

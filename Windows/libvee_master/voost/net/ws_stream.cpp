@@ -43,6 +43,47 @@ void websocket_server::close()
     return stream;
 }
 
+websocket_stream::websocket_stream():
+_host_io_service(io_service_sigleton::get().io_service()),
+_tcp_stream(_host_io_service)
+{
+
+}
+
+websocket_stream::websocket_stream(io_service_t& io_service):
+_host_io_service(io_service),
+_tcp_stream(io_service)
+{
+
+}
+
+websocket_stream::~websocket_stream()
+{
+
+}
+
+void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
+{
+    //nothing to do.
+}
+
+void websocket_stream::disconnect()
+{
+    _tcp_stream.disconnect();
+}
+
+net::size_t websocket_stream::write(void* buffer, net::size_t buf_capacity) throw(...)
+{
+    //TODO: ADD WEBSOCKET HEADER (RFC6455)
+    // and call _tcp_stream.write()
+}
+
+net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw(...)
+{
+    //TODO: ANALYZE WEBSOCKET HEADER
+    // and call _tcp_stream.read()
+}
+
 } // namespace ws
 } // namespace net
 } // namespace voost

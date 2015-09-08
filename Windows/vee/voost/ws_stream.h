@@ -7,8 +7,8 @@ namespace voost {
 namespace net {
 namespace ws {
 
-//class ws_stream;
 class websocket_server;
+class websocket_stream;
 
 class websocket_server: public server_interface
 {
@@ -28,6 +28,27 @@ public:
 protected:
     ::boost::asio::io_service& _host_io_service;
     tcp_server _tcp_server;
+};
+
+class websocket_stream: public net_stream
+{
+    DISALLOW_COPY_AND_ASSIGN(websocket_stream);
+public:
+    using tcp_stream = tcp::tcp_stream;
+    using socket_t = ::boost::asio::ip::tcp::socket;
+    using endpoint = ::boost::asio::ip::tcp::endpoint;
+    using io_service_t = ::boost::asio::io_service;
+    websocket_stream();
+    explicit websocket_stream(io_service_t& io_service);
+    virtual ~websocket_stream();
+    virtual void connect(const char* ip_addr, port_t port) throw(...) override;
+    virtual void disconnect() override;
+    virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;
+    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
+    inline io_service_t& get_io_service() const { return _host_io_service; }
+protected:
+    io_service_t& _host_io_service;
+    tcp_stream _tcp_stream;
 };
 
 //class ws_server: public tcp::tcp_server

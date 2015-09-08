@@ -45,11 +45,10 @@ public:
     virtual ~tcp_stream();
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
-    virtual net::size_t write(void* buffer, net::size_t len) throw(...) override;
-    virtual net::size_t read(void* buffer, net::size_t len) throw(...) override;
+    virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;
+    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
     inline io_service_t& get_io_service() const { return _host_io_service; }
-
-public:
+protected:
     io_service_t& _host_io_service;
     socket_t _socket;
 };
