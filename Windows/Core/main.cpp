@@ -8,6 +8,7 @@ Desc    : Entry point of nui framework core
 #include <iostream>
 #include <kernel/kernel.h>
 #include <vee/voost/timer.h>
+#include <vee/voost/net.h>
 #include <conio.h>
 
 void print_line()
@@ -45,6 +46,12 @@ int main()
         printf("Timer test\npress any key to stop a timer...\n");
         auto timer = vee::voost::timer::create_timer();
         timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
+        getch();
+        print_line();
+    }
+    {
+        auto server = vee::voost::net::websocket::create_server(1992);
+        auto session = server->accept();
         getch();
         print_line();
     }

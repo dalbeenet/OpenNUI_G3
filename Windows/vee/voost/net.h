@@ -51,7 +51,7 @@ namespace udp {
 
 } // namespace udp
 
-namespace ws {
+namespace websocket {
 
 enum class error_code: int
 {
@@ -66,6 +66,7 @@ public:
     virtual void close() = 0;
 };
 
+::std::shared_ptr<server_interface> create_server(unsigned short port);
 ::std::shared_ptr<net_stream> create_stream();
 
 } // namespace ws

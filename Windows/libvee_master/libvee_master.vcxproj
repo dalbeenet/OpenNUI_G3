@@ -19,6 +19,7 @@
     <ClInclude Include="..\vee\lock.h" />
     <ClInclude Include="..\vee\scheduler.h" />
     <ClInclude Include="..\vee\signal_channel.h" />
+    <ClInclude Include="..\vee\string.h" />
     <ClInclude Include="..\vee\tuple_unpacker.h" />
     <ClInclude Include="..\vee\type_parser.h" />
     <ClInclude Include="..\vee\vee.h" />

@@ -81,6 +81,9 @@
     <ClInclude Include="..\vee\voost\ws_stream.h">
       <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\string.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">
