@@ -83,13 +83,7 @@ client_header& client_header::operator=(client_header&& rhs)
 
 void client_header::print()
 {
-    printf("host: %s\n\
-                upgrade: %s\n\
-                      connection: %s\n\
-                                 origin: %s\n\
-                                            sec_websocket_key: %s\n\
-                                                       sec_websocket_protocol: %s\n\
-                                                                  sec_websocket_version: %s\n",
+    printf("Host: %s\nUpgrade: %s\nConnection: %s\nOrigin: %s\nSec_websocket_key: %s\nSec_websocket_protocol: %s\nSec_websocket_version: %s\n",
            host.data(),
            upgrade.data(),
            connection.data(),
@@ -102,7 +96,7 @@ void client_header::print()
 
 void client_header::parse(const char* data)
 {
-    
+    return parse(make_string(data));
 }
 
 void client_header::parse(string& data)
@@ -119,8 +113,70 @@ void client_header::parse(string& data)
         {
             data_by_lines.push_back(it);
         }
+    } 
+
+    auto get_value = [](const string& dst)-> std::pair<bool, string>
+    {
+        auto pos = dst.find(':');
+        if (pos == string::npos)
+        {
+            return std::make_pair(false, "");
+        }
+        else
+        {
+            string buffer(dst.substr(pos + 1));
+            string result = trim(buffer);
+            return std::make_pair(true, std::move(result));
+        }
+    };
+
+    /*printf("DATA RECIEVED --------------\n");
+    for (auto& it : data_by_lines)
+    {
+        printf("%s\n", it.data());
+    }*/
+
+    for (auto& it : data_by_lines)
+    {
+        auto set_value = [](::std::pair<bool, string>& result, string& dst) -> void
+        {
+            if (result.first == true)
+                dst = std::move(result.second);
+        };
+
+        if (strstr(it.data(), "Host:"))
+        {
+            set_value(get_value(it), host);
+        }
+        else if (strstr(it.data(), "Upgrade:"))
+        {
+            set_value(get_value(it), upgrade);
+        }
+        else if (strstr(it.data(), "Connection:"))
+        {
+            set_value(get_value(it), connection);
+        }
+        else if (strstr(it.data(), "Sec-WebSocket-Key:"))
+        {
+            set_value(get_value(it), sec_websocket_key);
+        }
+        else if (strstr(it.data(), "Origin:"))
+        {
+            set_value(get_value(it), origin);
+        }
+        else if (strstr(it.data(), "Sec-WebSocket-Protocol:"))
+        {
+            set_value(get_value(it), sec_websocket_protocol);
+        }
+        else if (strstr(it.data(), "Sec-WebSocket-Version:"))
+        {
+            set_value(get_value(it), sec_web_socket_version);
+        }
+        else
+        {
+            continue;
+        }
     }
-    //TODO: PARSING 
 }
 
 websocket_server::websocket_server(unsigned short port, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
@@ -155,6 +211,10 @@ void websocket_server::close()
     {
         ::std::array<char, 4096> buffer;
         tcp_stream->read(buffer.data(), buffer.size());
+        //::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>();
+        client_header header;
+        header.parse(make_string(buffer.data()));
+        header.print();
     }
     catch (vee::exception& e)
     {

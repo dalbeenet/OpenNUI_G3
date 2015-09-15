@@ -7,6 +7,12 @@ namespace vee {
 
 using string = std::string;
 
+inline string make_string(const char* str)
+{
+    string s(str);
+    return s;
+}
+
 inline string trim_left(const string& str)
 {
     string::size_type n = str.find_first_not_of(" \t\v\n");
