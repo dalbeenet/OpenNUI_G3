@@ -90,7 +90,7 @@ client_header& client_header::operator=(client_header&& rhs)
 
 void client_header::print()
 {
-    printf("Request-Uri: %s\nHost: %s\nUpgrade: %s\nConnection: %s\nOrigin: %s\nSec_websocket_key: %s\nSec_websocket_protocol: %s\nSec_websocket_version: %s\n",
+    printf("Request-Uri: %s\nHost: %s\nUpgrade: %s\nConnection: %s\nOrigin: %s\nSec-Websocket-Key: %s\nSec-Websocket-Protocol: %s\nSec-Websocket-Version: %s\n",
            request_uri.data(),
            host.data(),
            upgrade.data(),
@@ -278,9 +278,12 @@ bool websocket_server::_handshake(net_stream& raw_socket)
         
         string magic_string(header.sec_websocket_key);
         magic_string.append(RFC4122_GUID::get());
-        // Hashing
+        // Hashing via SHA-1
         auto hash_code = sha1_hashing(magic_string);
         print_hash_code(hash_code.data());
+        // Encoding via Base64
+        auto encoded_hash = base64::encode(hash_code);
+        printf("Base64: %s\n", encoded_hash.data());
     }
     catch (vee::exception& e)
     {

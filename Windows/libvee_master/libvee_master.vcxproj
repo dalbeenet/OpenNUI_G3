@@ -39,6 +39,7 @@
     <ClCompile Include="voost\net\tcp_stream.cpp" />
     <ClCompile Include="voost\net\ws_stream.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
+    <ClCompile Include="voost\string\base64.cpp" />
     <ClCompile Include="voost\string\utilites.cpp" />
     <ClCompile Include="voost\timer\xtimer.cpp" />
   </ItemGroup>

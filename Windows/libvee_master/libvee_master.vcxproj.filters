@@ -112,5 +112,6 @@
       <Filter>vee\exception</Filter>
     </ClCompile>
     <ClCompile Include="voost\string\utilites.cpp" />
+    <ClCompile Include="voost\string\base64.cpp" />
   </ItemGroup>
 </Project>
