@@ -93,11 +93,11 @@ void client_header::print()
            host.data(),
            upgrade.data(),
            connection.data(),
-           origin.data(),
-           sec_websocket_key.data(),
-           sec_websocket_protocol.data(),
-           sec_web_socket_version.data()
-           );
+origin.data(),
+sec_websocket_key.data(),
+sec_websocket_protocol.data(),
+sec_web_socket_version.data()
+);
 }
 
 void client_header::parse(const char* data)
@@ -119,7 +119,7 @@ void client_header::parse(string& data)
         {
             data_by_lines.push_back(it);
         }
-    } 
+    }
 
     auto get_value = [](const string& dst)-> std::pair<bool, string>
     {
@@ -139,7 +139,7 @@ void client_header::parse(string& data)
     /*printf("DATA RECIEVED --------------\n");
     for (auto& it : data_by_lines)
     {
-        printf("%s\n", it.data());
+    printf("%s\n", it.data());
     }*/
 
     for (auto& it : data_by_lines)
@@ -191,7 +191,32 @@ void client_header::parse(string& data)
 
 bool client_header::is_valid() const
 {
-    
+    if (
+        (request_uri.find("GET /chat HTTP/1.1") == string::npos) ||
+        (upgrade.find("Websocket") == string::npos)  ||
+        (connection.find("Upgrade") == string::npos) ||
+        (sec_web_socket_version.compare("13") == 0)
+        //! 다음이 생략됨
+        //! HOST 헤더 유효성 검사
+        //! Sec-Websocket-Key 헤더 유효성 검사
+        //! Origin 헤더 유효성 검사
+        )
+        {
+            return false;
+        }
+    return true;
+}
+
+void client_header::clear()
+{
+    request_uri.clear();
+    host.clear();
+    upgrade.clear();
+    connection.clear();
+    origin.clear();
+    sec_websocket_key.clear();
+    sec_web_socket_version.clear();
+    sec_websocket_protocol.clear();
 }
 
 websocket_server::websocket_server(unsigned short port, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
