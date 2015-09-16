@@ -88,7 +88,8 @@ client_header& client_header::operator=(client_header&& rhs)
 
 void client_header::print()
 {
-    printf("Host: %s\nUpgrade: %s\nConnection: %s\nOrigin: %s\nSec_websocket_key: %s\nSec_websocket_protocol: %s\nSec_websocket_version: %s\n",
+    printf("Request-Uri: %s\nHost: %s\nUpgrade: %s\nConnection: %s\nOrigin: %s\nSec_websocket_key: %s\nSec_websocket_protocol: %s\nSec_websocket_version: %s\n",
+           request_uri.data(),
            host.data(),
            upgrade.data(),
            connection.data(),
@@ -149,7 +150,11 @@ void client_header::parse(string& data)
                 dst = std::move(result.second);
         };
 
-        if (strstr(it.data(), "Host:"))
+        if (strstr(it.data(), "GET"))
+        {
+            request_uri = it;
+        }
+        else if (strstr(it.data(), "Host:"))
         {
             set_value(get_value(it), host);
         }
