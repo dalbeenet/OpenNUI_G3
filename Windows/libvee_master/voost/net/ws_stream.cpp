@@ -17,6 +17,7 @@ inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
 } // unnamed namespace
 
 client_header::client_header():
+request_uri("null"),
 host("null"),
 upgrade("null"),
 connection("null"),
@@ -34,6 +35,7 @@ client_header::~client_header()
 }
 
 client_header::client_header(const client_header& other):
+request_uri(other.request_uri),
 host(other.host),
 upgrade(other.upgrade),
 connection(other.connection),
@@ -46,6 +48,7 @@ sec_web_socket_version(other.sec_web_socket_version)
 }
 
 client_header::client_header(client_header&& other):
+request_uri(static_cast<string&&>(other.request_uri)),
 host(static_cast<string&&>(other.host)),
 upgrade(static_cast<string&&>(other.upgrade)),
 connection(static_cast<string&&>(other.connection)),
@@ -59,6 +62,7 @@ sec_web_socket_version(static_cast<string&&>(other.sec_web_socket_version))
 
 client_header& client_header::operator=(const client_header& rhs)
 {
+    request_uri = rhs.request_uri;
     host = rhs.host;
     upgrade = rhs.upgrade;
     connection = rhs.connection;
@@ -71,6 +75,7 @@ client_header& client_header::operator=(const client_header& rhs)
 
 client_header& client_header::operator=(client_header&& rhs)
 {
+    request_uri = static_cast<string&&>(rhs.request_uri);
     host = static_cast<string&&>(rhs.host);
     upgrade = static_cast<string&&>(rhs.upgrade);
     connection = static_cast<string&&>(rhs.connection);
@@ -179,6 +184,11 @@ void client_header::parse(string& data)
     }
 }
 
+bool client_header::is_valid() const
+{
+    
+}
+
 websocket_server::websocket_server(unsigned short port, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
 _host_io_service(io_service),
 _tcp_server(port, io_service)
@@ -206,11 +216,18 @@ void websocket_server::close()
 ::std::shared_ptr<net_stream> websocket_server::accept() throw(...)
 {
     //TODO: RFC6455 HANDSHAKE
-    auto tcp_stream = _tcp_server.accept();
+    auto stream = _tcp_server.accept();
+    bool handshake_result = _handshake(*stream);
+    ::std::shared_ptr<net_stream> stream(nullptr);
+    return stream;
+}
+
+bool websocket_server::_handshake(net_stream& raw_socket)
+{
     try
     {
         ::std::array<char, 4096> buffer;
-        tcp_stream->read(buffer.data(), buffer.size());
+        raw_socket.read(buffer.data(), buffer.size());
         //::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>();
         client_header header;
         header.parse(make_string(buffer.data()));
@@ -220,8 +237,6 @@ void websocket_server::close()
     {
         printf("websocket_server> exception occured! %s\n", e.what());
     }
-    ::std::shared_ptr<net_stream> stream(nullptr);
-    return stream;
 }
 
 websocket_stream::websocket_stream():
@@ -231,18 +246,18 @@ _tcp_stream(_host_io_service)
 
 }
 
+websocket_stream::websocket_stream(tcp_stream&& stream, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
+_host_io_service(io_service),
+_tcp_stream(static_cast<tcp_stream&&>(stream))
+{
+
+}
+
 websocket_stream::websocket_stream(io_service_t& io_service):
 _host_io_service(io_service),
 _tcp_stream(io_service)
 {
 
-}
-
-websocket_stream::websocket_stream(tcp_stream&& stream):
-_host_io_service(stream.get_io_service()),
-_tcp_stream(static_cast<tcp_stream&&>(stream))
-{
-    
 }
 
 websocket_stream::~websocket_stream()

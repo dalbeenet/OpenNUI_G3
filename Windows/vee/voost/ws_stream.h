@@ -22,6 +22,9 @@ struct client_header
     void print();
     void parse(const char* data);
     void parse(string& data);
+    bool is_valid() const;
+    void clear();
+    string request_uri;
     string host;
     string upgrade;
     string connection;
@@ -47,6 +50,8 @@ public:
     virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
     inline io_service_t& get_io_service() const { return _host_io_service; }
 protected:
+    bool _handshake(net_stream& raw_socket);
+protected:
     ::boost::asio::io_service& _host_io_service;
     tcp_server _tcp_server;
 };
@@ -60,14 +65,15 @@ public:
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
     websocket_stream();
-    explicit websocket_stream(tcp_stream&& stream);
-    explicit websocket_stream(io_service_t& io_service);
+    explicit websocket_stream(tcp_stream&& stream, io_service_t& io_service = io_service_sigleton::get().io_service());
+    explicit websocket_stream(io_service_t& io_service = io_service_sigleton::get().io_service());
     virtual ~websocket_stream();
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
     virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;
     virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
     inline io_service_t& get_io_service() const { return _host_io_service; }
+    void conversion(tcp_stream&& stream);
 protected:
     io_service_t& _host_io_service;
     tcp_stream _tcp_stream;
