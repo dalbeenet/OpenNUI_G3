@@ -3,8 +3,8 @@
 #include <vector>
 #include <map>
 #include <vee/voost/ws_stream.h>
+#include <vee/voost/string.h>
 #include <boost/tokenizer.hpp>
-#include <boost/uuid/sha1.hpp>
 
 namespace vee {
 namespace voost {
@@ -198,11 +198,11 @@ bool client_header::is_valid() const
     //! Sec-Websocket-Key 헤더 유효성 검사
     //! Origin 헤더 유효성 검사
     if (
-       (str::find_case_insensitive(request_uri.data(), "GET") == str::not_found) ||
-       (str::find_case_insensitive(request_uri.data(), "HTTP/1.1") == str::not_found) ||
-       (str::find_case_insensitive(upgrade.data(), "Websocket") == str::not_found) ||
-       (str::find_case_insensitive(connection.data(), "Upgrade") == str::not_found) ||
-       (str::find_case_insensitive(sec_web_socket_version.data(), "13") == str::not_found)
+       (strtool::find_case_insensitive(request_uri.data(), "GET") == strtool::not_found) ||
+       (strtool::find_case_insensitive(request_uri.data(), "HTTP/1.1") == strtool::not_found) ||
+       (strtool::find_case_insensitive(upgrade.data(), "Websocket") == strtool::not_found) ||
+       (strtool::find_case_insensitive(connection.data(), "Upgrade") == strtool::not_found) ||
+       (strtool::find_case_insensitive(sec_web_socket_version.data(), "13") == strtool::not_found)
        )
     {
         return false;
@@ -256,22 +256,10 @@ void websocket_server::close()
 
 bool websocket_server::_handshake(net_stream& raw_socket)
 {
-    auto display = [](char* hash) -> void
-    {
-        ::std::cout << "SHA1: " << std::hex;
-        for (int i = 0; i < 20; ++i)
-        {
-            ::std::cout << ((hash[i] & 0x000000F0) >> 4)
-                << (hash[i] & 0x0000000F);
-        }
-        ::std::cout << ::std::endl; // Das wars  
-    };
-
     try
     {
         ::std::array<char, 4096> buffer;
         raw_socket.read(buffer.data(), buffer.size());
-        //::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>();
         
         // Parsing HTTP header
         client_header header;
@@ -285,24 +273,14 @@ bool websocket_server::_handshake(net_stream& raw_socket)
             return false;
         }
 
-        printf("Header information -------");
+        printf("Header information -------\n");
         header.print();
         
-        header.sec_websocket_key.append(RFC4122_GUID::get());
-        boost::uuids::detail::sha1 sha1;
-        ::std::array<char, 1024> hash;
-        sha1.process_bytes(header.sec_websocket_key.c_str(), header.sec_websocket_key.size());
-        unsigned int digest[5];
-        sha1.get_digest(digest);
-        for (int i = 0; i < 5; ++i)
-        {
-            const char* tmp = reinterpret_cast<char*>(digest);
-            hash[i * 4] = tmp[i * 4 + 3];
-            hash[i * 4 + 1] = tmp[i * 4 + 2];
-            hash[i * 4 + 2] = tmp[i * 4 + 1];
-            hash[i * 4 + 3] = tmp[i * 4];
-        }
-        display(hash.data());
+        string magic_string(header.sec_websocket_key);
+        magic_string.append(RFC4122_GUID::get());
+        // Hashing
+        auto hash_code = sha1_hashing(magic_string);
+        print_hash_code(hash_code.data());
     }
     catch (vee::exception& e)
     {

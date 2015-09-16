@@ -47,7 +47,7 @@ private:
 };
 
 
-namespace str {
+namespace strtool {
 
 const int not_found = -1;
 
@@ -74,8 +74,6 @@ int find_case_insensitive(const char* src, const char* substr)
 }
 #pragma warning(default:4996)
 
-} // namespace str
-
 // find substring (case insensitive)
 template<typename T>
 int ci_find_substr(const T& str1, const T& str2, const std::locale& loc = std::locale())
@@ -83,8 +81,10 @@ int ci_find_substr(const T& str1, const T& str2, const std::locale& loc = std::l
     typename T::const_iterator it = std::search(str1.begin(), str1.end(),
                                                 str2.begin(), str2.end(), my_equal<typename T::value_type>(loc));
     if (it != str1.end()) return it - str1.begin();
-    else return str::not_found; // not found
+    else return not_found; // not found
 }
+
+} // namespace strtool
 
 }
 

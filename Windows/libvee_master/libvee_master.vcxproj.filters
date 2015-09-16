@@ -25,6 +25,9 @@
     <Filter Include="vee\exception">
       <UniqueIdentifier>{57e36143-cd10-4979-81d3-9aeb01af4e65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\voost\string">
+      <UniqueIdentifier>{7cc11330-1f3a-4c5e-a27f-aac76302d56f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vee\vee.h">
@@ -84,6 +87,9 @@
     <ClInclude Include="..\vee\string.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\voost\string.h">
+      <Filter>vee\voost\string</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">
@@ -105,5 +111,6 @@
     <ClCompile Include="exception\exception_impl.cpp">
       <Filter>vee\exception</Filter>
     </ClCompile>
+    <ClCompile Include="voost\string\utilites.cpp" />
   </ItemGroup>
 </Project>
