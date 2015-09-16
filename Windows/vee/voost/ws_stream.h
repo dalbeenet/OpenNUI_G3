@@ -11,6 +11,15 @@ namespace websocket {
 class websocket_server;
 class websocket_stream;
 
+struct RFC4122_GUID
+{
+    // Returns Globally Unique Identifier, GUID
+    inline static const char* get()
+    {
+        return "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+    }
+};
+
 struct client_header
 {
     client_header();
@@ -64,7 +73,6 @@ public:
     using socket_t = ::boost::asio::ip::tcp::socket;
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
-    websocket_stream();
     explicit websocket_stream(tcp_stream&& stream, io_service_t& io_service = io_service_sigleton::get().io_service());
     explicit websocket_stream(io_service_t& io_service = io_service_sigleton::get().io_service());
     virtual ~websocket_stream();
