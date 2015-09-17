@@ -36,5 +36,6 @@ void operator=(const TypeName&&) = delete
 #else
 #define VEE_PLATFORM_WINDOWS 0
 #endif
+#define PRINT_LINE for(int i = 0; i < 8; ++i) printf("----------");
 
 #endif // _VEE_MACRO_H_

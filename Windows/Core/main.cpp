@@ -34,21 +34,22 @@ void timer_callback(unsigned int timer_tick)
 
 int main()
 {
-    //TODO: Scheduler test
-    printf("Scheduler test\n");
-    xkernel::scheduler::initialize();
-    xkernel::scheduler::request(f1, nullptr);
-    xkernel::scheduler::request(f2, nullptr);
-    getch();
-    print_line();
-    xkernel::scheduler::dispose();
-    {
-        printf("Timer test\npress any key to stop a timer...\n");
-        auto timer = vee::voost::timer::create_timer();
-        timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
-        getch();
-        print_line();
-    }
+    ////TODO: Scheduler test
+    //printf("Scheduler test\n");
+    //xkernel::scheduler::initialize();
+    //xkernel::scheduler::request(f1, nullptr);
+    //xkernel::scheduler::request(f2, nullptr);
+    //getch();
+    //print_line();
+    //xkernel::scheduler::dispose();
+    //{
+    //    printf("Timer test\npress any key to stop a timer...\n");
+    //    auto timer = vee::voost::timer::create_timer();
+    //    timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
+    //    getch();
+    //    print_line();
+    //}
+    
     {
         auto server = vee::voost::net::websocket::create_server(1992);
         auto session = server->accept();

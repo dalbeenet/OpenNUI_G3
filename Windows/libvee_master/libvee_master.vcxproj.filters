@@ -107,11 +107,17 @@
     <ClCompile Include="voost\net\tcp_stream.cpp">
       <Filter>vee\voost\asio\net</Filter>
     </ClCompile>
-    <ClCompile Include="voost\net\ws_stream.cpp" />
     <ClCompile Include="exception\exception_impl.cpp">
       <Filter>vee\exception</Filter>
     </ClCompile>
-    <ClCompile Include="voost\string\utilites.cpp" />
-    <ClCompile Include="voost\string\base64.cpp" />
+    <ClCompile Include="voost\string\base64.cpp">
+      <Filter>vee\voost\string</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\string\utilites.cpp">
+      <Filter>vee\voost\string</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\net\ws_stream.cpp">
+      <Filter>vee\voost\asio\net</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

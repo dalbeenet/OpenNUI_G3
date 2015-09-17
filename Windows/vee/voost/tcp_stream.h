@@ -39,10 +39,11 @@ public:
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
     tcp_stream();
+    virtual ~tcp_stream();
     explicit tcp_stream(socket_t&& socket);
     explicit tcp_stream(io_service_t& io_service);
     tcp_stream(tcp_stream&& other);
-    virtual ~tcp_stream();
+    tcp_stream& operator=(tcp_stream&& rhs);
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
     virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;

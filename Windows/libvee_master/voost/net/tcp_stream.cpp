@@ -81,6 +81,14 @@ tcp_stream::~tcp_stream()
     //puts(__FUNCSIG__);
 }
 
+tcp_stream& tcp_stream::operator=(tcp_stream&& rhs)
+{
+    //_host_io_service = rhs._host_io_service;
+    //_socket = static_cast<socket_t&&>(rhs._socket);
+    ::std::swap(_socket, rhs._socket);
+    return *this;
+}
+
 void tcp_stream::connect(const char* ip_addr, port_t port) throw(...)
 {
     ::boost::system::error_code error;

@@ -5,11 +5,10 @@
 namespace vee {
 namespace voost {
 
-string sha1_hashing(const string& dst)
+::std::vector<unsigned char> sha1_hashing(const string& dst)
 {
     ::boost::uuids::detail::sha1 sha1;
-    ::std::array<char, 128> hash;
-    hash.fill(0);
+    ::std::vector<unsigned char> hash(20, 0);
     sha1.process_bytes(dst.c_str(), dst.size());
     unsigned int digest[5];
     sha1.get_digest(digest);
@@ -21,10 +20,10 @@ string sha1_hashing(const string& dst)
         hash[i * 4 + 2] = tmp[i * 4 + 1];
         hash[i * 4 + 3] = tmp[i * 4];
     }
-    return make_string(hash.data());
+    return hash;
 }
 
-void print_hash_code(const char* dst)
+void print_hash_code(::std::vector<unsigned char>& dst)
 {
         ::std::cout << "SHA1: " << std::hex;
         for (int i = 0; i < 20; ++i)

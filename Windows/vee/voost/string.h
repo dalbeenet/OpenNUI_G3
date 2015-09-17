@@ -2,18 +2,20 @@
 #define _VEE_VOOST_STRING_H_
 
 #include <array>
+#include <vector>
 #include <vee/string.h>
 
 namespace vee {
 namespace voost {
 
-string sha1_hashing(const string& dst);
-void print_hash_code(const char* dst);
+::std::vector<unsigned char> sha1_hashing(const string& dst);
+void print_hash_code(::std::vector<unsigned char>& dst);
 
 namespace base64 {
 
-string decode(const string &dst);
-string encode(const string &dst);
+string decode(const ::std::vector<unsigned char> &dst);
+string encode(const ::std::vector<unsigned char> &dst); 
+string encode(const std::vector<unsigned char>& data);
 
 } // namespace base64
 

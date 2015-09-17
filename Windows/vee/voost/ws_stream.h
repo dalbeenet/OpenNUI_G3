@@ -20,15 +20,15 @@ struct RFC4122_GUID
     }
 };
 
-struct client_header
+struct RFC6455_client_handshake_header
 {
-    client_header();
-    ~client_header();
-    client_header(const client_header&);
-    client_header(client_header&&);
-    client_header& operator=(const client_header&);
-    client_header& operator=(client_header&&);
-    void print();
+    RFC6455_client_handshake_header();
+    ~RFC6455_client_handshake_header();
+    RFC6455_client_handshake_header(const RFC6455_client_handshake_header&);
+    RFC6455_client_handshake_header(RFC6455_client_handshake_header&&);
+    RFC6455_client_handshake_header& operator=(const RFC6455_client_handshake_header&);
+    RFC6455_client_handshake_header& operator=(RFC6455_client_handshake_header&&);
+    void print() const;
     void parse(const char* data);
     void parse(string& data);
     bool is_valid() const;
@@ -41,6 +41,24 @@ struct client_header
     string sec_websocket_key;
     string sec_websocket_protocol;
     string sec_web_socket_version;
+};
+
+struct RFC6455_server_response
+{
+    RFC6455_server_response();
+    ~RFC6455_server_response();
+    RFC6455_server_response(const RFC6455_server_response&);
+    RFC6455_server_response(RFC6455_server_response&&);
+    RFC6455_server_response(string& secret_key);
+    RFC6455_server_response& operator=(const RFC6455_server_response&);
+    RFC6455_server_response& operator=(RFC6455_server_response&&);
+    void print() const;
+    void clear();
+    string pack() const;
+    string http_status;
+    string upgrade;
+    string connection;
+    string sec_websocket_accept;
 };
 
 class websocket_server: public server_interface
@@ -73,17 +91,18 @@ public:
     using socket_t = ::boost::asio::ip::tcp::socket;
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
-    explicit websocket_stream(tcp_stream&& stream, io_service_t& io_service = io_service_sigleton::get().io_service());
-    explicit websocket_stream(io_service_t& io_service = io_service_sigleton::get().io_service());
+    websocket_stream();
+    explicit websocket_stream(tcp_stream&& stream);
     virtual ~websocket_stream();
+    websocket_stream& operator=(websocket_stream&& rhs);
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
     virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;
     virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
-    inline io_service_t& get_io_service() const { return _host_io_service; }
+    inline io_service_t& get_io_service() const { return *_host_io_service_ptr; }
     void conversion(tcp_stream&& stream);
 protected:
-    io_service_t& _host_io_service;
+    io_service_t* _host_io_service_ptr;
     tcp_stream _tcp_stream;
 };
 
