@@ -1,5 +1,6 @@
 #include <vee/voost/string.h>
 #include <boost/uuid/sha1.hpp>
+#include <cstdint>
 #include <iostream>
 
 namespace vee {

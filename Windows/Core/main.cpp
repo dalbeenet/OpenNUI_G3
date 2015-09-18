@@ -6,6 +6,7 @@ Desc    : Entry point of nui framework core
 *******************************************************************/ 
 
 #include <iostream>
+#include <array>
 #include <kernel/kernel.h>
 #include <vee/voost/timer.h>
 #include <vee/voost/net.h>
@@ -51,10 +52,26 @@ int main()
     //}
     
     {
+        printf("Websocket echo server\n");
         auto server = vee::voost::net::websocket::create_server(1992);
         auto session = server->accept();
-        getch();
+        std::array<char, 512> buffer;
+        try
+        {
+            while (true)
+            {
+                auto bytes_transferred = session->read(buffer.data(), buffer.size());
+                printf("recv %lldbytes: %s\n", bytes_transferred, buffer.data());
+                bytes_transferred = session->write(buffer.data(), bytes_transferred);
+                printf("echo %lldbytes: %s\n", bytes_transferred, buffer.data());
+            }
+        }
+        catch (vee::exception& e)
+        {
+            printf("HELLO EXCEPTION: %s\n", e.what());
+        }
         print_line();
     }
+
     return 0;
 }

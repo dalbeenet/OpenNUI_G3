@@ -28,6 +28,9 @@
     <Filter Include="vee\voost\string">
       <UniqueIdentifier>{7cc11330-1f3a-4c5e-a27f-aac76302d56f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\voost\endian">
+      <UniqueIdentifier>{1a38d1e5-76ff-470c-8d8f-00fe2ee614e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vee\vee.h">
@@ -63,9 +66,6 @@
     <ClInclude Include="..\vee\signal_channel.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="..\vee\voost\shared_memory.h">
-      <Filter>vee\voost</Filter>
-    </ClInclude>
     <ClInclude Include="..\vee\voost\xtimer.h">
       <Filter>vee\voost\asio\timer</Filter>
     </ClInclude>
@@ -89,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="..\vee\voost\string.h">
       <Filter>vee\voost\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\endian.h">
+      <Filter>vee\voost\endian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\shared_memory.h">
+      <Filter>vee\voost\shared_memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="voost\net\ws_stream.cpp">
       <Filter>vee\voost\asio\net</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\endian\conversion.cpp">
+      <Filter>vee\voost\endian</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

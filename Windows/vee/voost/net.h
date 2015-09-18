@@ -10,7 +10,7 @@ namespace voost {
 namespace net {
 
 using port_t = unsigned short;
-using size_t = unsigned int;
+using size_t = unsigned long long;
 using byte = unsigned char;
 
 class net_stream abstract
@@ -19,11 +19,9 @@ public:
     virtual ~net_stream() = default;
     virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
     virtual void disconnect() = 0;
-    virtual size_t write(void* buffer, size_t len) throw(...) = 0;
-    virtual size_t read(void* buffer, size_t len) throw(...) = 0;
+    virtual net::size_t write(void* data, size_t len) throw(...) = 0;
+    virtual net::size_t read(void* buffer, size_t buf_capacity) throw(...) = 0;
 };
-
-namespace tcp {
 
 enum class error_code: int
 {
@@ -31,8 +29,11 @@ enum class error_code: int
     send_failure,
     recv_failure,
     invalid_data,
+    connection_closed,
     user,
 };
+
+namespace tcp {
 
 class server_interface abstract
 {
@@ -52,11 +53,6 @@ namespace udp {
 } // namespace udp
 
 namespace websocket {
-
-enum class error_code: int
-{
-    bad_request = 400,
-};
 
 class server_interface abstract
 {

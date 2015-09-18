@@ -1,5 +1,6 @@
 #ifndef _VEE_VOOST_WS_STREAM_H_
 #define _VEE_VOOST_WS_STREAM_H_
+#include <cstdint>
 #include <vee/voost/tcp_stream.h>
 #include <vee/string.h>
 
@@ -20,14 +21,15 @@ struct RFC4122_GUID
     }
 };
 
-struct RFC6455_client_handshake_header
+//TODO: HTTP header∑Œ ≈Î«’
+struct handshake_client_request
 {
-    RFC6455_client_handshake_header();
-    ~RFC6455_client_handshake_header();
-    RFC6455_client_handshake_header(const RFC6455_client_handshake_header&);
-    RFC6455_client_handshake_header(RFC6455_client_handshake_header&&);
-    RFC6455_client_handshake_header& operator=(const RFC6455_client_handshake_header&);
-    RFC6455_client_handshake_header& operator=(RFC6455_client_handshake_header&&);
+    handshake_client_request();
+    ~handshake_client_request();
+    handshake_client_request(const handshake_client_request&);
+    handshake_client_request(handshake_client_request&&);
+    handshake_client_request& operator=(const handshake_client_request&);
+    handshake_client_request& operator=(handshake_client_request&&);
     void print() const;
     void parse(const char* data);
     void parse(string& data);
@@ -43,22 +45,56 @@ struct RFC6455_client_handshake_header
     string sec_web_socket_version;
 };
 
-struct RFC6455_server_response
+struct handshake_server_response
 {
-    RFC6455_server_response();
-    ~RFC6455_server_response();
-    RFC6455_server_response(const RFC6455_server_response&);
-    RFC6455_server_response(RFC6455_server_response&&);
-    RFC6455_server_response(string& secret_key);
-    RFC6455_server_response& operator=(const RFC6455_server_response&);
-    RFC6455_server_response& operator=(RFC6455_server_response&&);
+    handshake_server_response();
+    ~handshake_server_response();
+    handshake_server_response(const handshake_server_response&);
+    handshake_server_response(handshake_server_response&&);
+    handshake_server_response(string& secret_key);
+    handshake_server_response& operator=(const handshake_server_response&);
+    handshake_server_response& operator=(handshake_server_response&&);
     void print() const;
     void clear();
-    string pack() const;
+    string binary_pack() const;
     string http_status;
     string upgrade;
     string connection;
     string sec_websocket_accept;
+};
+
+struct data_frame_header
+{
+    enum class opcode_t: unsigned char
+    {
+        undefined = 0,
+        continuation_frame,
+        text_frame,
+        binary_frame,
+        connnection_close,
+        ping,
+        pong,
+        reserved_for_further
+    };
+    // analzyzed datas
+    bool     fin  = true;
+    bool     use_mask = false;
+    uint64_t payload_len = 0;
+    uint32_t payload_pos = 0;
+    //x bool     use_extended16_payload = false;
+    //x bool     use_extended64_payload = false;
+
+    // data sections
+    int8_t  fin_opcode = 0;
+    int8_t  mask_payload_len = 0;
+    int16_t extended_payload_len16 = 0;
+    int64_t extended_payload_len64 = 0;
+    opcode_t opcode = opcode_t::undefined;
+    std::array<unsigned char, 4> masking_key;
+    //std::vector<unsigned char> payload;
+    void analyze(const unsigned char* raw_data, net::size_t length);
+    net::size_t binary_pack(unsigned char* out_buffer) const;
+    net::size_t binary_pack_size() const;
 };
 
 class websocket_server: public server_interface
@@ -97,7 +133,8 @@ public:
     websocket_stream& operator=(websocket_stream&& rhs);
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
-    virtual net::size_t write(void* buffer, net::size_t buf_capacity) throw(...) override;
+    //! Read and Write operations require additional space to accommodate the Websocket data frame header in the data buffer.
+    virtual net::size_t write(void* data, net::size_t len) throw(...) override;
     virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
     inline io_service_t& get_io_service() const { return *_host_io_service_ptr; }
     void conversion(tcp_stream&& stream);
