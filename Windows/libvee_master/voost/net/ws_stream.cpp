@@ -307,6 +307,7 @@ string handshake_server_response::binary_pack() const
     ret.append(connection);
     ret.append("\r\nSec-WebSocket-Accept: ");
     ret.append(sec_websocket_accept);
+    //ret.append("\r\nSec-WebSocket-Location: ws://localhost:1992/");
     ret.append("\r\n\r\n");
     return ret;
 }
@@ -437,8 +438,8 @@ net::size_t data_frame_header::binary_pack_size() const
     // FOLLOWING PROCESS as same as binary_pack() method, but This function doesn't call memmove()
     net::size_t shift = 0;
 
-    int8_t fin_opcode_block = (int8_t)0x1; // must be binary frame (net_stream interface requirement)
-    (fin) ? (fin_opcode_block |= 0x80) : (fin_opcode_block |= 0x00);
+    //x int8_t fin_opcode_block = (int8_t)0x1; // must be binary frame (net_stream interface requirement)
+    //x (fin) ? (fin_opcode_block |= 0x80) : (fin_opcode_block |= 0x00);
     //x memmove(out_buffer + shift++, &fin_opcode_block, 1);
     shift += 1;
 
@@ -570,7 +571,7 @@ bool websocket_server::_handshake(net_stream& raw_socket)
         puts(response_data.data());
         PRINT_LINE;
         // Send response data to client
-        raw_socket.write((void*)response_data.data(), response_data.size() + 1);
+        raw_socket.write((void*)response_data.data(), response_data.size());
     }
     catch (vee::exception& e)
     {
@@ -620,21 +621,10 @@ net::size_t websocket_stream::write(void* data, net::size_t len) throw(...)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
-    header.use_mask = false; //TODO: 커스텀 마스크 사용하는 함수 지원하기, 지금은 고정된 마스크
-    /*header.masking_key[0] = 0x37;
-    header.masking_key[1] = 0xfa;
-    header.masking_key[2] = 0x21;
-    header.masking_key[3] = 0x3d;*/
+    header.use_mask = false; //TODO: 커스텀 마스크 사용하는 함수 지원하기, 지금은 고정된 마스크 -> 클라이언트에만 필요, 서버는 절대 마스킹하면 안됨!
     header.payload_len = len;
     net::size_t header_size = header.binary_pack_size();
     std::vector<unsigned char> packet((uint32_t)(len + header_size), 0); //TODO: 매번 벡터를 안만드는 방법을 생각해보자.
-    //header.binary_pack(packet.data());
-    /*for (net::size_t i = 0; i < len; ++i)
-    {
-        unsigned char mask_it = *((unsigned char*)data + i);
-        mask_it ^= header.masking_key[i%4];
-        memmove(packet.data() + header_size + i, &mask_it, 1);
-    }*/
     memmove(packet.data() + header.binary_pack(packet.data()), data, (uint32_t)len);
     return _tcp_stream.write(packet.data(), packet.size());
 }
@@ -662,9 +652,7 @@ net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw
         throw ::vee::exception("Connection is closed by host", (int)error_code::connection_closed);
     }
 
-    //memset(raw_data, 0, buf_capacity);
     // Copy binary data from buffer (DO NOT USE EXTEISNION FLAG!)
-    //memmove(raw_data, raw_data + header.payload_pos, header.payload_len);
     // Unmask
     {
         for (unsigned int i = 0; i < header.payload_len; ++i)

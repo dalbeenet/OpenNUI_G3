@@ -58,6 +58,9 @@ int main()
         std::array<char, 512> buffer;
         try
         {
+            char welcome_message[] = "Welcome";
+            session->write(welcome_message, strlen(welcome_message));
+
             while (true)
             {
                 auto bytes_transferred = session->read(buffer.data(), buffer.size());
