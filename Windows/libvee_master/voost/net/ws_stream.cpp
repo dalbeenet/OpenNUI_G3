@@ -5,6 +5,7 @@
 #include <vee/voost/ws_stream.h>
 #include <vee/voost/string.h>
 #include <boost/tokenizer.hpp>
+#include <boost/endian/conversion.hpp>
 
 namespace vee {
 namespace voost {
@@ -353,14 +354,14 @@ void data_frame_header::analyze(const unsigned char* raw_data, net::size_t lengt
     if (payload_len == 0x7e)
     {
         memmove(&extended_payload_len16, raw_data + shift, 2);
-        payload_len = extended_payload_len16;
+        payload_len = boost::endian::big_to_native(extended_payload_len16);
         shift += 2;
         //x use_extended16_payload = true;
     }
     else if (payload_len == 0x7f)
     {
         memmove(&extended_payload_len64, raw_data + shift, 8);
-        payload_len = extended_payload_len64;
+        payload_len = boost::endian::big_to_native(extended_payload_len64);
         shift += 8;
         //x use_extended64_payload = true;
     }
@@ -394,14 +395,14 @@ net::size_t data_frame_header::binary_pack(unsigned char* out_buffer) const
 {
     net::size_t shift = 0;
 
-    int8_t fin_opcode_block = (int8_t)0x1; // must be text frame (net_stream interface requirement)
+    int8_t fin_opcode_block = (int8_t)0x2; // must be text frame (net_stream interface requirement)
     (fin) ? (fin_opcode_block |= 0x80) : (fin_opcode_block |= 0x00);
     memmove(out_buffer + shift++, &fin_opcode_block, 1);
 
     int8_t mask_payload_len_block = 0;
     if (payload_len >= 0x7e)
     {
-        if (payload_len > INT16_MAX)
+        if (payload_len <= INT16_MAX)
             mask_payload_len_block = 0x7e;
         else
             mask_payload_len_block = 0x7f;
@@ -413,13 +414,13 @@ net::size_t data_frame_header::binary_pack(unsigned char* out_buffer) const
 
     if ((mask_payload_len_block & (~0x80)) == 0x7e)
     {
-        int16_t extended_payload_len_16 = (int16_t)payload_len;
+        int16_t extended_payload_len_16 = boost::endian::native_to_big((int16_t)payload_len);
         memmove(out_buffer + shift, &extended_payload_len_16, 2);
         shift += 2;
     }
     else if ((mask_payload_len_block & (~0x80)) == 0x7f)
     {
-        int64_t extended_payload_len_64 = (int64_t)payload_len;
+        int64_t extended_payload_len_64 = boost::endian::native_to_big((int64_t)payload_len);
         memmove(out_buffer + shift, &extended_payload_len_64, 8);
         shift += 8;
     }
@@ -446,7 +447,7 @@ net::size_t data_frame_header::binary_pack_size() const
     int8_t mask_payload_len_block = 0;
     if (payload_len >= 0x7e)
     {
-        if (payload_len > INT16_MAX)
+        if (payload_len <= INT16_MAX)
             mask_payload_len_block = 0x7e;
         else
             mask_payload_len_block = 0x7f;
@@ -459,13 +460,13 @@ net::size_t data_frame_header::binary_pack_size() const
 
     if ((mask_payload_len_block & (~0x80)) == 0x7e)
     {
-        int16_t extended_payload_len_16 = (int16_t)payload_len;
+        int16_t extended_payload_len_16 = boost::endian::native_to_big((int16_t)payload_len);
         //x memmove(out_buffer + shift, &extended_payload_len_16, 2);
         shift += 2;
     }
     else if ((mask_payload_len_block & (~0x80)) == 0x7f)
     {
-        int64_t extended_payload_len_64 = (int64_t)payload_len;
+        int64_t extended_payload_len_64 = boost::endian::native_to_big((int64_t)payload_len);
         //x memmove(out_buffer + shift, &extended_payload_len_64, 8);
         shift += 8;
     }
@@ -633,19 +634,36 @@ net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     net::size_t bytes_transferred = 0;
+    data_frame_header header;
+    unsigned char* raw_data = (unsigned char *)buffer;
+    
     try
     {
-        bytes_transferred = _tcp_stream.read(buffer, buf_capacity);
+        while (true)
+        {
+            bytes_transferred = _tcp_stream.read(buffer, buf_capacity);
+            header.analyze(raw_data, bytes_transferred);
+            // Ignore ping and pong operation
+            if (header.opcode == data_frame_header::opcode_t::ping)
+            {
+                printf("Websocket says ping~\n");
+            }
+            else if (header.opcode == data_frame_header::opcode_t::pong)
+            {
+                printf("Websocket says pong~\n");
+            }
+            else
+            {
+                break;
+            }
+        }
     }
     catch (vee::exception& e)
     {
         printf("websocket_stream> exception occured at read() %s\n", e.what());
         return 0;
     }
-    unsigned char* raw_data = (unsigned char *)buffer;
-    data_frame_header header;
-    header.analyze(raw_data, bytes_transferred);
-
+    
     // Check the connection close operation
     if (header.opcode == data_frame_header::opcode_t::connnection_close)
     {
