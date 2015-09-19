@@ -38,6 +38,7 @@
     <ClCompile Include="lock\lock_impl.cpp" />
     <ClCompile Include="voost\asio_impl.cpp" />
     <ClCompile Include="voost\endian\conversion.cpp" />
+    <ClCompile Include="voost\net\net.cpp" />
     <ClCompile Include="voost\net\tcp_stream.cpp" />
     <ClCompile Include="voost\net\ws_stream.cpp" />
     <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />

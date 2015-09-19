@@ -128,5 +128,8 @@
     <ClCompile Include="voost\endian\conversion.cpp">
       <Filter>vee\voost\endian</Filter>
     </ClCompile>
+    <ClCompile Include="voost\net\net.cpp">
+      <Filter>vee\voost\asio\net</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

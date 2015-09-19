@@ -19,8 +19,8 @@ public:
     virtual ~net_stream() = default;
     virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
     virtual void disconnect() = 0;
-    virtual net::size_t write(void* data, size_t len) throw(...) = 0;
-    virtual net::size_t read(void* buffer, size_t buf_capacity) throw(...) = 0;
+    virtual net::size_t write(void* data, net::size_t len) throw(...) = 0;
+    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) = 0;
 };
 
 enum class error_code: int
@@ -53,6 +53,21 @@ namespace udp {
 } // namespace udp
 
 namespace websocket {
+
+//TODO: 웹소켓 구현을 아래의 인터페이스로 교체하기
+class stream_interface abstract: public net_stream
+{
+public:
+    virtual ~stream_interface() = default;
+    //virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
+    //virtual void disconnect() = 0;
+    virtual net::size_t write(void* data, net::size_t len) throw(...) override;
+    virtual net::size_t write_string(void* data, net::size_t len) throw(...) = 0;
+    virtual net::size_t write_binary(void* data, net::size_t len) throw(...) = 0;
+    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
+    virtual net::size_t read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual net::size_t read_all(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+};
 
 class server_interface abstract
 {
