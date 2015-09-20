@@ -56,23 +56,33 @@ int main()
         using vee::voost::net::websocket::ws_stream;
         using vee::voost::net::websocket::opcode_id;
         auto server = vee::voost::net::websocket::create_server(1992);
-        auto session = std::static_pointer_cast<ws_stream>(server->accept());
+        auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
         std::array<char, 512> buffer;
         try
         {
+            // Welcome message
             char welcome_message[] = "Welcome";
-            session->write(opcode_id::text_frame, welcome_message, strlen(welcome_message));
+            session1->write(opcode_id::text_frame, welcome_message, strlen(welcome_message));
+
+            // Connect to websocket echo server
+            auto session2 = vee::voost::net::websocket::create_stream();
+            session2->connect("", 1000);
+
             while (true)
             {
-                auto bytes_transferred = session->read(buffer.data(), buffer.size());
-                printf("recv %lldbytes: %s\n", bytes_transferred, buffer.data());
-                bytes_transferred = session->write(buffer.data(), bytes_transferred);
-                printf("echo %lldbytes: %s\n", bytes_transferred, buffer.data());
+                auto bytes_transferred = session1->read(buffer.data(), buffer.size());
+                printf("s1 recieved: %lldbytes: %s\n", bytes_transferred, buffer.data());
+                bytes_transferred = (session2->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
+                printf("s2 send: %lldbytes: %s\n", bytes_transferred, buffer.data());
+                session2->read(buffer.data(), buffer.size());
+                printf("s2 recieved: %lldbytes: %s\n", bytes_transferred, buffer.data());
+                bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
+                printf("s1 send: %lldbytes: %s\n", bytes_transferred, buffer.data());
             }
         }
         catch (vee::exception& e)
         {
-            printf("HELLO EXCEPTION: %s\n", e.what());
+            printf("EXCEPTION: %s\n", e.what());
         }
         print_line();
     }

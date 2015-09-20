@@ -38,7 +38,7 @@ enum class error_code: int
     recv_failure,
     invalid_data,
     disconnected_by_host,
-    user,
+    client_handshake_failure,
 };
 
 namespace tcp {
@@ -88,7 +88,7 @@ public:
 };
 
 ::std::shared_ptr<net_server> create_server(unsigned short port);
-::std::shared_ptr<net_stream> create_stream();
+::std::shared_ptr<ws_stream> create_stream();
 
 } // namespace ws
 

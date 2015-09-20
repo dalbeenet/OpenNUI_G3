@@ -35,6 +35,7 @@ struct handshake_client_request
     void parse(string& data);
     bool is_valid() const;
     void clear();
+    string binary_pack() const;
     string request_uri;
     string host;
     string upgrade;
@@ -54,6 +55,9 @@ struct handshake_server_response
     handshake_server_response(string& secret_key);
     handshake_server_response& operator=(const handshake_server_response&);
     handshake_server_response& operator=(handshake_server_response&&);
+    void parse(const char* data);
+    void parse(string& data);
+    //TODO: bool is_valid() const; // 현재는 RFC6455의 예시 응답으로 비교
     void print() const;
     void clear();
     string binary_pack() const;

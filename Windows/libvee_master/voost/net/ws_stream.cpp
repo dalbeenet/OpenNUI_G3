@@ -225,6 +225,28 @@ void handshake_client_request::clear()
     sec_websocket_protocol.clear();
 }
 
+string handshake_client_request::binary_pack() const
+{
+    string pack;
+    pack.append(request_uri);
+    pack.append("\r\nHost: ");
+    pack.append(host);
+    pack.append("\r\nUpgrade: ");
+    pack.append(upgrade);
+    pack.append("\r\nConnection: ");
+    pack.append(connection);
+    pack.append("\r\nSec-WebSocket-Key: ");
+    pack.append(sec_websocket_key);
+    pack.append("\r\nOrigin: ");
+    pack.append(origin);
+    pack.append("\r\nSec-WebSocket-Protocol: ");
+    pack.append(sec_websocket_protocol);
+    pack.append("\r\nSec-WebSocket-Version: ");
+    pack.append(sec_web_socket_version);
+    pack.append("\r\n\r\n");
+    return pack;
+}
+
 handshake_server_response::handshake_server_response():
 http_status("HTTP/1.1 101 Switching Protocols"),
 upgrade("websocket"),
@@ -282,6 +304,75 @@ handshake_server_response& handshake_server_response::operator=(handshake_server
     connection = std::move(rhs.connection);
     sec_websocket_accept = std::move(rhs.sec_websocket_accept);
     return *this;
+}
+
+void handshake_server_response::parse(const char* data)
+{
+    return parse(make_string(data));
+}
+
+void handshake_server_response::parse(string& data)
+{
+    using char_separator = ::boost::char_separator<char>;
+    using tokenizer = boost::tokenizer<char_separator>;
+
+    // Parse raw data per lines (token: \n)
+    ::std::vector<string> data_by_lines;
+    {
+        char_separator sep("\r\n");
+        tokenizer tok(data, sep);
+        for (auto& it : tok)
+        {
+            data_by_lines.push_back(it);
+        }
+    }
+
+    auto get_value = [](const string& dst)-> std::pair<bool, string>
+    {
+        auto pos = dst.find(':');
+        if (pos == string::npos)
+        {
+            return std::make_pair(false, "");
+        }
+        else
+        {
+            string buffer(dst.substr(pos + 1));
+            string result = trim(buffer);
+            return std::make_pair(true, std::move(result));
+        }
+    };
+
+    for (auto& it : data_by_lines)
+    {
+        auto set_value = [](::std::pair<bool, string>& result, string& dst) -> void
+        {
+            if (result.first == true)
+            {
+                dst = std::move(result.second);
+            }
+        };
+
+        if (strstr(it.data(), "HTTP/1.1 101 Switching Protocols"))
+        {
+            http_status = it;
+        }
+        else if (strstr(it.data(), "Upgrade:"))
+        {
+            set_value(get_value(it), upgrade);
+        }
+        else if (strstr(it.data(), "Connection:"))
+        {
+            set_value(get_value(it), connection);
+        }
+        else if (strstr(it.data(), "Sec-WebSocket-Accept:"))
+        {
+            set_value(get_value(it), sec_websocket_accept);
+        }
+        else
+        {
+            continue;
+        }
+    }
 }
 
 void handshake_server_response::print() const
@@ -626,7 +717,43 @@ websocket_stream& websocket_stream::operator=(websocket_stream&& rhs)
 
 void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
 {
-    //nothing to do.
+#pragma warning(disable:4996)
+    handshake_client_request request;
+    request.request_uri = "GET /chat HTTP/1.1";
+    request.host = "127.0.0.1:";
+    {
+        ::std::array<char, 128> buffer;
+        sprintf(buffer.data(), "%d", port);
+        request.host.append(buffer.data());
+    }
+    request.upgrade = "websocket";
+    request.connection = "Upgrade";
+    request.sec_websocket_key = "dGhlIHNhbXBsZSBub25jZQ=="; //TODO: Randomize
+    request.origin = "http://127.0.0.1";
+    {
+        ::std::array<char, 128> buffer;
+        sprintf(buffer.data(), "%d", port);
+        request.origin.append(buffer.data());
+    }
+    request.sec_websocket_protocol = "char, superchat";
+    request.sec_web_socket_version = "13";
+
+    handshake_server_response response;
+    ::std::array<char, 512> response_buffer;
+    {
+        string pack = request.binary_pack();
+        _tcp_stream.connect(ip_addr, port);
+        _tcp_stream.write((void*)pack.data(), pack.size());
+        _tcp_stream.read(response_buffer.data(), response_buffer.size());
+    }
+    response.parse(response_buffer.data());
+    //Temporary validate check process
+    if (response.sec_websocket_accept.compare("s3pPLMBiTxaQ9kYGzzhZRbK+xOo=") != 0)
+    { // indvlid response
+        throw ::vee::exception("Sec-Websocket-Accept key is wrong!", (int)error_code::client_handshake_failure);
+    }
+    printf("Connect success!");
+#pragma warning(default:4996)
 }
 
 void websocket_stream::disconnect()
@@ -734,10 +861,10 @@ void websocket_stream::conversion(tcp_stream&& stream)
     return server;
 }
 
-::std::shared_ptr<net_stream> create_stream()
+::std::shared_ptr<ws_stream> create_stream()
 {
     //TODO: IO_SERVICE SELECTION
-    ::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>();
+    ::std::shared_ptr<ws_stream> stream = ::std::make_shared<websocket_stream>();
     return stream;
 }
 
