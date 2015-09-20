@@ -11,7 +11,7 @@ namespace tcp {
 class tcp_server;
 class tcp_stream;
 
-class tcp_server: public server_interface
+class tcp_server: public net_server
 {
     DISALLOW_COPY_AND_ASSIGN(tcp_server);
 public:

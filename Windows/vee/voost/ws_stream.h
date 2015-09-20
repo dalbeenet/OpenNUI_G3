@@ -65,17 +65,6 @@ struct handshake_server_response
 
 struct data_frame_header
 {
-    enum class opcode_t: unsigned char
-    {
-        undefined = 0,
-        continuation_frame,
-        text_frame,
-        binary_frame,
-        connnection_close,
-        ping,
-        pong,
-        reserved_for_further
-    };
     // analzyzed datas
     bool     fin  = true;
     bool     use_mask = false;
@@ -89,15 +78,15 @@ struct data_frame_header
     int8_t  mask_payload_len = 0;
     int16_t extended_payload_len16 = 0;
     int64_t extended_payload_len64 = 0;
-    opcode_t opcode = opcode_t::undefined;
+    opcode_id opcode = opcode_id::undefined;
     std::array<unsigned char, 4> masking_key;
     //std::vector<unsigned char> payload;
     void analyze(const unsigned char* raw_data, net::size_t length);
-    net::size_t binary_pack(unsigned char* out_buffer) const;
+    net::size_t binary_pack(opcode_id opcode, unsigned char* out_buffer) const;
     net::size_t binary_pack_size() const;
 };
 
-class websocket_server: public server_interface
+class websocket_server: public net_server
 {
     DISALLOW_COPY_AND_ASSIGN(websocket_server);
 public:
@@ -119,7 +108,7 @@ protected:
     tcp_server _tcp_server;
 };
 
-class websocket_stream: public net_stream
+class websocket_stream: public ws_stream
 {
     DISALLOW_COPY_AND_ASSIGN(websocket_stream);
 public:
@@ -134,9 +123,13 @@ public:
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
     //! Read and Write operations require additional space to accommodate the Websocket data frame header in the data buffer.
-    virtual net::size_t write(void* data, net::size_t len) throw(...) override;
-    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
-    inline io_service_t& get_io_service() const { return *_host_io_service_ptr; }
+    virtual io_result write(opcode_id opcode, void* data, net::size_t len) throw(...) override;
+    virtual io_result read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) override;
+    virtual io_result read_all(void* buffer, net::size_t buf_capacity) throw(...) override;
+    inline io_service_t& get_io_service() const
+    {
+        return *_host_io_service_ptr;
+    }
     void conversion(tcp_stream&& stream);
 protected:
     io_service_t* _host_io_service_ptr;

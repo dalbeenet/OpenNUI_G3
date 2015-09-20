@@ -53,14 +53,15 @@ int main()
     
     {
         printf("Websocket echo server\n");
+        using vee::voost::net::websocket::ws_stream;
+        using vee::voost::net::websocket::opcode_id;
         auto server = vee::voost::net::websocket::create_server(1992);
-        auto session = server->accept();
+        auto session = std::static_pointer_cast<ws_stream>(server->accept());
         std::array<char, 512> buffer;
         try
         {
             char welcome_message[] = "Welcome";
-            session->write(welcome_message, strlen(welcome_message));
-
+            session->write(opcode_id::text_frame, welcome_message, strlen(welcome_message));
             while (true)
             {
                 auto bytes_transferred = session->read(buffer.data(), buffer.size());

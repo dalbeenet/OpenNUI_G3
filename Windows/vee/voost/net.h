@@ -23,27 +23,27 @@ public:
     virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) = 0;
 };
 
+class net_server abstract
+{
+public:
+    virtual ~net_server() = default;
+    virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
+    virtual void close() = 0;
+};
+
 enum class error_code: int
 {
     connection_failure = 1,
     send_failure,
     recv_failure,
     invalid_data,
-    connection_closed,
+    disconnected_by_host,
     user,
 };
 
 namespace tcp {
 
-class server_interface abstract
-{
-public:
-    virtual ~server_interface() = default;
-    virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
-    virtual void close() = 0;
-};
-
-::std::shared_ptr<server_interface> create_server(unsigned short port);
+::std::shared_ptr<net_server> create_server(unsigned short port);
 ::std::shared_ptr<net_stream> create_stream();
 
 } // namespace tcp
@@ -54,30 +54,40 @@ namespace udp {
 
 namespace websocket {
 
-//TODO: 웹소켓 구현을 아래의 인터페이스로 교체하기
-class stream_interface abstract: public net_stream
+enum class opcode_id: unsigned char
+{
+    undefined = 0,
+    continuation_frame,
+    text_frame,
+    binary_frame,
+    connnection_close,
+    ping,
+    pong,
+    reserved_for_further
+};
+
+class ws_server;
+class ws_stream;
+
+class ws_stream abstract: public net_stream
 {
 public:
-    virtual ~stream_interface() = default;
-    //virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
-    //virtual void disconnect() = 0;
+    struct io_result
+    {
+        net::size_t header_size = 0;
+        net::size_t payload_size = 0;
+    };
+    virtual ~ws_stream() = default;
+    virtual void        connect(const char* ip_addr, port_t port) throw(...) = 0;
+    virtual void        disconnect() = 0;
     virtual net::size_t write(void* data, net::size_t len) throw(...) override;
-    virtual net::size_t write_string(void* data, net::size_t len) throw(...) = 0;
-    virtual net::size_t write_binary(void* data, net::size_t len) throw(...) = 0;
+    virtual io_result   write(opcode_id opcode, void* data, net::size_t len) throw(...) = 0;
     virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
-    virtual net::size_t read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) = 0;
-    virtual net::size_t read_all(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual io_result   read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual io_result   read_all(void* buffer, net::size_t buf_capacity) throw(...) = 0;
 };
 
-class server_interface abstract
-{
-public:
-    virtual ~server_interface() = default;
-    virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
-    virtual void close() = 0;
-};
-
-::std::shared_ptr<server_interface> create_server(unsigned short port);
+::std::shared_ptr<net_server> create_server(unsigned short port);
 ::std::shared_ptr<net_stream> create_stream();
 
 } // namespace ws

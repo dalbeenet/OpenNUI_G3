@@ -324,25 +324,25 @@ void data_frame_header::analyze(const unsigned char* raw_data, net::size_t lengt
     switch ((fin_opcode & 0x0f))
     {
     case 0x0:
-        opcode = opcode_t::continuation_frame;
+        opcode = opcode_id::continuation_frame;
         break;
     case 0x1:
-        opcode = opcode_t::text_frame;
+        opcode = opcode_id::text_frame;
         break;
     case 0x2:
-        opcode = opcode_t::binary_frame;
+        opcode = opcode_id::binary_frame;
         break;
     case 0x8:
-        opcode = opcode_t::connnection_close;
+        opcode = opcode_id::connnection_close;
         break;
     case 0x9:
-        opcode = opcode_t::ping;
+        opcode = opcode_id::ping;
         break;
     case 0xA:
-        opcode = opcode_t::pong;
+        opcode = opcode_id::pong;
         break;
     default:
-        opcode = opcode_t::reserved_for_further;
+        opcode = opcode_id::reserved_for_further;
         break;
     }
     //TODO: RSV1~3 (Extension flag) processing 
@@ -391,11 +391,39 @@ void data_frame_header::analyze(const unsigned char* raw_data, net::size_t lengt
     return;
 }
 
-net::size_t data_frame_header::binary_pack(unsigned char* out_buffer) const
+net::size_t data_frame_header::binary_pack(opcode_id opcode, unsigned char* out_buffer) const
 {
     net::size_t shift = 0;
 
-    int8_t fin_opcode_block = (int8_t)0x2; // must be text frame (net_stream interface requirement)
+    int8_t fin_opcode_block = 0; 
+    switch (opcode)
+    {
+    case vee::voost::net::websocket::opcode_id::continuation_frame:
+        fin_opcode_block = 0x0;
+        break;
+    case vee::voost::net::websocket::opcode_id::text_frame:
+        fin_opcode_block = 0x1;
+        break;
+    case vee::voost::net::websocket::opcode_id::binary_frame:
+        fin_opcode_block = 0x2;
+        break;
+    case vee::voost::net::websocket::opcode_id::connnection_close:
+        fin_opcode_block = 0x8;
+        break;
+    case vee::voost::net::websocket::opcode_id::ping:
+        fin_opcode_block = 0x9;
+        break;
+    case vee::voost::net::websocket::opcode_id::pong:
+        fin_opcode_block = 0xA;
+        break;
+    case vee::voost::net::websocket::opcode_id::reserved_for_further:
+        fin_opcode_block = 0x2; // Websocket stream does not support this operation. set to default value(binary frame).
+        break;
+    default:
+        fin_opcode_block = 0x2; // defualt value is binary frame
+        break;
+    }
+
     (fin) ? (fin_opcode_block |= 0x80) : (fin_opcode_block |= 0x00);
     memmove(out_buffer + shift++, &fin_opcode_block, 1);
 
@@ -537,18 +565,6 @@ bool websocket_server::_handshake(net_stream& raw_socket)
             return false;
         }
 
-        /*{
-            printf("RFC6455 HANDSHAKE HASHING + ENCODING TEST PROCESS ----------------\n");
-            string key("dGhlIHNhbXBsZSBub25jZQ==");
-            printf("key: %s\n", key.data());
-            key.append(RFC4122_GUID::get());
-            printf("append guid: %s\n", key.data());
-            auto hashing = sha1_hashing(key);
-            print_hash_code(hashing);
-            auto base64_encoded = base64::encode(hashing);
-            printf("Base64 encoded: %s\n\n", base64_encoded.data());
-            }*/
-        
         printf("websocket_server> [RFC6455 Handshake] Websocket client request\n");
         PRINT_LINE;
         header.print();
@@ -559,10 +575,10 @@ bool websocket_server::_handshake(net_stream& raw_socket)
         magic_string.append(RFC4122_GUID::get());
         // Hashing via SHA-1
         auto hash_code = sha1_hashing(magic_string);
-        //x print_hash_code(hash_code);
+        print_hash_code(hash_code);
         // Encoding via Base64
         string hash_code_base64 = base64::encode(hash_code);
-        //x printf("Base64: %s\n", hash_code_base64.data());
+        printf("To base64: %s\n", hash_code_base64.data());
         // Make data for response
         handshake_server_response response(hash_code_base64);
         string response_data = response.binary_pack();
@@ -615,10 +631,13 @@ void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
 
 void websocket_stream::disconnect()
 {
+    std::array<unsigned char, 128> buffer;
+    buffer.fill(0);
+    write(opcode_id::connnection_close, buffer.data(), buffer.size());
     _tcp_stream.disconnect();
 }
 
-net::size_t websocket_stream::write(void* data, net::size_t len) throw(...)
+ws_stream::io_result websocket_stream::write(opcode_id opcode, void* data, net::size_t len) throw(...)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
@@ -626,17 +645,21 @@ net::size_t websocket_stream::write(void* data, net::size_t len) throw(...)
     header.payload_len = len;
     net::size_t header_size = header.binary_pack_size();
     std::vector<unsigned char> packet((uint32_t)(len + header_size), 0); //TODO: 매번 벡터를 안만드는 방법을 생각해보자.
-    memmove(packet.data() + header.binary_pack(packet.data()), data, (uint32_t)len);
-    return _tcp_stream.write(packet.data(), packet.size());
+    memmove(packet.data() + header.binary_pack(opcode, packet.data()), data, (uint32_t)len);
+    _tcp_stream.write(packet.data(), packet.size());
+    io_result result;
+    result.header_size = header_size;
+    result.payload_size = header.payload_len;
+    return result;
 }
 
-net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_all(void* buffer, net::size_t buf_capacity) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     net::size_t bytes_transferred = 0;
     data_frame_header header;
     unsigned char* raw_data = (unsigned char *)buffer;
-    
+
     try
     {
         while (true)
@@ -644,11 +667,11 @@ net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw
             bytes_transferred = _tcp_stream.read(buffer, buf_capacity);
             header.analyze(raw_data, bytes_transferred);
             // Ignore ping and pong operation
-            if (header.opcode == data_frame_header::opcode_t::ping)
+            if (header.opcode == opcode_id::ping)
             {
                 printf("Websocket says ping~\n");
             }
-            else if (header.opcode == data_frame_header::opcode_t::pong)
+            else if (header.opcode == opcode_id::pong)
             {
                 printf("Websocket says pong~\n");
             }
@@ -661,13 +684,14 @@ net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw
     catch (vee::exception& e)
     {
         printf("websocket_stream> exception occured at read() %s\n", e.what());
-        return 0;
+        io_result result;
+        return result;
     }
-    
+
     // Check the connection close operation
-    if (header.opcode == data_frame_header::opcode_t::connnection_close)
+    if (header.opcode == opcode_id::connnection_close)
     {
-        throw ::vee::exception("Connection is closed by host", (int)error_code::connection_closed);
+        throw ::vee::exception("Connection is closed by host", (int)error_code::disconnected_by_host);
     }
 
     // Copy binary data from buffer (DO NOT USE EXTEISNION FLAG!)
@@ -679,11 +703,23 @@ net::size_t websocket_stream::read(void* buffer, net::size_t buf_capacity) throw
             raw_data[i + header.payload_pos] ^= mask;
         }
     }
-    memmove(raw_data, raw_data + header.payload_pos, (uint32_t)(header.payload_len));
-    memset(raw_data + header.payload_len, 0, (uint32_t)(buf_capacity - header.payload_len));
+    //memmove(raw_data, raw_data + header.payload_pos, (uint32_t)(header.payload_len));
+    //memset(raw_data + header.payload_len, 0, (uint32_t)(buf_capacity - header.payload_len));
     //printf("payload_data: %s\n", raw_data);
 
-    return header.payload_len;
+    io_result result;
+    result.header_size = bytes_transferred - header.payload_len;
+    result.payload_size = header.payload_len;
+
+    return result;
+}
+
+ws_stream::io_result websocket_stream::read_payload_only(void* buffer, net::size_t buf_capacity) throw(...)
+{
+    io_result result = read_all(buffer, buf_capacity);
+    memmove(buffer, (char*)buffer + result.header_size, (uint32_t)(result.payload_size));
+    memset((char*)buffer + result.payload_size, 0, (uint32_t)(buf_capacity - result.payload_size));
+    return result;
 }
 
 void websocket_stream::conversion(tcp_stream&& stream)
@@ -692,9 +728,9 @@ void websocket_stream::conversion(tcp_stream&& stream)
     _host_io_service_ptr = &(_tcp_stream.get_io_service());
 }
 
-::std::shared_ptr<server_interface> create_server(unsigned short port)
+::std::shared_ptr<net_server> create_server(unsigned short port)
 {
-    ::std::shared_ptr<server_interface> server = ::std::make_shared<websocket_server>(port);
+    ::std::shared_ptr<net_server> server = ::std::make_shared<websocket_server>(port);
     return server;
 }
 
