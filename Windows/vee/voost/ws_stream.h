@@ -125,15 +125,15 @@ public:
     virtual ~websocket_stream();
     websocket_stream& operator=(websocket_stream&& rhs);
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
-    virtual void async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_callback> e) override;
+    virtual void async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e) override;
     virtual void disconnect() override;
     //! Read and Write operations require additional space to accommodate the Websocket data frame header in the data buffer.
     virtual io_result write(opcode_id opcode, const byte* data, net::size_t len) throw(...) override;
-    virtual void      async_write(opcode_id opcode, const byte* data, net::size_t len, std::shared_ptr<async_write_callback> e) throw(...) override;
+    virtual void      async_write(opcode_id opcode, const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...) override;
     virtual io_result read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...) override;
     virtual io_result read_all(byte* const buffer, net::size_t buf_capacity) throw(...) override;
-    virtual void      async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...) override;
-    virtual void      async_read_all(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...) override;
+    virtual void      async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) override;
+    virtual void      async_read_all(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) override;
     inline io_service_t& get_io_service() const
     {
         return *_host_io_service_ptr;
@@ -141,8 +141,8 @@ public:
     void conversion(tcp_stream&& stream);
 
 protected:
-    static std::pair<io_result /*header and payload size*/, std::vector<byte> /*data*/> _convert_to_websocket_form(opcode_id opcode, const byte* data, net::size_t len) const;
-    static std::pair<io_result /*header and payload size*/, data_frame_header /*header*/> _preprocess_received_data(byte* const data, net::size_t len) const throw(...);
+    static std::pair<io_result /*header and payload size*/, std::vector<byte> /*data*/> _convert_to_websocket_form(opcode_id opcode, const byte* data, net::size_t len);
+    static std::pair<io_result /*header and payload size*/, data_frame_header /*header*/> _preprocess_received_data(byte* const data, net::size_t len) throw(...);
 protected:
     io_service_t* _host_io_service_ptr;
     tcp_stream _tcp_stream;

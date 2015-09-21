@@ -56,6 +56,7 @@ int main()
         using vee::voost::net::byte;
         using vee::voost::net::websocket::ws_stream;
         using vee::voost::net::websocket::opcode_id;
+        using op_result = vee::voost::net::net_stream::op_result;
 
         auto server = vee::voost::net::websocket::create_server(1992);
         auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
@@ -75,8 +76,15 @@ int main()
             {
                 unsigned int bytes_transferred = session1->read(buffer.data(), buffer.size());
                 printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
-                bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
-                printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                //bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
+                //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                session1->async_write(opcode_id::text_frame, 
+                                      buffer.data(), 
+                                      bytes_transferred, 
+                                      [](op_result& result, size_t bytes_transferred) -> void
+                {
+                    printf("echo send: %dbytes\n", bytes_transferred);
+                });
             }
         }
         catch (vee::exception& e)

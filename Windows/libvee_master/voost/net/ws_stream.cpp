@@ -756,9 +756,9 @@ void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
 #pragma warning(default:4996)
 }
 
-void websocket_stream::async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_callback> e)
+void websocket_stream::async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e)
 {
-    //TODO: implementation
+    _tcp_stream.async_connect(ip_addr, port, e);
 }
 
 void websocket_stream::disconnect()
@@ -776,10 +776,10 @@ ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data,
     return ws_packet.first; // return io_result
 }
 
-void websocket_stream::async_write(opcode_id opcode, const byte* data, net::size_t len, std::shared_ptr<async_write_callback> e) throw(...)
+void websocket_stream::async_write(opcode_id opcode, const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...)
 {
     auto packet = _convert_to_websocket_form(opcode, data, len);
-    _tcp_stream.async_write(packet.second.data(), len, std::move(e));
+    _tcp_stream.async_write(packet.second.data(), packet.first.header_size + len, std::move(e));
 }
 
 ws_stream::io_result websocket_stream::read_all(byte* const buffer, net::size_t buf_capacity) throw(...)
@@ -814,40 +814,62 @@ ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, net
     return result;
 }
 
-void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...)
+void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
 {
-    //TODO: implementation
+    auto preprocess = [this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    {
+        if (function_result.error != error_code::none)
+        {
+            e(function_result, buffer, buf_capacity, bytes_transferred);
+        }
+        try
+        {
+            auto info = _preprocess_received_data(buffer, bytes_transferred);
+            memmove(buffer, buffer + info.first.header_size, (uint32_t)(info.first.payload_size));
+            memset(buffer + info.first.payload_size, 0, (uint32_t)(buf_capacity - info.first.payload_size));
+            e(function_result, buffer, buf_capacity, info.first.payload_size);
+        }
+        catch (vee::exception& ex)
+        {
+            if (ex.code == (int)error_code::websocket_heartbeat)
+            {
+                async_read_payload_only(buffer, buf_capacity, e);
+            }
+            else
+            {
+                throw ex;
+            }
+        }
+    };
+    async_read_payload_only(buffer, buf_capacity, e);
 }
 
-void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...)
+void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
 {
-    //TODO: implementation
-    /*auto preprocess = [](std::shared_ptr<async_write_callback> e, op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    auto preprocess = [this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
     {
-    if (function_result.error != error_code::none)
-    {
-    e->operator()(function_result, buffer, bytes_transferred);
-    }
-    try
-    {
-    auto info = _preprocess_received_data(buffer, bytes_transferred);
-    e->operator()(function_result, buffer, bytes_transferred);
-    }
-    catch (vee::exception& e)
-    {
-    if (e.code == (int)error_code::websocket_heartbeat)
-    {
-
-    }
-    else
-    {
-    throw e;
-    }
-    }
+        if (function_result.error != error_code::none)
+        {
+            e(function_result, buffer, buf_capacity, bytes_transferred);
+        }
+        try
+        {
+            auto info = _preprocess_received_data(buffer, bytes_transferred);
+            e(function_result, buffer, buf_capacity, bytes_transferred);
+        }
+        catch (vee::exception& ex)
+        {
+            if (ex.code == (int)error_code::websocket_heartbeat)
+            {
+                async_read_all(buffer, buf_capacity, e);
+            }
+            else
+            {
+                throw ex;
+            }
+        }
     };
-    _tcp_stream.async_read(buffer,
-    buf_capacity,
-    std::bind(preprocess, std::move(e), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));*/
+    _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
 void websocket_stream::conversion(tcp_stream&& stream)
@@ -862,7 +884,7 @@ void websocket_stream::conversion(tcp_stream&& stream)
     return server;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, net::size_t len) const
+std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, net::size_t len)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
@@ -880,7 +902,7 @@ std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*
     return ret;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, net::size_t len) const throw(...)
+std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, net::size_t len) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> ret;
