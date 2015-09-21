@@ -127,9 +127,9 @@ public:
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void disconnect() override;
     //! Read and Write operations require additional space to accommodate the Websocket data frame header in the data buffer.
-    virtual io_result write(opcode_id opcode, void* data, net::size_t len) throw(...) override;
-    virtual io_result read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) override;
-    virtual io_result read_all(void* buffer, net::size_t buf_capacity) throw(...) override;
+    virtual io_result write(opcode_id opcode, const byte* data, net::size_t len) throw(...) override;
+    virtual io_result read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...) override;
+    virtual io_result read_all(byte* const buffer, net::size_t buf_capacity) throw(...) override;
     inline io_service_t& get_io_service() const
     {
         return *_host_io_service_ptr;

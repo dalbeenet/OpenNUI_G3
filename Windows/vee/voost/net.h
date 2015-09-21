@@ -2,6 +2,7 @@
 #define _VEE_VOOST_NET_H_
 
 #include <vee/macro.h>
+#include <vee/delegate.h>
 #include <vee/exception.h>
 #include <memory>
 
@@ -13,14 +14,30 @@ using port_t = unsigned short;
 using size_t = unsigned long long;
 using byte = unsigned char;
 
+enum class error_code: int
+{
+    success = 0,
+    connection_failure,
+    send_failure,
+    recv_failure,
+    invalid_data,
+    disconnected_by_host,
+    client_handshake_failure,
+};
+
 class net_stream abstract
 {
 public:
+    //using connect_callback = delegate<void(const char* ip_addr, port_t port, error_code)>;
+    //using write_callback = delegate<>;
     virtual ~net_stream() = default;
     virtual void connect(const char* ip_addr, port_t port) throw(...) = 0;
+    //virtual net::size_t connect_async(const char* ip_addr, port_t port);
     virtual void disconnect() = 0;
-    virtual net::size_t write(void* data, net::size_t len) throw(...) = 0;
-    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual net::size_t write(const byte* data, net::size_t len) throw(...) = 0;
+    virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
+    //virtual net::size_t async_write(void* data, net::size_t len) throw(...) = 0;
+    //virtual net::size_t async_read(void* buffer, net::size_t buf_capacity) throw(...) = 0;
 };
 
 class net_server abstract
@@ -29,16 +46,6 @@ public:
     virtual ~net_server() = default;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
     virtual void close() = 0;
-};
-
-enum class error_code: int
-{
-    connection_failure = 1,
-    send_failure,
-    recv_failure,
-    invalid_data,
-    disconnected_by_host,
-    client_handshake_failure,
 };
 
 namespace tcp {
@@ -80,11 +87,11 @@ public:
     virtual ~ws_stream() = default;
     virtual void        connect(const char* ip_addr, port_t port) throw(...) = 0;
     virtual void        disconnect() = 0;
-    virtual net::size_t write(void* data, net::size_t len) throw(...) override;
-    virtual io_result   write(opcode_id opcode, void* data, net::size_t len) throw(...) = 0;
-    virtual net::size_t read(void* buffer, net::size_t buf_capacity) throw(...) override;
-    virtual io_result   read_payload_only(void* buffer, net::size_t buf_capacity) throw(...) = 0;
-    virtual io_result   read_all(void* buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual net::size_t write(const byte* data, net::size_t len) throw(...) override;
+    virtual io_result   write(opcode_id opcode, const byte* data, net::size_t len) throw(...) = 0;
+    virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) override;
+    virtual io_result   read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
+    virtual io_result   read_all(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
 };
 
 ::std::shared_ptr<net_server> create_server(unsigned short port);

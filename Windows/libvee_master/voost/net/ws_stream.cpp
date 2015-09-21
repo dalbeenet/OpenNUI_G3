@@ -643,12 +643,12 @@ bool websocket_server::_handshake(net_stream& raw_socket)
 {
     try
     {
-        ::std::array<char, 4096> buffer;
+        ::std::array<byte, 4096> buffer;
         raw_socket.read(buffer.data(), buffer.size());
         
         // Parsing HTTP header
         handshake_client_request header;
-        header.parse(make_string(buffer.data()));
+        header.parse(make_string((char*)buffer.data()));
         
         // Validating the client header
         if (header.is_valid() == false)
@@ -679,7 +679,7 @@ bool websocket_server::_handshake(net_stream& raw_socket)
         puts(response_data.data());
         PRINT_LINE;
         // Send response data to client
-        raw_socket.write((void*)response_data.data(), response_data.size());
+        raw_socket.write((byte*)response_data.data(), response_data.size());
     }
     catch (vee::exception& e)
     {
@@ -743,8 +743,8 @@ void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
     {
         string pack = request.binary_pack();
         _tcp_stream.connect(ip_addr, port);
-        _tcp_stream.write((void*)pack.data(), pack.size());
-        _tcp_stream.read(response_buffer.data(), response_buffer.size());
+        _tcp_stream.write((byte*)pack.data(), pack.size());
+        _tcp_stream.read((byte*)response_buffer.data(), response_buffer.size());
     }
     response.parse(response_buffer.data());
     //Temporary validate check process
@@ -764,7 +764,7 @@ void websocket_stream::disconnect()
     _tcp_stream.disconnect();
 }
 
-ws_stream::io_result websocket_stream::write(opcode_id opcode, void* data, net::size_t len) throw(...)
+ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, net::size_t len) throw(...)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
@@ -780,7 +780,7 @@ ws_stream::io_result websocket_stream::write(opcode_id opcode, void* data, net::
     return result;
 }
 
-ws_stream::io_result websocket_stream::read_all(void* buffer, net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_all(byte* const buffer, net::size_t buf_capacity) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     net::size_t bytes_transferred = 0;
@@ -841,7 +841,7 @@ ws_stream::io_result websocket_stream::read_all(void* buffer, net::size_t buf_ca
     return result;
 }
 
-ws_stream::io_result websocket_stream::read_payload_only(void* buffer, net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...)
 {
     io_result result = read_all(buffer, buf_capacity);
     memmove(buffer, (char*)buffer + result.header_size, (uint32_t)(result.payload_size));
