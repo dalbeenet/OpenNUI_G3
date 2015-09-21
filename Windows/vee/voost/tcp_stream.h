@@ -44,11 +44,17 @@ public:
     explicit tcp_stream(io_service_t& io_service);
     tcp_stream(tcp_stream&& other);
     tcp_stream& operator=(tcp_stream&& rhs);
-    virtual void connect(const char* ip_addr, port_t port) throw(...) override;
-    virtual void disconnect() override;
+    virtual void        connect(const char* ip_addr, port_t port) throw(...) override;
+    virtual void        async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_callback> e) override;
+    virtual void        disconnect() override;
     virtual net::size_t write(const byte* data, net::size_t len) throw(...) override;
+    virtual void        async_write(const byte* data, net::size_t len, std::shared_ptr<async_write_callback> e) throw(...) override;
     virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) override;
-    inline io_service_t& get_io_service() const { return _host_io_service; }
+    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...) override;
+    inline io_service_t& get_io_service() const
+    {
+        return _host_io_service;
+    }
 protected:
     io_service_t& _host_io_service;
     socket_t _socket;

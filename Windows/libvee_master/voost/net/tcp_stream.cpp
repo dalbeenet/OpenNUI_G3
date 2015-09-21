@@ -100,6 +100,27 @@ void tcp_stream::connect(const char* ip_addr, port_t port) throw(...)
     }
 }
 
+void tcp_stream::async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_callback> e)
+{
+    auto caller = [](std::shared_ptr<async_connect_callback> e, boost::system::error_code error) -> void
+    {
+        op_result result;
+        if (error)
+        {
+            result.error = error_code::connection_failure;
+            result.desc = error.message();
+        }
+        else
+        {
+            result.error = error_code::none;
+            result.desc = "none";
+        }
+        e->operator()(result);
+    };
+    endpoint ep(string_to_ipaddr(ip_addr), port);
+    _socket.async_connect(ep, std::bind(caller, std::move(e), std::placeholders::_1));
+}
+
 net::size_t tcp_stream::write(const byte* data, net::size_t len) throw(...)
 {
     ::boost::system::error_code error;
@@ -109,6 +130,32 @@ net::size_t tcp_stream::write(const byte* data, net::size_t len) throw(...)
         throw ::vee::exception("Send failure!", (int)error_code::send_failure);
     }
     return write_len;
+}
+
+void tcp_stream::async_write(const byte* data, net::size_t len, std::shared_ptr<async_write_callback> e) throw(...)
+{
+    auto caller = [](std::shared_ptr<async_write_callback> e, boost::system::error_code error, std::size_t bytes_transferred)
+    {
+        op_result result;
+        if (error)
+        {
+            result.error = error_code::send_failure;
+            result.desc = error.message();
+        }
+        else
+        {
+            result.error = error_code::none;
+            result.desc = "none";
+        }
+        e->operator()(result, bytes_transferred);
+    };
+
+    if (_socket.is_open() == false)
+    {
+        throw vee::exception("invalid connection!", (int)error_code::invalid_connection);
+    }
+    _socket.async_write_some(::boost::asio::buffer(data, (uint32_t)len), 
+                             std::bind(caller, std::move(e), std::placeholders::_1, std::placeholders::_2));
 }
 
 net::size_t tcp_stream::read(byte* const buffer, net::size_t buf_capacity) throw(...)
@@ -121,6 +168,32 @@ net::size_t tcp_stream::read(byte* const buffer, net::size_t buf_capacity) throw
         throw ::vee::exception("Recv failure!", (int)error_code::recv_failure);
     }
     return read_len;
+}
+
+void tcp_stream::async_read(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_callback> e) throw(...)
+{
+    auto caller = [](std::shared_ptr<async_read_callback> e, byte* const buffer, net::size_t buffer_capacity, boost::system::error_code error, std::size_t bytes_transferred)
+    {
+        op_result result;
+        if (error)
+        {
+            result.error = error_code::recv_failure;
+            result.desc = error.message();
+        }
+        else
+        {
+            result.error = error_code::none;
+            result.desc = "none";
+        }
+        e->operator()(result, buffer, buffer_capacity, bytes_transferred);
+    };
+
+    if (_socket.is_open() == false)
+    {
+        throw vee::exception("invalid connection!", (int)error_code::invalid_connection);
+    }
+    _socket.async_read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity),
+                             std::bind(caller, std::move(e), buffer, buf_capacity, std::placeholders::_1, std::placeholders::_2));
 }
 
 void tcp_stream::disconnect()

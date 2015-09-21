@@ -56,15 +56,16 @@ int main()
         using vee::voost::net::byte;
         using vee::voost::net::websocket::ws_stream;
         using vee::voost::net::websocket::opcode_id;
+
         auto server = vee::voost::net::websocket::create_server(1992);
         auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
         std::array<byte, 512> buffer;
         try
         {
-            // Connect to websocket echo server
-            auto session2 = vee::voost::net::websocket::create_stream();
-            session2->connect("175.126.232.80", 12998);
-            //session2->connect("174.129.224.73", 80);
+            //x Connect to websocket echo server
+            //x auto session2 = vee::voost::net::websocket::create_stream();
+            //x session2->connect("175.126.232.80", 12998);
+            //x session2->connect("174.129.224.73", 80);
 
             // Welcome message
             char welcome_message[] = "Welcome";
@@ -72,14 +73,10 @@ int main()
 
             while (true)
             {
-                auto bytes_transferred = session1->read(buffer.data(), buffer.size());
-                printf("s1 recieved: %lldbytes: %s\n", bytes_transferred, buffer.data());
-                bytes_transferred = (session2->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
-                printf("s2 send: %lldbytes: %s\n", bytes_transferred, buffer.data());
-                session2->read(buffer.data(), buffer.size());
-                printf("s2 recieved: %lldbytes: %s\n", bytes_transferred, buffer.data());
+                unsigned int bytes_transferred = session1->read(buffer.data(), buffer.size());
+                printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
                 bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
-                printf("s1 send: %lldbytes: %s\n", bytes_transferred, buffer.data());
+                printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
             }
         }
         catch (vee::exception& e)
