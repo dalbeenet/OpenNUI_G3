@@ -23,6 +23,7 @@ public:
     virtual ~tcp_server();
     virtual void close() override;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
+    virtual void async_accept(std::function<_vee_net_async_accept_callback_sig> e) override;
     inline io_service_t& get_io_service() const { return _host_io_service; }
 protected:
     io_service_t& _host_io_service;

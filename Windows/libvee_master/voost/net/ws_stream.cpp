@@ -634,9 +634,35 @@ void websocket_server::close()
     }
     else
     {
-        ::std::shared_ptr<net_stream> stream(nullptr);
-        return stream;
+        throw vee::exception("rfc6455_client_handshake_failure", (int)error_code::rfc6455_client_handshake_failure);
     }
+}
+
+void websocket_server::async_accept(std::function<_vee_net_async_accept_callback_sig> e)
+{
+    auto handle_accept = [e](op_result& result, ::std::shared_ptr<net_stream>& stream)
+    {
+        if (result.error != error_code::none)
+        {
+            e(result, stream);
+        }
+        else
+        {
+            ::std::shared_ptr<tcp_stream> raw_tcp_stream = ::std::static_pointer_cast<tcp_stream>(stream);
+            bool handshake_result = websocket_server::_handshake(*raw_tcp_stream);
+            if (!handshake_result)
+            {
+                result.error = error_code::rfc6455_client_handshake_failure;
+                result.desc.append("\r\nrfc6455_client_handshake_failure!");
+            }
+            else
+            {
+                ::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>(static_cast<tcp_stream&&>(*raw_tcp_stream));
+                e(result, stream);
+            }
+        }
+    };
+    _tcp_server.async_accept(handle_accept);
 }
 
 bool websocket_server::_handshake(net_stream& raw_socket)
@@ -816,7 +842,7 @@ ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, net
 
 void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
 {
-    auto preprocess = [this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    std::function<_vee_net_async_read_callback_sig> preprocess = [&preprocess, this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
     {
         if (function_result.error != error_code::none)
         {
@@ -833,7 +859,7 @@ void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t b
         {
             if (ex.code == (int)error_code::websocket_heartbeat)
             {
-                async_read_payload_only(buffer, buf_capacity, e);
+                _tcp_stream.async_read(buffer, buf_capacity, preprocess);
             }
             else
             {
@@ -841,12 +867,12 @@ void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t b
             }
         }
     };
-    async_read_payload_only(buffer, buf_capacity, e);
+    _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
 void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
 {
-    auto preprocess = [this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    std::function<_vee_net_async_read_callback_sig> preprocess = [&preprocess, this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
     {
         if (function_result.error != error_code::none)
         {
@@ -861,7 +887,7 @@ void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capaci
         {
             if (ex.code == (int)error_code::websocket_heartbeat)
             {
-                async_read_all(buffer, buf_capacity, e);
+                _tcp_stream.async_read(buffer, buf_capacity, preprocess);
             }
             else
             {

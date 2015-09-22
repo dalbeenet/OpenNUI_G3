@@ -46,6 +46,20 @@ void net_stream::async_read(byte* const buffer, net::size_t buf_capacity, std::s
     return async_read(buffer, buf_capacity, caller);
 }
 
+void net_server::async_accept(async_accept_delegate_t e)
+{
+    return async_accept(std::make_shared<async_accept_delegate_t>(e));
+}
+
+void net_server::async_accept(std::shared_ptr<async_accept_delegate_t> e)
+{
+    auto caller = [e](op_result& result, ::std::shared_ptr<net_stream> stream) -> void
+    {
+        e->operator()(result, stream);
+    };
+    return async_accept(caller);
+}
+
 namespace websocket {
 
 net::size_t ws_stream::write(const byte* data, net::size_t len) throw(...)

@@ -44,8 +44,32 @@ void tcp_server::close()
 {
     ::boost::asio::ip::tcp::socket client(_host_io_service);
     _acceptor.accept(client);
+    //TODO: exception handling
     ::std::shared_ptr<net_stream> ret = ::std::make_shared<tcp_stream>(std::move(client));
     return ret;
+}
+
+void tcp_server::async_accept(std::function<_vee_net_async_accept_callback_sig> e)
+{
+    std::shared_ptr<::boost::asio::ip::tcp::socket> socket = std::make_shared<::boost::asio::ip::tcp::socket>(_host_io_service);
+    auto handle_accept = [socket, e](const boost::system::error_code& error) -> void
+    {
+        op_result result;
+        if (error)
+        {
+            result.error = error_code::accept_failure;
+            result.desc = error.message();
+            ::std::shared_ptr<net_stream> ptr(nullptr);
+            e(result, ptr);
+        }
+        else
+        {
+            result.error = error_code::none;
+            result.desc = error.message();
+            e(result, ::std::make_shared<tcp_stream>(std::move(*socket)));
+        }
+    };
+    _acceptor.async_accept(*socket, handle_accept);
 }
 
 tcp_stream::tcp_stream():

@@ -104,9 +104,10 @@ public:
     virtual ~websocket_server();
     virtual void close() override;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
+    virtual void async_accept(std::function<_vee_net_async_accept_callback_sig> e) override;
     inline io_service_t& get_io_service() const { return _host_io_service; }
 protected:
-    bool _handshake(net_stream& raw_socket);
+    static bool _handshake(net_stream& raw_socket);
 protected:
     ::boost::asio::io_service& _host_io_service;
     tcp_server _tcp_server;

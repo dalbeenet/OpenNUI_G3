@@ -18,6 +18,7 @@ enum class error_code: int
 {
     none = 0,
     connection_failure,
+    accept_failure,
     send_failure,
     recv_failure,
     disconnected_by_host,
@@ -26,17 +27,18 @@ enum class error_code: int
     websocket_heartbeat,
 };
 
-#define _vee_net_async_connect_callback_sig void(op_result&)
-#define _vee_net_async_write_callback_sig void(op_result& /*function_result*/, net::size_t /*bytes_transferred*/)
-#define _vee_net_async_read_callback_sig void(op_result& /*function_result*/, byte* const /*recieve_buffer_address*/, net::size_t /*recieve_buffer_size*/, net::size_t /*bytes_transferred*/)
+struct op_result
+{
+    error_code  error;
+    std::string desc;
+};
+
+#define _vee_net_async_connect_callback_sig void(::vee::voost::net::op_result&)
+#define _vee_net_async_write_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::vee::voost::net::size_t /*bytes_transferred*/)
+#define _vee_net_async_read_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::vee::voost::net::byte* const /*recieve_buffer_address*/, ::vee::voost::net::size_t /*recieve_buffer_size*/, ::vee::voost::net::size_t /*bytes_transferred*/)
 class net_stream abstract
 {
 public:
-    struct op_result
-    {
-        error_code  error;
-        std::string desc;
-    };
     using async_connect_delegate_t = delegate<_vee_net_async_connect_callback_sig>;
     using async_write_delegate_t = delegate<_vee_net_async_write_callback_sig>;
     using async_read_delegate_t = delegate<_vee_net_async_read_callback_sig>;
@@ -56,11 +58,16 @@ public:
     virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> callback) throw(...) = 0;
 };
 
+#define _vee_net_async_accept_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::std::shared_ptr<::vee::voost::net::net_stream> /*stream*/)
 class net_server abstract
 {
 public:
+    using async_accept_delegate_t = delegate<_vee_net_async_accept_callback_sig>;
     virtual ~net_server() = default;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) = 0;
+    virtual void async_accept(async_accept_delegate_t e);
+    virtual void async_accept(std::shared_ptr<async_accept_delegate_t> e);
+    virtual void async_accept(std::function<_vee_net_async_accept_callback_sig> e) = 0;
     virtual void close() = 0;
 };
 
