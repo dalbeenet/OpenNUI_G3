@@ -15,9 +15,9 @@ using error_code = ::vee::system::error_code;
 class sync_stream abstract
 {
 public:
-    virtual ~sync_stream();
-    virtual uint32_t write(const byte* data, uint32_t size) throw(...) = 0;
-    virtual uint32_t read(byte* const buffer, uint32_t buf_capacity) throw(...) = 0;
+    virtual ~sync_stream() = default;
+    virtual uint32_t write(const byte* data, const uint32_t size) throw(...) = 0;
+    virtual uint32_t read(byte* const buffer, const uint32_t buf_capacity) throw(...) = 0;
 };
 
 #define _vee_async_read_callback_sig void(::vee::system::operation_result& /*opereation_result*/, ::vee::byte* const /*recieve_buffer_address*/, uint32_t /*recieve_buffer_size*/, uint32_t /*bytes_transferred*/)
@@ -49,7 +49,7 @@ public:
     virtual void async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...) = 0;
 };
 
-class stream abstract: virtual public sync_stream, virtual public async_stream
+class stream abstract: public sync_stream, public async_stream
 {
 public:
 };

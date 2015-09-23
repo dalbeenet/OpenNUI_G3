@@ -2,7 +2,7 @@
 #define _VEE_VOOST_NET_H_
 
 #include <vee/macro.h>
-#include <vee/delegate.h>
+#include <vee/stream.h>
 #include <vee/exception.h>
 #include <memory>
 
@@ -13,52 +13,29 @@ namespace net {
 using port_t = unsigned short;
 using size_t = std::size_t;
 using byte = unsigned char;
+using operation_result = ::vee::system::operation_result;
+using error_code = ::vee::system::error_code;
 
-enum class error_code: int
-{
-    none = 0,
-    connection_failure,
-    accept_failure,
-    send_failure,
-    recv_failure,
-    disconnected_by_host,
-    rfc6455_client_handshake_failure,
-    invalid_connection,
-    websocket_heartbeat,
-};
-
-struct op_result
-{
-    error_code  error;
-    std::string desc;
-};
-
-#define _vee_net_async_connect_callback_sig void(::vee::voost::net::op_result&)
-#define _vee_net_async_write_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::vee::voost::net::size_t /*bytes_transferred*/)
-#define _vee_net_async_read_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::vee::voost::net::byte* const /*recieve_buffer_address*/, ::vee::voost::net::size_t /*recieve_buffer_size*/, ::vee::voost::net::size_t /*bytes_transferred*/)
-class net_stream abstract
+#define _vee_net_async_connect_callback_sig void(::vee::system::operation_result&)
+#define _vee_net_async_read_callback_sig _vee_async_read_callback_sig
+#define _vee_net_async_write_callback_sig _vee_async_write_callback_sig
+class net_stream abstract: public stream
 {
 public:
-    using async_connect_delegate_t = delegate<_vee_net_async_connect_callback_sig>;
-    using async_write_delegate_t = delegate<_vee_net_async_write_callback_sig>;
-    using async_read_delegate_t = delegate<_vee_net_async_read_callback_sig>;
+    using async_connect_delegate = delegate<_vee_net_async_connect_callback_sig>;
+    using async_connect_delegate_ptr = ::std::shared_ptr<async_connect_delegate>;
+    using async_connect_callback = ::std::function<_vee_net_async_connect_callback_sig>;
     virtual ~net_stream() = default;
     virtual void        connect(const char* ip_addr, port_t port) throw(...) = 0;
-    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_delegate_t e);
-    virtual void        async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_delegate_t> e);
-    virtual void        async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> callback) = 0;
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_delegate& e);
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_delegate&& e);
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_delegate_ptr& e_ptr);
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_delegate_ptr&& e_ptr);
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_callback callback) = 0;
     virtual void        disconnect() = 0;
-    virtual net::size_t write(const byte* data, net::size_t len) throw(...) = 0;
-    virtual void        async_write(const byte* data, net::size_t len, async_write_delegate_t e) throw(...);
-    virtual void        async_write(const byte* data, net::size_t len, std::shared_ptr<async_write_delegate_t> e) throw(...);
-    virtual void        async_write(const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> callback) throw(...) = 0;
-    virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
-    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, async_read_delegate_t e) throw(...);
-    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_delegate_t> e) throw(...);
-    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> callback) throw(...) = 0;
 };
 
-#define _vee_net_async_accept_callback_sig void(::vee::voost::net::op_result& /*function_result*/, ::std::shared_ptr<::vee::voost::net::net_stream> /*stream*/)
+#define _vee_net_async_accept_callback_sig void(::vee::system::operation_result& /*function_result*/, ::std::shared_ptr<::vee::voost::net::net_stream> /*stream*/)
 class net_server abstract
 {
 public:
@@ -109,23 +86,30 @@ public:
     };
     virtual ~ws_stream() = default;
     virtual void        connect(const char* ip_addr, port_t port) throw(...) = 0;
-    //x virtual void        async_connect(const char* ip_addr, port_t port, std::shared_ptr<async_connect_delegate_t> e);
-    virtual void        async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e) = 0;
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_callback e) = 0;
     virtual void        disconnect() = 0;
-    virtual net::size_t write(const byte* data, net::size_t len) throw(...) override;
-    virtual io_result   write(opcode_id opcode, const byte* data, net::size_t len) throw(...) = 0;
-    virtual void        async_write(const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...) override;
-    virtual void        async_write(opcode_id opcode, const byte* data, net::size_t len, std::shared_ptr<async_write_delegate_t> e) throw(...);
-    virtual void        async_write(opcode_id opcode, const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...) = 0;
-    virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) override;
-    virtual io_result   read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
-    virtual io_result   read_all(byte* const buffer, net::size_t buf_capacity) throw(...) = 0;
-    //x virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_delegate_t> e) throw(...) override;
-    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) override;
-    virtual void        async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_delegate_t> e) throw(...);
-    virtual void        async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) = 0;
-    virtual void        async_read_all(byte* const buffer, net::size_t buf_capacity, std::shared_ptr<async_read_delegate_t> e) throw(...);
-    virtual void        async_read_all(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) = 0;
+    virtual net::size_t write(const byte* data, const net::size_t len) throw(...) override;
+    virtual io_result   write(opcode_id opcode, const byte* data, const net::size_t len) throw(...) = 0;
+    virtual void        async_write(const byte* data, const net::size_t len, async_write_callback e) throw(...) override;
+    virtual void        async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_delegate& e) throw(...);
+    virtual void        async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_delegate&& e) throw(...);
+    virtual void        async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_delegate_ptr& e_ptr) throw(...);
+    virtual void        async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_delegate_ptr&& e_ptr) throw(...);
+    virtual void        async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_callback e) throw(...) = 0;
+    virtual net::size_t read(byte* const buffer, const net::size_t buf_capacity) throw(...) override;
+    virtual io_result   read_payload_only(byte* const buffer, const net::size_t buf_capacity) throw(...) = 0;
+    virtual io_result   read_all(byte* const buffer, const net::size_t buf_capacity) throw(...) = 0;
+    virtual void        async_read(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) override;
+    virtual void        async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_delegate& e) throw(...);
+    virtual void        async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_delegate&& e) throw(...);
+    virtual void        async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_delegate_ptr& e_ptr) throw(...);
+    virtual void        async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_delegate_ptr&& e_ptr) throw(...);
+    virtual void        async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) = 0;
+    virtual void        async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_delegate& e) throw(...);
+    virtual void        async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_delegate&& e) throw(...);
+    virtual void        async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_delegate_ptr& e_ptr) throw(...);
+    virtual void        async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_delegate_ptr&& e_ptr) throw(...);
+    virtual void        async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) = 0;
 };
 
 ::std::shared_ptr<net_server> create_server(unsigned short port);

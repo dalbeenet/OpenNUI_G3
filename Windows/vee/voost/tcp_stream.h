@@ -46,12 +46,12 @@ public:
     tcp_stream(tcp_stream&& other);
     tcp_stream& operator=(tcp_stream&& rhs);
     virtual void        connect(const char* ip_addr, port_t port) throw(...) override;
-    virtual void        async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e) override;
+    virtual void        async_connect(const char* ip_addr, port_t port, async_connect_callback e) override;
     virtual void        disconnect() override;
-    virtual net::size_t write(const byte* data, net::size_t len) throw(...) override;
-    virtual void        async_write(const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...) override;
-    virtual net::size_t read(byte* const buffer, net::size_t buf_capacity) throw(...) override;
-    virtual void        async_read(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...) override;
+    virtual net::size_t write(const byte* data, const net::size_t len) throw(...) override;
+    virtual void        async_write(const byte* data, const net::size_t len, async_write_callback e) throw(...) override;
+    virtual net::size_t read(byte* const buffer, const net::size_t buf_capacity) throw(...) override;
+    virtual void        async_read(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) override;
     inline io_service_t& get_io_service() const
     {
         return _host_io_service;

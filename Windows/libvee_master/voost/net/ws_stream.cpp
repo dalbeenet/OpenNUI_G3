@@ -404,7 +404,7 @@ string handshake_server_response::binary_pack() const
     return ret;
 }
 
-void data_frame_header::analyze(const unsigned char* raw_data, net::size_t length)
+void data_frame_header::analyze(const unsigned char* raw_data, const net::size_t length)
 {
     if (!raw_data) return;
 
@@ -634,15 +634,15 @@ void websocket_server::close()
     }
     else
     {
-        throw vee::exception("rfc6455_client_handshake_failure", (int)error_code::rfc6455_client_handshake_failure);
+        throw vee::exception("rfc6455_client_handshake_failure", (int)error_code::rfc6455_handshake_failure);
     }
 }
 
 void websocket_server::async_accept(std::function<_vee_net_async_accept_callback_sig> e)
 {
-    auto handle_accept = [e](op_result& result, ::std::shared_ptr<net_stream>& stream)
+    auto handle_accept = [e](operation_result& result, ::std::shared_ptr<net_stream>& stream)
     {
-        if (result.error != error_code::none)
+        if (result.error != error_code::success)
         {
             e(result, stream);
         }
@@ -652,7 +652,7 @@ void websocket_server::async_accept(std::function<_vee_net_async_accept_callback
             bool handshake_result = websocket_server::_handshake(*raw_tcp_stream);
             if (!handshake_result)
             {
-                result.error = error_code::rfc6455_client_handshake_failure;
+                result.error = error_code::rfc6455_handshake_failure;
                 result.desc.append("\r\nrfc6455_client_handshake_failure!");
             }
             else
@@ -776,13 +776,13 @@ void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
     //Temporary validate check process
     if (response.sec_websocket_accept.compare("s3pPLMBiTxaQ9kYGzzhZRbK+xOo=") != 0)
     { // indvlid response
-        throw ::vee::exception("Sec-Websocket-Accept key is wrong!", (int)error_code::rfc6455_client_handshake_failure);
+        throw ::vee::exception("Sec-Websocket-Accept key is wrong!", (int)error_code::rfc6455_handshake_failure);
     }
     printf("Connect success!");
 #pragma warning(default:4996)
 }
 
-void websocket_stream::async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e)
+void websocket_stream::async_connect(const char* ip_addr, port_t port, async_connect_callback e)
 {
     _tcp_stream.async_connect(ip_addr, port, e);
 }
@@ -795,20 +795,20 @@ void websocket_stream::disconnect()
     _tcp_stream.disconnect();
 }
 
-ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, net::size_t len) throw(...)
+ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, const net::size_t len) throw(...)
 {
     auto ws_packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.write(ws_packet.second.data(), ws_packet.second.size());
     return ws_packet.first; // return io_result
 }
 
-void websocket_stream::async_write(opcode_id opcode, const byte* data, net::size_t len, std::function<_vee_net_async_write_callback_sig> e) throw(...)
+void websocket_stream::async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_callback e) throw(...)
 {
     auto packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.async_write(packet.second.data(), packet.first.header_size + len, std::move(e));
 }
 
-ws_stream::io_result websocket_stream::read_all(byte* const buffer, net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_all(byte* const buffer, const net::size_t buf_capacity) throw(...)
 {
     while (true)
     {
@@ -820,7 +820,7 @@ ws_stream::io_result websocket_stream::read_all(byte* const buffer, net::size_t 
         }
         catch (vee::exception& e)
         {
-            if (e.code == (int)error_code::websocket_heartbeat)
+            if (e.code == (int)error_code::rfc6455_websocket_heartbeat)
             {
                 continue;
             }
@@ -832,7 +832,7 @@ ws_stream::io_result websocket_stream::read_all(byte* const buffer, net::size_t 
     }
 }
 
-ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, const net::size_t buf_capacity) throw(...)
 {
     io_result result = read_all(buffer, buf_capacity);
     memmove(buffer, buffer + result.header_size, (uint32_t)(result.payload_size));
@@ -840,11 +840,11 @@ ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, net
     return result;
 }
 
-void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
+void websocket_stream::async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...)
 {
-    std::function<_vee_net_async_read_callback_sig> preprocess = [&preprocess, this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const net::size_t buf_capacity, const net::size_t bytes_transferred) -> void
     {
-        if (function_result.error != error_code::none)
+        if (function_result.error != error_code::success)
         {
             e(function_result, buffer, buf_capacity, bytes_transferred);
         }
@@ -857,7 +857,7 @@ void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t b
         }
         catch (vee::exception& ex)
         {
-            if (ex.code == (int)error_code::websocket_heartbeat)
+            if (ex.code == (int)error_code::rfc6455_websocket_heartbeat)
             {
                 _tcp_stream.async_read(buffer, buf_capacity, preprocess);
             }
@@ -870,11 +870,11 @@ void websocket_stream::async_read_payload_only(byte* const buffer, net::size_t b
     _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
-void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capacity, std::function<_vee_net_async_read_callback_sig> e) throw(...)
+void websocket_stream::async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...)
 {
-    std::function<_vee_net_async_read_callback_sig> preprocess = [&preprocess, this, e](op_result& function_result, byte* const buffer, net::size_t buf_capacity, net::size_t bytes_transferred) -> void
+    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const net::size_t buf_capacity, const net::size_t bytes_transferred) -> void
     {
-        if (function_result.error != error_code::none)
+        if (function_result.error != error_code::success)
         {
             e(function_result, buffer, buf_capacity, bytes_transferred);
         }
@@ -885,7 +885,7 @@ void websocket_stream::async_read_all(byte* const buffer, net::size_t buf_capaci
         }
         catch (vee::exception& ex)
         {
-            if (ex.code == (int)error_code::websocket_heartbeat)
+            if (ex.code == (int)error_code::rfc6455_websocket_heartbeat)
             {
                 _tcp_stream.async_read(buffer, buf_capacity, preprocess);
             }
@@ -910,7 +910,7 @@ void websocket_stream::conversion(tcp_stream&& stream)
     return server;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, net::size_t len)
+std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, const net::size_t len)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
@@ -928,11 +928,11 @@ std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*
     return ret;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, net::size_t len) throw(...)
+std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, const net::size_t len) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> ret;
-    net::size_t& bytes_transferred = len;
+    net::size_t bytes_transferred = len;
     io_result& io_result = ret.first;
     data_frame_header& header = ret.second;
 
@@ -941,7 +941,7 @@ std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*
     {
     case opcode_id::ping:
     case opcode_id::pong:
-            throw vee::exception("Websocket heartbeat", (int)error_code::websocket_heartbeat);
+            throw vee::exception("Websocket heartbeat", (int)error_code::rfc6455_websocket_heartbeat);
     default:
         break;
     }
@@ -949,7 +949,7 @@ std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*
     // Check the connection close operation
     if (header.opcode == opcode_id::connnection_close)
     {
-        throw ::vee::exception("Connection is closed by host", (int)error_code::disconnected_by_host);
+        throw ::vee::exception("Connection is closed by host", (int)error_code::stream_disconnected_by_host);
     }
 
     // Copy binary data from buffer (DO NOT USE EXTEISNION FLAG!)

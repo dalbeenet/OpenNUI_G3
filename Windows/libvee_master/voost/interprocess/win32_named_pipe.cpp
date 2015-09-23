@@ -5,10 +5,6 @@ namespace vee {
 namespace voost {
 namespace interprocess {
 
-namespace win32 {
-
-} // namespace win32
-
 } // namespace interprocess
 } // namespace voost
 } // namespace vee

@@ -58,37 +58,7 @@ int main()
         using vee::voost::net::error_code;
         using vee::voost::net::websocket::ws_stream;
         using vee::voost::net::websocket::opcode_id;
-        using op_result = vee::voost::net::op_result;
-
-    //    auto server = vee::voost::net::websocket::create_server(1992);
-    //    std::function<_vee_net_async_accept_callback_sig> accept_handler =
-    //        [&](op_result& result, std::shared_ptr<net_stream> session) -> void
-    //    {
-    //        if (result.error != error_code::none) return;
-    //        auto web_session = std::static_pointer_cast<ws_stream>(session);
-    //        std::shared_ptr< std::array<byte, 512> > buffer = std::make_shared< std::array<byte, 512> >();
-    //        std::function<_vee_net_async_read_callback_sig> read_handler =
-    //            [&read_handler, web_session](op_result& result, byte* const recv_buffer, size_t buf_capacity, size_t bytes_transferred)
-    //        {
-    //            if (result.error != error_code::none) return;
-    //            printf("data recv: %dbytes: %s\n", bytes_transferred, recv_buffer);
-    //            web_session->async_write(opcode_id::text_frame,
-    //                                     recv_buffer,
-    //                                     bytes_transferred,
-    //                                     [recv_buffer, buf_capacity, web_session](op_result& result, size_t bytes_transferred) -> void
-    //            {
-    //                printf("echo send: %dbytes\n", bytes_transferred);
-    //                // web_session->async_read(recv_buffer, buf_capacity, read_handler);
-    //            });
-    //        };
-    //        web_session->async_read(buffer->data(), buffer->size(), read_handler);
-    //        server->async_accept(accept_handler);
-    //    };
-    //    server->async_accept(accept_handler);
-    //    printf("Press any key to exit...\n");
-    //    getch();
-    //    print_line();
-    //}
+        using operation_result = vee::system::operation_result;
 
         auto server = vee::voost::net::websocket::create_server(1992);
         auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
@@ -113,7 +83,7 @@ int main()
                 session1->async_write(opcode_id::text_frame, 
                                       buffer.data(), 
                                       bytes_transferred, 
-                                      [](op_result& result, size_t bytes_transferred) -> void
+                                      [](operation_result& result, size_t bytes_transferred) -> void
                 {
                     printf("echo send: %dbytes\n", bytes_transferred);
                 });
