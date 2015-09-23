@@ -11,7 +11,7 @@ namespace voost {
 namespace net {
 
 using port_t = unsigned short;
-using size_t = unsigned int;
+using size_t = std::size_t;
 using byte = unsigned char;
 
 enum class error_code: int

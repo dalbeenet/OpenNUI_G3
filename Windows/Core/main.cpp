@@ -51,14 +51,14 @@ int main()
     //    print_line();
     //}
     
-    //{
-    //    printf("Websocket echo server\n");
-    //    using vee::voost::net::byte;
-    //    using vee::voost::net::net_stream;
-    //    using vee::voost::net::error_code;
-    //    using vee::voost::net::websocket::ws_stream;
-    //    using vee::voost::net::websocket::opcode_id;
-    //    using op_result = vee::voost::net::op_result;
+    {
+        printf("Websocket echo server\n");
+        using vee::voost::net::byte;
+        using vee::voost::net::net_stream;
+        using vee::voost::net::error_code;
+        using vee::voost::net::websocket::ws_stream;
+        using vee::voost::net::websocket::opcode_id;
+        using op_result = vee::voost::net::op_result;
 
     //    auto server = vee::voost::net::websocket::create_server(1992);
     //    std::function<_vee_net_async_accept_callback_sig> accept_handler =
@@ -90,40 +90,40 @@ int main()
     //    print_line();
     //}
 
-    //    auto server = vee::voost::net::websocket::create_server(1992);
-    //    auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
-    //    std::array<byte, 512> buffer;
-    //    try
-    //    {
-    //        //x Connect to websocket echo server
-    //        //x auto session2 = vee::voost::net::websocket::create_stream();
-    //        //x session2->connect("175.126.232.80", 12998);
-    //        //x session2->connect("174.129.224.73", 80);
+        auto server = vee::voost::net::websocket::create_server(1992);
+        auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
+        std::array<byte, 512> buffer;
+        try
+        {
+            //x Connect to websocket echo server
+            //x auto session2 = vee::voost::net::websocket::create_stream();
+            //x session2->connect("175.126.232.80", 12998);
+            //x session2->connect("174.129.224.73", 80);
 
-    //        // Welcome message
-    //        char welcome_message[] = "Welcome";
-    //        session1->write(opcode_id::text_frame, (byte*)welcome_message, strlen(welcome_message));
+            // Welcome message
+            char welcome_message[] = "Welcome";
+            session1->write(opcode_id::text_frame, (byte*)welcome_message, strlen(welcome_message));
 
-    //        while (true)
-    //        {
-    //            unsigned int bytes_transferred = session1->read(buffer.data(), buffer.size());
-    //            printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
-    //            //bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
-    //            //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
-    //            session1->async_write(opcode_id::text_frame, 
-    //                                  buffer.data(), 
-    //                                  bytes_transferred, 
-    //                                  [](op_result& result, size_t bytes_transferred) -> void
-    //            {
-    //                printf("echo send: %dbytes\n", bytes_transferred);
-    //            });
-    //        }
-    //    }
-    //    catch (vee::exception& e)
-    //    {
-    //        printf("EXCEPTION: %s\n", e.what());
-    //    }
-    //}
+            while (true)
+            {
+                unsigned int bytes_transferred = session1->read(buffer.data(), buffer.size());
+                printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
+                //bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
+                //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                session1->async_write(opcode_id::text_frame, 
+                                      buffer.data(), 
+                                      bytes_transferred, 
+                                      [](op_result& result, size_t bytes_transferred) -> void
+                {
+                    printf("echo send: %dbytes\n", bytes_transferred);
+                });
+            }
+        }
+        catch (vee::exception& e)
+        {
+            printf("EXCEPTION: %s\n", e.what());
+        }
+    }
 
     return 0;
 }

@@ -19,13 +19,16 @@
     <ClInclude Include="..\vee\lock.h" />
     <ClInclude Include="..\vee\scheduler.h" />
     <ClInclude Include="..\vee\signal_channel.h" />
+    <ClInclude Include="..\vee\stream.h" />
     <ClInclude Include="..\vee\string.h" />
+    <ClInclude Include="..\vee\system.h" />
     <ClInclude Include="..\vee\tuple_unpacker.h" />
     <ClInclude Include="..\vee\type_parser.h" />
     <ClInclude Include="..\vee\vee.h" />
     <ClInclude Include="..\vee\voost\asio.h" />
     <ClInclude Include="..\vee\voost\endian.h" />
     <ClInclude Include="..\vee\voost\net.h" />
+    <ClInclude Include="..\vee\voost\pipe.h" />
     <ClInclude Include="..\vee\voost\shared_memory.h" />
     <ClInclude Include="..\vee\voost\string.h" />
     <ClInclude Include="..\vee\voost\tcp_stream.h" />
@@ -36,12 +39,14 @@
   <ItemGroup>
     <ClCompile Include="exception\exception_impl.cpp" />
     <ClCompile Include="lock\lock_impl.cpp" />
+    <ClCompile Include="stream\async_stream.cpp" />
     <ClCompile Include="voost\asio_impl.cpp" />
     <ClCompile Include="voost\endian\conversion.cpp" />
+    <ClCompile Include="voost\interprocess\win32_named_pipe.cpp" />
+    <ClCompile Include="voost\interprocess\xshared_memory.cpp" />
     <ClCompile Include="voost\net\net.cpp" />
     <ClCompile Include="voost\net\tcp_stream.cpp" />
     <ClCompile Include="voost\net\ws_stream.cpp" />
-    <ClCompile Include="voost\shared_memory\xshared_memory.cpp" />
     <ClCompile Include="voost\string\base64.cpp" />
     <ClCompile Include="voost\string\utilites.cpp" />
     <ClCompile Include="voost\timer\xtimer.cpp" />
