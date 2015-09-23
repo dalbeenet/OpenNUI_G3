@@ -404,7 +404,7 @@ string handshake_server_response::binary_pack() const
     return ret;
 }
 
-void data_frame_header::analyze(const unsigned char* raw_data, const net::size_t length)
+void data_frame_header::analyze(const unsigned char* raw_data, const uint32_t length)
 {
     if (!raw_data) return;
 
@@ -482,9 +482,9 @@ void data_frame_header::analyze(const unsigned char* raw_data, const net::size_t
     return;
 }
 
-net::size_t data_frame_header::binary_pack(opcode_id opcode, unsigned char* out_buffer) const
+uint32_t data_frame_header::binary_pack(opcode_id opcode, unsigned char* out_buffer) const
 {
-    net::size_t shift = 0;
+    uint32_t shift = 0;
 
     int8_t fin_opcode_block = 0; 
     switch (opcode)
@@ -553,10 +553,10 @@ net::size_t data_frame_header::binary_pack(opcode_id opcode, unsigned char* out_
     return shift; // same as length of header
 }
 
-net::size_t data_frame_header::binary_pack_size() const
+uint32_t data_frame_header::binary_pack_size() const
 {
     // FOLLOWING PROCESS as same as binary_pack() method, but This function doesn't call memmove()
-    net::size_t shift = 0;
+    uint32_t shift = 0;
 
     //x int8_t fin_opcode_block = (int8_t)0x1; // must be binary frame (net_stream interface requirement)
     //x (fin) ? (fin_opcode_block |= 0x80) : (fin_opcode_block |= 0x00);
@@ -795,26 +795,26 @@ void websocket_stream::disconnect()
     _tcp_stream.disconnect();
 }
 
-ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, const net::size_t len) throw(...)
+ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, const uint32_t len) throw(...)
 {
     auto ws_packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.write(ws_packet.second.data(), ws_packet.second.size());
     return ws_packet.first; // return io_result
 }
 
-void websocket_stream::async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_callback e) throw(...)
+void websocket_stream::async_write(opcode_id opcode, const byte* data, const uint32_t len, async_write_callback e) throw(...)
 {
     auto packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.async_write(packet.second.data(), packet.first.header_size + len, std::move(e));
 }
 
-ws_stream::io_result websocket_stream::read_all(byte* const buffer, const net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_all(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
     while (true)
     {
         try
         {
-            net::size_t bytes_transferred = _tcp_stream.read(buffer, buf_capacity);
+            uint32_t bytes_transferred = _tcp_stream.read(buffer, buf_capacity);
             auto info = _preprocess_received_data(buffer, bytes_transferred);
             return info.first;
         }
@@ -832,7 +832,7 @@ ws_stream::io_result websocket_stream::read_all(byte* const buffer, const net::s
     }
 }
 
-ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, const net::size_t buf_capacity) throw(...)
+ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
     io_result result = read_all(buffer, buf_capacity);
     memmove(buffer, buffer + result.header_size, (uint32_t)(result.payload_size));
@@ -840,9 +840,9 @@ ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, con
     return result;
 }
 
-void websocket_stream::async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...)
+void websocket_stream::async_read_payload_only(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
 {
-    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const net::size_t buf_capacity, const net::size_t bytes_transferred) -> void
+    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const uint32_t buf_capacity, const uint32_t bytes_transferred) -> void
     {
         if (function_result.error != error_code::success)
         {
@@ -870,9 +870,9 @@ void websocket_stream::async_read_payload_only(byte* const buffer, const net::si
     _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
-void websocket_stream::async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...)
+void websocket_stream::async_read_all(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
 {
-    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const net::size_t buf_capacity, const net::size_t bytes_transferred) -> void
+    async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const uint32_t buf_capacity, const uint32_t bytes_transferred) -> void
     {
         if (function_result.error != error_code::success)
         {
@@ -910,29 +910,29 @@ void websocket_stream::conversion(tcp_stream&& stream)
     return server;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, const net::size_t len)
+std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, const uint32_t len)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
     header.use_mask = false; //TODO: 커스텀 마스크 사용하는 함수 지원하기, 지금은 고정된 마스크 -> 클라이언트에만 필요, 서버는 절대 마스킹하면 안됨!
     header.payload_len = len;
-    net::size_t header_size = header.binary_pack_size();
+    uint32_t header_size = header.binary_pack_size();
     std::vector<byte> packet_data((uint32_t)(len + header_size), 0); //TODO: 매번 벡터를 안만드는 방법을 생각해보자.
     memmove(packet_data.data() + header.binary_pack(opcode, packet_data.data()), data, (uint32_t)len);
 
     std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> ret;
     ret.first.header_size = header_size;
-    ret.first.payload_size = (net::size_t)header.payload_len;
+    ret.first.payload_size = (uint32_t)header.payload_len;
     ret.second = std::move(packet_data);
 
     return ret;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, const net::size_t len) throw(...)
+std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, const uint32_t len) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
     std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> ret;
-    net::size_t bytes_transferred = len;
+    uint32_t bytes_transferred = len;
     io_result& io_result = ret.first;
     data_frame_header& header = ret.second;
 
@@ -962,8 +962,8 @@ std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*
         }
     }
 
-    ret.first.header_size = bytes_transferred - (net::size_t)header.payload_len;
-    ret.first.payload_size = (net::size_t)header.payload_len;
+    ret.first.header_size = bytes_transferred - (uint32_t)header.payload_len;
+    ret.first.payload_size = (uint32_t)header.payload_len;
 
     return ret;
 }

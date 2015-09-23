@@ -49,7 +49,7 @@ public:
     virtual void async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...) = 0;
 };
 
-class stream abstract: public sync_stream, public async_stream
+class iostream abstract: public sync_stream, public async_stream
 {
 public:
 };

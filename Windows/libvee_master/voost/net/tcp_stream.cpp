@@ -145,10 +145,10 @@ void tcp_stream::async_connect(const char* ip_addr, port_t port, async_connect_c
     _socket.async_connect(ep, handle_connect);
 }
 
-net::size_t tcp_stream::write(const byte* data, const net::size_t len) throw(...)
+uint32_t tcp_stream::write(const byte* data, const uint32_t len) throw(...)
 {
     ::boost::system::error_code error;
-    net::size_t write_len = (net::size_t)_socket.write_some(::boost::asio::buffer(data, (uint32_t)len), error);
+    uint32_t write_len = (uint32_t)_socket.write_some(::boost::asio::buffer(data, (uint32_t)len), error);
     if (error)
     {
         throw ::vee::exception("Send failure!", (int)error_code::stream_send_failure);
@@ -156,7 +156,7 @@ net::size_t tcp_stream::write(const byte* data, const net::size_t len) throw(...
     return write_len;
 }
 
-void tcp_stream::async_write(const byte* data, const net::size_t len, async_write_callback e) throw(...)
+void tcp_stream::async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...)
 {
     auto handle_write = [e](const boost::system::error_code& error, size_t bytes_transferred) -> void
     {
@@ -180,11 +180,11 @@ void tcp_stream::async_write(const byte* data, const net::size_t len, async_writ
     _socket.async_write_some(::boost::asio::buffer(data, (uint32_t)len), handle_write);
 }
 
-net::size_t tcp_stream::read(byte* const buffer, const net::size_t buf_capacity) throw(...)
+uint32_t tcp_stream::read(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
     ::boost::system::error_code error;
     memset(buffer, 0, (uint32_t)buf_capacity);
-    net::size_t read_len = (net::size_t)_socket.read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity), error);
+    uint32_t read_len = (uint32_t)_socket.read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity), error);
     if (error)
     {
         throw ::vee::exception("Recv failure!", (int)error_code::stream_read_failure);
@@ -192,7 +192,7 @@ net::size_t tcp_stream::read(byte* const buffer, const net::size_t buf_capacity)
     return read_len;
 }
 
-void tcp_stream::async_read(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...)
+void tcp_stream::async_read(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
 {
     auto handle_read = [buffer, buf_capacity, e](const boost::system::error_code& error, size_t bytes_transferred) -> void
     {

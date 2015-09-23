@@ -85,9 +85,9 @@ struct data_frame_header
     opcode_id opcode = opcode_id::undefined;
     std::array<unsigned char, 4> masking_key;
     //std::vector<unsigned char> payload;
-    void analyze(const unsigned char* raw_data, const net::size_t length);
-    net::size_t binary_pack(opcode_id opcode, unsigned char* out_buffer) const;
-    net::size_t binary_pack_size() const;
+    void analyze(const unsigned char* raw_data, const uint32_t length);
+    uint32_t binary_pack(opcode_id opcode, unsigned char* out_buffer) const;
+    uint32_t binary_pack_size() const;
 };
 
 class websocket_server: public net_server
@@ -129,12 +129,12 @@ public:
     virtual void async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e) override;
     virtual void disconnect() override;
     //! Read and Write operations require additional space to accommodate the Websocket data frame header in the data buffer.
-    virtual io_result write(opcode_id opcode, const byte* data, const net::size_t len) throw(...) override;
-    virtual void      async_write(opcode_id opcode, const byte* data, const net::size_t len, async_write_callback e) throw(...) override;
-    virtual io_result read_payload_only(byte* const buffer, const net::size_t buf_capacity) throw(...) override;
-    virtual io_result read_all(byte* const buffer, const net::size_t buf_capacity) throw(...) override;
-    virtual void      async_read_payload_only(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) override;
-    virtual void      async_read_all(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) override;
+    virtual io_result write(opcode_id opcode, const byte* data, const uint32_t len) throw(...) override;
+    virtual void      async_write(opcode_id opcode, const byte* data, const uint32_t len, async_write_callback e) throw(...) override;
+    virtual io_result read_payload_only(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
+    virtual io_result read_all(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
+    virtual void      async_read_payload_only(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...) override;
+    virtual void      async_read_all(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...) override;
     inline io_service_t& get_io_service() const
     {
         return *_host_io_service_ptr;
@@ -142,8 +142,8 @@ public:
     void conversion(tcp_stream&& stream);
 
 protected:
-    static std::pair<io_result /*header and payload size*/, std::vector<byte> /*data*/> _convert_to_websocket_form(opcode_id opcode, const byte* data, const net::size_t len);
-    static std::pair<io_result /*header and payload size*/, data_frame_header /*header*/> _preprocess_received_data(byte* const data, const net::size_t len) throw(...);
+    static std::pair<io_result /*header and payload size*/, std::vector<byte> /*data*/> _convert_to_websocket_form(opcode_id opcode, const byte* data, const uint32_t len);
+    static std::pair<io_result /*header and payload size*/, data_frame_header /*header*/> _preprocess_received_data(byte* const data, const uint32_t len) throw(...);
 protected:
     io_service_t* _host_io_service_ptr;
     tcp_stream _tcp_stream;

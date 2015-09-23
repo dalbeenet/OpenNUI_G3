@@ -48,10 +48,10 @@ public:
     virtual void        connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void        async_connect(const char* ip_addr, port_t port, async_connect_callback e) override;
     virtual void        disconnect() override;
-    virtual net::size_t write(const byte* data, const net::size_t len) throw(...) override;
-    virtual void        async_write(const byte* data, const net::size_t len, async_write_callback e) throw(...) override;
-    virtual net::size_t read(byte* const buffer, const net::size_t buf_capacity) throw(...) override;
-    virtual void        async_read(byte* const buffer, const net::size_t buf_capacity, async_read_callback e) throw(...) override;
+    virtual uint32_t    write(const byte* data, const uint32_t len) throw(...) override;
+    virtual void        async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...) override;
+    virtual uint32_t    read(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
+    virtual void        async_read(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...) override;
     inline io_service_t& get_io_service() const
     {
         return _host_io_service;

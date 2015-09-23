@@ -65,11 +65,6 @@ int main()
         std::array<byte, 512> buffer;
         try
         {
-            //x Connect to websocket echo server
-            //x auto session2 = vee::voost::net::websocket::create_stream();
-            //x session2->connect("175.126.232.80", 12998);
-            //x session2->connect("174.129.224.73", 80);
-
             // Welcome message
             char welcome_message[] = "Welcome";
             session1->write(opcode_id::text_frame, (byte*)welcome_message, strlen(welcome_message));
