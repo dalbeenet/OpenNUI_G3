@@ -6,7 +6,7 @@
 namespace vee {
 namespace system {
 
-enum class error_code: unsigned int
+enum class error_code: int
 {
     success = 0,
     stream_connection_failure,

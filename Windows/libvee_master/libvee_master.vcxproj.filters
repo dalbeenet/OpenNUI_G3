@@ -84,9 +84,6 @@
     <ClInclude Include="..\vee\voost\tcp_stream.h">
       <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
-    <ClInclude Include="..\vee\voost\ws_stream.h">
-      <Filter>vee\voost\asio\net</Filter>
-    </ClInclude>
     <ClInclude Include="..\vee\string.h">
       <Filter>vee</Filter>
     </ClInclude>
@@ -107,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="..\vee\stream.h">
       <Filter>vee\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\xwebsocket_stream.h">
+      <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,9 +131,6 @@
     <ClCompile Include="voost\string\utilites.cpp">
       <Filter>vee\voost\string</Filter>
     </ClCompile>
-    <ClCompile Include="voost\net\ws_stream.cpp">
-      <Filter>vee\voost\asio\net</Filter>
-    </ClCompile>
     <ClCompile Include="voost\endian\conversion.cpp">
       <Filter>vee\voost\endian</Filter>
     </ClCompile>
@@ -148,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="stream\async_stream.cpp">
       <Filter>vee\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\net\xwebsocket_stream_impl.cpp">
+      <Filter>vee\voost\asio\net</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

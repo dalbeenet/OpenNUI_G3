@@ -2,7 +2,7 @@
 #include <array>
 #include <vector>
 #include <map>
-#include <vee/voost/ws_stream.h>
+#include <vee/voost/xwebsocket_stream.h>
 #include <vee/voost/string.h>
 #include <boost/tokenizer.hpp>
 #include <boost/endian/conversion.hpp>
@@ -599,37 +599,37 @@ uint32_t data_frame_header::binary_pack_size() const
     return shift; // same as length of header
 }
 
-websocket_server::websocket_server(unsigned short port, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
+xwebsocket_server::xwebsocket_server(unsigned short port, io_service_t& io_service /* = io_service_sigleton::get().io_service() */):
 _host_io_service(io_service),
 _tcp_server(port, io_service)
 {
     
 }
 
-websocket_server::websocket_server(websocket_server&& other):
+xwebsocket_server::xwebsocket_server(xwebsocket_server&& other):
 _host_io_service(other._host_io_service),
-_tcp_server(static_cast<websocket_server::tcp_server&&>(other._tcp_server))
+_tcp_server(static_cast<xwebsocket_server::tcp_server&&>(other._tcp_server))
 {
 
 }
 
-websocket_server::~websocket_server()
+xwebsocket_server::~xwebsocket_server()
 {
 
 }
 
-void websocket_server::close()
+void xwebsocket_server::close()
 {
 
 }
 
-::std::shared_ptr<net_stream> websocket_server::accept() throw(...)
+::std::shared_ptr<net_stream> xwebsocket_server::accept() throw(...)
 {
     ::std::shared_ptr<tcp_stream> raw_tcp_stream = ::std::static_pointer_cast<tcp_stream>(_tcp_server.accept());
     bool handshake_result = _handshake(*raw_tcp_stream);
     if (handshake_result == true)
     {
-        ::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>( static_cast<tcp_stream&&>(*raw_tcp_stream) );
+        ::std::shared_ptr<net_stream> stream = ::std::make_shared<xwebsocket_stream>( static_cast<tcp_stream&&>(*raw_tcp_stream) );
         return stream;
     }
     else
@@ -638,7 +638,7 @@ void websocket_server::close()
     }
 }
 
-void websocket_server::async_accept(std::function<_vee_net_async_accept_callback_sig> e)
+void xwebsocket_server::async_accept(std::function<_vee_net_async_accept_callback_sig> e)
 {
     auto handle_accept = [e](operation_result& result, ::std::shared_ptr<net_stream>& stream)
     {
@@ -649,7 +649,7 @@ void websocket_server::async_accept(std::function<_vee_net_async_accept_callback
         else
         {
             ::std::shared_ptr<tcp_stream> raw_tcp_stream = ::std::static_pointer_cast<tcp_stream>(stream);
-            bool handshake_result = websocket_server::_handshake(*raw_tcp_stream);
+            bool handshake_result = xwebsocket_server::_handshake(*raw_tcp_stream);
             if (!handshake_result)
             {
                 result.error = error_code::rfc6455_handshake_failure;
@@ -657,7 +657,7 @@ void websocket_server::async_accept(std::function<_vee_net_async_accept_callback
             }
             else
             {
-                ::std::shared_ptr<net_stream> stream = ::std::make_shared<websocket_stream>(static_cast<tcp_stream&&>(*raw_tcp_stream));
+                ::std::shared_ptr<net_stream> stream = ::std::make_shared<xwebsocket_stream>(static_cast<tcp_stream&&>(*raw_tcp_stream));
                 e(result, stream);
             }
         }
@@ -665,7 +665,7 @@ void websocket_server::async_accept(std::function<_vee_net_async_accept_callback
     _tcp_server.async_accept(handle_accept);
 }
 
-bool websocket_server::_handshake(net_stream& raw_socket)
+bool xwebsocket_server::_handshake(net_stream& raw_socket)
 {
     try
     {
@@ -715,33 +715,33 @@ bool websocket_server::_handshake(net_stream& raw_socket)
     return true;
 }
 
-websocket_stream::websocket_stream():
+xwebsocket_stream::xwebsocket_stream():
 _tcp_stream(io_service_sigleton::get().io_service()),
 _host_io_service_ptr(&(_tcp_stream.get_io_service()))
 {
 
 }
 
-websocket_stream::websocket_stream(tcp_stream&& stream):
+xwebsocket_stream::xwebsocket_stream(tcp_stream&& stream):
 _tcp_stream(static_cast<tcp_stream&&>(stream)),
 _host_io_service_ptr(&(_tcp_stream.get_io_service()))
 {
 
 }
 
-websocket_stream::~websocket_stream()
+xwebsocket_stream::~xwebsocket_stream()
 {
 
 }
 
-websocket_stream& websocket_stream::operator=(websocket_stream&& rhs)
+xwebsocket_stream& xwebsocket_stream::operator=(xwebsocket_stream&& rhs)
 {
     _tcp_stream = static_cast<tcp_stream&&>(rhs._tcp_stream);
     _host_io_service_ptr = &(_tcp_stream.get_io_service());
     return *this;
 }
 
-void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
+void xwebsocket_stream::connect(const char* ip_addr, port_t port) throw(...)
 {
 #pragma warning(disable:4996)
     handshake_client_request request;
@@ -782,12 +782,12 @@ void websocket_stream::connect(const char* ip_addr, port_t port) throw(...)
 #pragma warning(default:4996)
 }
 
-void websocket_stream::async_connect(const char* ip_addr, port_t port, async_connect_callback e)
+void xwebsocket_stream::async_connect(const char* ip_addr, port_t port, async_connect_callback e)
 {
     _tcp_stream.async_connect(ip_addr, port, e);
 }
 
-void websocket_stream::disconnect()
+void xwebsocket_stream::disconnect()
 {
     std::array<unsigned char, 128> buffer;
     buffer.fill(0);
@@ -795,20 +795,20 @@ void websocket_stream::disconnect()
     _tcp_stream.disconnect();
 }
 
-ws_stream::io_result websocket_stream::write(opcode_id opcode, const byte* data, const uint32_t len) throw(...)
+websocket_stream::io_result xwebsocket_stream::write(opcode_id opcode, const byte* data, const uint32_t len) throw(...)
 {
     auto ws_packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.write(ws_packet.second.data(), ws_packet.second.size());
     return ws_packet.first; // return io_result
 }
 
-void websocket_stream::async_write(opcode_id opcode, const byte* data, const uint32_t len, async_write_callback e) throw(...)
+void xwebsocket_stream::async_write(opcode_id opcode, const byte* data, const uint32_t len, async_write_callback e) throw(...)
 {
     auto packet = _convert_to_websocket_form(opcode, data, len);
     _tcp_stream.async_write(packet.second.data(), packet.first.header_size + len, std::move(e));
 }
 
-ws_stream::io_result websocket_stream::read_all(byte* const buffer, const uint32_t buf_capacity) throw(...)
+websocket_stream::io_result xwebsocket_stream::read_all(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
     while (true)
     {
@@ -832,7 +832,7 @@ ws_stream::io_result websocket_stream::read_all(byte* const buffer, const uint32
     }
 }
 
-ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, const uint32_t buf_capacity) throw(...)
+websocket_stream::io_result xwebsocket_stream::read_payload_only(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
     io_result result = read_all(buffer, buf_capacity);
     memmove(buffer, buffer + result.header_size, (uint32_t)(result.payload_size));
@@ -840,7 +840,7 @@ ws_stream::io_result websocket_stream::read_payload_only(byte* const buffer, con
     return result;
 }
 
-void websocket_stream::async_read_payload_only(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
+void xwebsocket_stream::async_read_payload_only(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
 {
     async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const uint32_t buf_capacity, const uint32_t bytes_transferred) -> void
     {
@@ -870,7 +870,7 @@ void websocket_stream::async_read_payload_only(byte* const buffer, const uint32_
     _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
-void websocket_stream::async_read_all(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
+void xwebsocket_stream::async_read_all(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
 {
     async_read_callback preprocess = [&preprocess, this, e](operation_result& function_result, byte* const buffer, const uint32_t buf_capacity, const uint32_t bytes_transferred) -> void
     {
@@ -898,7 +898,7 @@ void websocket_stream::async_read_all(byte* const buffer, const uint32_t buf_cap
     _tcp_stream.async_read(buffer, buf_capacity, preprocess);
 }
 
-void websocket_stream::conversion(tcp_stream&& stream)
+void xwebsocket_stream::conversion(tcp_stream&& stream)
 {
     _tcp_stream = static_cast<tcp_stream&&>(stream);
     _host_io_service_ptr = &(_tcp_stream.get_io_service());
@@ -906,11 +906,11 @@ void websocket_stream::conversion(tcp_stream&& stream)
 
 ::std::shared_ptr<net_server> create_server(unsigned short port)
 {
-    ::std::shared_ptr<net_server> server = ::std::make_shared<websocket_server>(port);
+    ::std::shared_ptr<net_server> server = ::std::make_shared<xwebsocket_server>(port);
     return server;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> websocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, const uint32_t len)
+std::pair<websocket_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> xwebsocket_stream::_convert_to_websocket_form(opcode_id opcode, const byte* data, const uint32_t len)
 {
     data_frame_header header;
     header.fin = true; //TODO: 쪼개서 보내는 함수 지원하기, 지금은 무조건 한번에 다! 보낸다! 스펙상 INT64_MAX만큼 한번에 보낼 수 있지만 브라우저가 뻗을 듯
@@ -920,7 +920,7 @@ std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*
     std::vector<byte> packet_data((uint32_t)(len + header_size), 0); //TODO: 매번 벡터를 안만드는 방법을 생각해보자.
     memmove(packet_data.data() + header.binary_pack(opcode, packet_data.data()), data, (uint32_t)len);
 
-    std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> ret;
+    std::pair<websocket_stream::io_result /*header and payload size*/, std::vector<byte> /*data*/> ret;
     ret.first.header_size = header_size;
     ret.first.payload_size = (uint32_t)header.payload_len;
     ret.second = std::move(packet_data);
@@ -928,10 +928,10 @@ std::pair<ws_stream::io_result /*header and payload size*/, std::vector<byte> /*
     return ret;
 }
 
-std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> websocket_stream::_preprocess_received_data(byte* const data, const uint32_t len) throw(...)
+std::pair<websocket_stream::io_result /*header and payload size*/, data_frame_header /*header*/> xwebsocket_stream::_preprocess_received_data(byte* const data, const uint32_t len) throw(...)
 {
     //TODO: FIN 패킷이 아닐 때 인터페이스에 맞춰주는 코드.... 필요할까?
-    std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*header*/> ret;
+    std::pair<websocket_stream::io_result /*header and payload size*/, data_frame_header /*header*/> ret;
     uint32_t bytes_transferred = len;
     io_result& io_result = ret.first;
     data_frame_header& header = ret.second;
@@ -968,10 +968,10 @@ std::pair<ws_stream::io_result /*header and payload size*/, data_frame_header /*
     return ret;
 }
 
-::std::shared_ptr<ws_stream> create_stream()
+::std::shared_ptr<websocket_stream> create_stream()
 {
     //TODO: IO_SERVICE SELECTION
-    ::std::shared_ptr<ws_stream> stream = ::std::make_shared<websocket_stream>();
+    ::std::shared_ptr<websocket_stream> stream = ::std::make_shared<xwebsocket_stream>();
     return stream;
 }
 

@@ -9,8 +9,8 @@ namespace voost {
 namespace net {
 namespace websocket {
 
-class websocket_server;
-class websocket_stream;
+class xwebsocket_server;
+class xwebsocket_stream;
 
 struct RFC4122_GUID
 {
@@ -90,18 +90,18 @@ struct data_frame_header
     uint32_t binary_pack_size() const;
 };
 
-class websocket_server: public net_server
+class xwebsocket_server: public net_server
 {
-    DISALLOW_COPY_AND_ASSIGN(websocket_server);
+    DISALLOW_COPY_AND_ASSIGN(xwebsocket_server);
 public:
     using tcp_server = tcp::tcp_server;
     using tcp_stream = tcp::tcp_stream;
     using socket_t = ::boost::asio::ip::tcp::socket;
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
-    websocket_server(unsigned short port, io_service_t& io_service = io_service_sigleton::get().io_service());
-    websocket_server(websocket_server&& other);
-    virtual ~websocket_server();
+    xwebsocket_server(unsigned short port, io_service_t& io_service = io_service_sigleton::get().io_service());
+    xwebsocket_server(xwebsocket_server&& other);
+    virtual ~xwebsocket_server();
     virtual void close() override;
     virtual ::std::shared_ptr<net_stream> accept() throw(...) override;
     virtual void async_accept(std::function<_vee_net_async_accept_callback_sig> e) override;
@@ -113,18 +113,18 @@ protected:
     tcp_server _tcp_server;
 };
 
-class websocket_stream: public ws_stream
+class xwebsocket_stream: public websocket_stream
 {
-    DISALLOW_COPY_AND_ASSIGN(websocket_stream);
+    DISALLOW_COPY_AND_ASSIGN(xwebsocket_stream);
 public:
     using tcp_stream = tcp::tcp_stream;
     using socket_t = ::boost::asio::ip::tcp::socket;
     using endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service_t = ::boost::asio::io_service;
-    websocket_stream();
-    explicit websocket_stream(tcp_stream&& stream);
-    virtual ~websocket_stream();
-    websocket_stream& operator=(websocket_stream&& rhs);
+    xwebsocket_stream();
+    explicit xwebsocket_stream(tcp_stream&& stream);
+    virtual ~xwebsocket_stream();
+    xwebsocket_stream& operator=(xwebsocket_stream&& rhs);
     virtual void connect(const char* ip_addr, port_t port) throw(...) override;
     virtual void async_connect(const char* ip_addr, port_t port, std::function<_vee_net_async_connect_callback_sig> e) override;
     virtual void disconnect() override;

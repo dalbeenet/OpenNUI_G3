@@ -56,12 +56,12 @@ int main()
         using vee::voost::net::byte;
         using vee::voost::net::net_stream;
         using vee::voost::net::error_code;
-        using vee::voost::net::websocket::ws_stream;
+        using vee::voost::net::websocket::websocket_stream;
         using vee::voost::net::websocket::opcode_id;
-        using operation_result = vee::system::operation_result;
+        using vee::system::operation_result;
 
         auto server = vee::voost::net::websocket::create_server(1992);
-        auto session1 = std::static_pointer_cast<ws_stream>(server->accept());
+        auto session1 = std::static_pointer_cast<websocket_stream>(server->accept());
         std::array<byte, 512> buffer;
         try
         {

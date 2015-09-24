@@ -72,10 +72,10 @@ enum class opcode_id: unsigned char
     reserved_for_further
 };
 
-class ws_server;
-class ws_stream;
+class websocket_server;
+class websocket_stream;
 
-class ws_stream abstract: public net_stream
+class websocket_stream abstract: public net_stream
 {
 public:
     struct io_result
@@ -83,7 +83,7 @@ public:
         uint32_t header_size = 0;
         uint32_t payload_size = 0;
     };
-    virtual ~ws_stream() = default;
+    virtual ~websocket_stream() = default;
     virtual void        connect(const char* ip_addr, port_t port) throw(...) = 0;
     virtual void        async_connect(const char* ip_addr, port_t port, async_connect_callback e) = 0;
     virtual void        disconnect() = 0;
@@ -112,7 +112,7 @@ public:
 };
 
 ::std::shared_ptr<net_server> create_server(unsigned short port);
-::std::shared_ptr<ws_stream> create_stream();
+::std::shared_ptr<websocket_stream> create_stream();
 
 } // namespace ws
 
