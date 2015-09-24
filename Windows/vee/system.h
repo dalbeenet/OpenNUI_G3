@@ -17,6 +17,7 @@ enum class error_code: int
     stream_closed,
     rfc6455_handshake_failure,
     rfc6455_websocket_heartbeat,
+    win32_busy_named_pipe,
 };
 
 struct operation_result

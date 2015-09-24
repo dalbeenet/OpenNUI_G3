@@ -2,7 +2,7 @@
 #include <vee/macro.h>
 #include <vee/exception.h>
 #include <Windows.h>
-
+#pragma warning(disable:4996)
 namespace vee {
 namespace voost {
 namespace interprocess {
@@ -73,11 +73,21 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
     if (error != ERROR_PIPE_BUSY)
     {
         char buffer[128] = { 0, };
-        sprintf(buffer, "CreateFileA(Win32 api) failure! error_code: %d", );
+        sprintf(buffer, "CreateFileA(Win32 api) failure! win32_error_code: %d", error);
         throw vee::exception(buffer, (int)system::error_code::stream_connection_failure);
+    }
+
+    // All pipe instances are busy, so wait for 5 seconds.
+    if (!WaitNamedPipeA(pipe_name, 5000))
+    {
+        char buffer[128] = { 0, };
+        sprintf(buffer, "Could not open pipe \"%s\", 5 second wait timed out.\n", pipe_name);
+        // Throw an exception if the pipe still busy while 5 seconds.
+        throw vee::exception(buffer, (int)system::error_code::win32_busy_named_pipe);
     }
 }
 
 } // namespace interprocess
 } // namespace voost
 } // namespace vee
+#pragma warning(default:4996)
