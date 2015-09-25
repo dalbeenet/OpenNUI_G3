@@ -5,6 +5,12 @@
 
 namespace vee {
 
+#if (_MSC_VER == 1900) // VS2015
+#define __noexcept noexcept
+#else
+#define __noexcept throw()
+#endif
+
 class exception
 {
 public:

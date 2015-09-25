@@ -1,6 +1,7 @@
 #ifndef _VEE_SYSTEM_H_
 #define _VEE_SYSTEM_H_
 
+#include <vee/exception.h>
 #include <vee/string.h>
 
 namespace vee {
@@ -19,6 +20,8 @@ enum class error_code: int
     rfc6455_handshake_failure,
     rfc6455_websocket_heartbeat,
     win32_busy_named_pipe,
+    win32_close_handle_failure,
+    invalid_parameter
 };
 
 struct operation_result

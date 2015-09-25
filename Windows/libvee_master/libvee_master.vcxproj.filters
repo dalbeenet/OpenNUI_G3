@@ -34,6 +34,9 @@
     <Filter Include="vee\stream">
       <UniqueIdentifier>{d32ab706-31c4-49c5-a053-c8f20892921e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\win32">
+      <UniqueIdentifier>{24b6b51d-8863-4b01-8591-84248fb67a54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vee\vee.h">
@@ -108,6 +111,9 @@
     <ClInclude Include="..\vee\voost\xwebsocket_stream.h">
       <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\win32.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">
@@ -149,5 +155,6 @@
     <ClCompile Include="voost\net\xwebsocket_stream_impl.cpp">
       <Filter>vee\voost\asio\net</Filter>
     </ClCompile>
+    <ClCompile Include="win32\win32_handle.cpp" />
   </ItemGroup>
 </Project>

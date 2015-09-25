@@ -35,6 +35,7 @@
     <ClInclude Include="..\vee\voost\timer.h" />
     <ClInclude Include="..\vee\voost\xwebsocket_stream.h" />
     <ClInclude Include="..\vee\voost\xtimer.h" />
+    <ClInclude Include="..\vee\win32.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exception\exception_impl.cpp" />
@@ -50,6 +51,7 @@
     <ClCompile Include="voost\string\base64.cpp" />
     <ClCompile Include="voost\string\utilites.cpp" />
     <ClCompile Include="voost\timer\xtimer.cpp" />
+    <ClCompile Include="win32\win32_handle.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{65A082DC-494F-4576-B661-11BE002FF2E9}</ProjectGuid>
