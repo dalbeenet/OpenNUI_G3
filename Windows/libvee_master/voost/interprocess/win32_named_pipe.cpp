@@ -1,7 +1,7 @@
 #include <vee/voost/pipe.h>
 #include <vee/macro.h>
 #include <vee/exception.h>
-#include <Windows.h>
+#include <vee/win32.h>
 #pragma warning(disable:4996)
 namespace vee {
 namespace voost {
@@ -17,7 +17,7 @@ public:
     virtual uint32_t write(const byte* data, const uint32_t size) throw(...) override;
     virtual uint32_t read(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
 protected:
-    HANDLE _pipe_handle;
+    win32_handle _pipe_handle;
     string _pipe_name;
 };
 
@@ -26,16 +26,14 @@ win32_named_pipe::~win32_named_pipe()
 
 }
 
-win32_named_pipe::win32_named_pipe():
-_pipe_handle(NULL),
-_pipe_name("")
+win32_named_pipe::win32_named_pipe()
 {
-        
+    
 }
 
 void win32_named_pipe::connect(const char* pipe_name, const creation_option creation_opt, const pipe_read_mode read_mode, const uint32_t time_out_millisec) throw(...)
 {
-    if (_pipe_handle != NULL)
+    if (_pipe_handle.get() != NULL)
         throw vee::exception("pipe is already opened!", (int)error_code::stream_already_connected);
     HANDLE pipe_handle = NULL;
     {
@@ -155,6 +153,58 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
         }
     }
 
+    // pipe stream ready
+    _pipe_handle = pipe_handle;
+}
+
+uint32_t win32_named_pipe::read(byte* const buffer, const uint32_t buf_capacity) throw(...)
+{
+    if (_pipe_handle == (HANDLE)NULL)
+    {
+        throw vee::exception("Invalid named pipe stream", (int)system::error_code::closed_stream);
+    }
+    DWORD bytes_transferred = 0;
+    BOOL result = ReadFile(_pipe_handle.get(),      // pipe handle
+                           buffer,                  // buffer to receive reply
+                           buf_capacity,            // size of buffer
+                           &bytes_transferred,      // number of bytes read
+                           NULL);                   // not overlapped
+    if (!result)
+    {
+        char temp[256] = { 0, };
+        sprintf(temp, "ReadFile from pipe failed. GLE=%d", GetLastError());
+        throw vee::exception(temp, (int)system::error_code::stream_send_failure);
+    }
+    else if (GetLastError() == ERROR_MORE_DATA)
+    {
+        char temp[256] = { 0, };
+        sprintf(temp, "Could not copy all of received data to receive buffer. GLE=%d", GetLastError());
+        throw vee::exception(temp, (int)system::error_code::buffer_is_too_small);
+    }
+
+    return bytes_transferred;
+}
+
+uint32_t win32_named_pipe::write(const byte* data, const uint32_t size) throw(...)
+{
+    if (_pipe_handle == (HANDLE)NULL)
+    {
+        throw vee::exception("Invalid named pipe stream", (int)system::error_code::closed_stream);
+    }
+    DWORD bytes_transferred = 0;
+    BOOL result = WriteFile(_pipe_handle.get(),     // pipe handle
+                            data,                   // data buffer
+                            size,                   // length of data
+                            &bytes_transferred,     // bytes written
+                            NULL);                  // not overlapped
+    if (!result)
+    {
+        char temp[256] = { 0, };
+        sprintf(temp, "WriteFile to pipe failed. GLE=%d", GetLastError());
+        throw vee::exception(temp, (int)system::error_code::stream_send_failure);
+    }
+
+    return static_cast<uint8_t>(bytes_transferred);
 }
 
 } // namespace interprocess

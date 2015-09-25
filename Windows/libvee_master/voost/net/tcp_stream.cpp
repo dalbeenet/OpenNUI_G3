@@ -175,7 +175,7 @@ void tcp_stream::async_write(const byte* data, const uint32_t len, async_write_c
     };
     if (_socket.is_open() == false)
     {
-        throw vee::exception("invalid connection!", (int)error_code::stream_closed);
+        throw vee::exception("invalid connection!", (int)error_code::closed_stream);
     }
     _socket.async_write_some(::boost::asio::buffer(data, (uint32_t)len), handle_write);
 }
@@ -211,7 +211,7 @@ void tcp_stream::async_read(byte* const buffer, const uint32_t buf_capacity, asy
     };
     if (_socket.is_open() == false)
     {
-        throw vee::exception("invalid connection!", (int)error_code::stream_closed);
+        throw vee::exception("invalid connection!", (int)error_code::closed_stream);
     }
     _socket.async_read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity), handle_read);
 }

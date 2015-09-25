@@ -16,7 +16,7 @@ _handle(NULL)
 
 }
 
-win32_handle::win32_handle(win32_handle& other) __noexcept:
+win32_handle::win32_handle(const win32_handle& other) __noexcept:
 _handle(other._handle)
 {
     
@@ -28,7 +28,19 @@ _handle(other._handle)
     other.clear();
 }
 
-win32_handle& win32_handle::operator=(win32_handle& other) __noexcept
+win32_handle::win32_handle(const HANDLE& handle) __noexcept:
+_handle(handle)
+{
+
+}
+
+win32_handle::win32_handle(HANDLE&& handle) __noexcept:
+_handle(handle)
+{
+
+}
+
+win32_handle& win32_handle::operator=(const win32_handle& other) __noexcept
 {
     _handle = other._handle;
     return *this;
@@ -51,6 +63,8 @@ void win32_handle::close() throw(...)
             sprintf(buffer, "%s> CloseHandle failure! GLE: %d", __FUNCSIG__, GetLastError());
             throw vee::exception(buffer, (int)system::error_code::win32_close_handle_failure);
         }
+        _handle = NULL;
+        return;
     }
 }
 
@@ -61,7 +75,10 @@ void win32_handle::close_nothrow() __noexcept
         if (!CloseHandle(_handle))
         {
             printf("%s> CloseHandle failure! GLE: %d\n", __FUNCSIG__, GetLastError());
+            return;
         }
+        _handle = NULL;
+        return;
     }
 }
 

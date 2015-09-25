@@ -16,12 +16,13 @@ enum class error_code: int
     stream_send_failure,
     stream_read_failure,
     stream_disconnected_by_host,
-    stream_closed,
+    closed_stream,
     rfc6455_handshake_failure,
     rfc6455_websocket_heartbeat,
     win32_busy_named_pipe,
     win32_close_handle_failure,
-    invalid_parameter
+    invalid_parameter,
+    buffer_is_too_small,
 };
 
 struct operation_result
