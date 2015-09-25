@@ -9,6 +9,7 @@ namespace system {
 enum class error_code: int
 {
     success = 0,
+    stream_already_connected, //TODO: NET 인터페이스에도 지원
     stream_connection_failure,
     server_accept_failure,
     stream_send_failure,
