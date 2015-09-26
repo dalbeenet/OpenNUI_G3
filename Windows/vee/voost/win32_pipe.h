@@ -2,6 +2,7 @@
 #include <vee/macro.h>
 #include <vee/exception.h>
 #include <vee/win32.h>
+#include <vee/voost/asio.h>
 
 namespace vee {
 namespace voost {
@@ -12,9 +13,11 @@ class win32_named_pipe: public named_pipe
 {
     DISALLOW_COPY_AND_ASSIGN(win32_named_pipe);
 public:
+    using asio_stream_handle = ::boost::asio::windows::stream_handle;
     virtual ~win32_named_pipe() __noexcept;
     win32_named_pipe() __noexcept;
-    win32_named_pipe(win32_handle&& handle, const char* pipe_name, bool is_server_side) __noexcept;
+    win32_named_pipe(HANDLE handle, const char* pipe_name, bool is_server_side);
+    win32_named_pipe(asio_stream_handle&& handle, const char* pipe_name, bool is_server_side) __noexcept;
     win32_named_pipe(win32_named_pipe&& other) __noexcept;
     win32_named_pipe& operator=(win32_named_pipe&& other) __noexcept;
     virtual void connect(const char* pipe_name,
@@ -23,14 +26,16 @@ public:
                          const uint32_t time_out_millisec) throw(...) override;
     virtual void disconnect() __noexcept override;
     virtual uint32_t write(const byte* data, const uint32_t size) throw(...) override;
+    virtual void async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...) override;
     virtual uint32_t read(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
+    virtual void async_read(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...) override;
     inline string& pipe_name()
     {
         return _pipe_name;
     }
 protected:
-    win32_handle _pipe_handle;
     string _pipe_name;
+    asio_stream_handle _stream_handler;
     bool   _is_server_side;
 };
 

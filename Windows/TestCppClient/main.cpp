@@ -10,7 +10,7 @@ int main()
     auto stream = interprocess::win32::create_named_pipe();
     try
     {
-        stream->connect("\\\\.\\pipe\\opennuipipe",
+        stream->connect("\\\\.\\pipe\\opennuipipe2",
                         interprocess::creation_option::open_existing,
                         interprocess::pipe_data_transfer_mode::iomode_message,
                         5000);

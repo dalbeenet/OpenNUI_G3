@@ -10,6 +10,9 @@
     <Filter Include="Kernel\XKernel">
       <UniqueIdentifier>{5677fecf-af64-4c64-824e-2eb308f9214d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kernel\Session">
+      <UniqueIdentifier>{a5036406-be03-4dfc-9350-a380c6a364f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -26,6 +29,9 @@
     </ClInclude>
     <ClInclude Include="kernel\xkernel\parameters.h">
       <Filter>Kernel\XKernel</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\session.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

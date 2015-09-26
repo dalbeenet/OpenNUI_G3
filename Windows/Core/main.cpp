@@ -50,6 +50,7 @@ void named_pipe_echo_server()
     {
         printf("Named pipe echo server\n");
         using vee::byte;
+        using vee::operation_result;
         using vee::voost::interprocess::creation_option;
         using vee::voost::interprocess::pipe_data_transfer_mode;
         using vee::voost::interprocess::named_pipe;
@@ -60,7 +61,7 @@ void named_pipe_echo_server()
         
         try
         {
-            auto session = server->accept("\\\\.\\pipe\\opennuipipe",
+            auto session = server->accept("\\\\.\\pipe\\opennuipipe2",
                                           pipe_data_transfer_mode::iomode_message, 1024, 1024);
             printf("Client connected.\n");
             std::array<byte, 512> buffer;
@@ -72,15 +73,14 @@ void named_pipe_echo_server()
             {
                 unsigned int bytes_transferred = session->read(buffer.data(), buffer.size());
                 printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
-                bytes_transferred = session->write((byte*)buffer.data(), bytes_transferred);
-                printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
-                /*session->async_write(opcode_id::text_frame,
-                                      buffer.data(),
-                                      bytes_transferred,
-                                      [](operation_result& result, size_t bytes_transferred) -> void
-                                      {
-                                      printf("echo send: %dbytes\n", bytes_transferred);
-                                      });*/
+                //bytes_transferred = session->write((byte*)buffer.data(), bytes_transferred);
+                //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                session->async_write(buffer.data(),
+                                     bytes_transferred,
+                                     [](operation_result& result, size_t bytes_transferred) -> void
+                                     {
+                                        printf("echo send: %dbytes\n", bytes_transferred);
+                                    });
             }
         }
         catch (vee::exception& e)

@@ -44,7 +44,7 @@ win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
     }
     win32_handle pipe_handle = CreateNamedPipeA(
         pipe_name,    // pipe name
-        PIPE_ACCESS_DUPLEX,  // read and wirte access
+        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read and wirte access
         win32_pipe_type_arg | PIPE_WAIT, // pipe mode | blocking_mode
         PIPE_UNLIMITED_INSTANCES,// max. instances
         in_buffer_size,
@@ -69,7 +69,9 @@ win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
         throw vee::exception(buffer, (int)system::error_code::server_accept_failure);
     }
 
-    return win32_named_pipe(std::move(pipe_handle), pipe_name, true);
+    win32_named_pipe pipe(pipe_handle.get(), pipe_name, true);
+    pipe_handle.clear();
+    return pipe;
 }
 
 //////////////////////////////////////////////////////////////////////////

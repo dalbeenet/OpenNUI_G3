@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\kernel.h" />
+    <ClInclude Include="kernel\session.h" />
     <ClInclude Include="kernel\xkernel\parameters.h" />
     <ClInclude Include="kernel\xkernel\taskapi.h" />
   </ItemGroup>

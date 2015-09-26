@@ -29,7 +29,7 @@ enum class pipe_data_transfer_mode: int
     iomode_message,   // Data is read from the pipe as a stream of messages. The function fails if this flag is specified for a byte-type pipe.
 };
 
-class named_pipe abstract: public sync_stream
+class named_pipe abstract: public sync_stream, public async_stream
 {
 public:
     virtual ~named_pipe() = default;

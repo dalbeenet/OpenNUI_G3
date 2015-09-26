@@ -1,4 +1,6 @@
 #include <vee/voost/win32_pipe.h>
+#include <boost/exception/diagnostic_information.hpp> 
+#include <iostream>
 
 #pragma warning(disable:4996)
 namespace vee {
@@ -11,38 +13,50 @@ win32_named_pipe::~win32_named_pipe() __noexcept
     disconnect();
 }
 
-win32_named_pipe::win32_named_pipe() __noexcept
+win32_named_pipe::win32_named_pipe() __noexcept:
+_stream_handler(io_service_sigleton::get().io_service())
 {
     
 }
 
-win32_named_pipe::win32_named_pipe(win32_handle&& handle, const char* pipe_name, bool is_server_side) __noexcept:
-_pipe_handle(std::move(handle)),
+//TODO: IO_SERVICE Selection
+win32_named_pipe::win32_named_pipe(HANDLE handle, const char* pipe_name, bool is_server_side) __noexcept:
 _pipe_name(pipe_name),
-_is_server_side(is_server_side)
+_is_server_side(is_server_side),
+_stream_handler(io_service_sigleton::get().io_service(), std::move(handle))
 {
 
 }
 
+//TODO: IO_SERVICE Selection
+win32_named_pipe::win32_named_pipe(asio_stream_handle&& handle, const char* pipe_name, bool is_server_side) __noexcept:
+_pipe_name(pipe_name),
+_is_server_side(is_server_side),
+_stream_handler(std::move(handle))
+{
+
+}
+
+//TODO: IO_SERVICE Selection
 win32_named_pipe::win32_named_pipe(win32_named_pipe&& other) __noexcept:
-_pipe_handle(std::move(other._pipe_handle)),
 _pipe_name(std::move(other._pipe_name)),
-_is_server_side(other._is_server_side)
+_is_server_side(other._is_server_side),
+_stream_handler(std::move(other._stream_handler))
 {
 
 }
 
 win32_named_pipe& win32_named_pipe::operator=(win32_named_pipe&& other) __noexcept
 {
-    _pipe_handle = std::move(other._pipe_handle);
     _pipe_name = std::move(other._pipe_name);
     _is_server_side = other._is_server_side;
+    _stream_handler = std::move(other._stream_handler);
     return *this;
 }
 
 void win32_named_pipe::connect(const char* pipe_name, const creation_option creation_opt, const pipe_data_transfer_mode read_mode, const uint32_t time_out_millisec) throw(...)
 {
-    if (_pipe_handle.get() != NULL)
+    if (_stream_handler.is_open() == true)
         throw vee::exception("pipe is already opened!", (int)error_code::stream_already_connected);
     HANDLE pipe_handle = NULL;
     {
@@ -70,11 +84,11 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
 
         pipe_handle = CreateFileA(
             pipe_name, // pipe name
-            GENERIC_READ | GENERIC_WRITE, // read and write access
+            GENERIC_READ | GENERIC_WRITE | FILE_FLAG_OVERLAPPED, // read and write access
             0,              // no sharing
             NULL,           // default secuirty attributes
             win32_file_craetion_opt,  // creation option
-            0,              // defualt attributes
+            FILE_FLAG_OVERLAPPED,     // overlapped I/O
             NULL            // no template file
             );
 
@@ -160,37 +174,44 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
         }
     }
 
-    // pipe stream ready
-    _pipe_handle = pipe_handle;
+    // pipe stream is ready
     _pipe_name = pipe_name;
     _is_server_side = false;
+    _stream_handler.assign(pipe_handle);
 }
 
 void win32_named_pipe::disconnect() __noexcept
 {
+    if (_stream_handler.is_open() == false)
+        return;
     if (_is_server_side)
     {
-        FlushFileBuffers(_pipe_handle.get());
-        DisconnectNamedPipe(_pipe_handle.get());
+        FlushFileBuffers(_stream_handler.native_handle());
+        DisconnectNamedPipe(_stream_handler.native_handle());
     }
-    _pipe_handle.close_nothrow();
     _is_server_side = false;
-    _pipe_handle = NULL;
+    try
+    {
+        _stream_handler.close();
+    }
+    catch (boost::exception& e) // øπø‹ ªÔ≈¥
+    {
+        std::cerr << boost::diagnostic_information(e);
+    }
 }
 
 uint32_t win32_named_pipe::read(byte* const buffer, const uint32_t buf_capacity) throw(...)
 {
-    if (_pipe_handle == (HANDLE)NULL)
+    if (_stream_handler.is_open() == false)
     {
         throw vee::exception("Invalid named pipe stream", (int)system::error_code::closed_stream);
     }
-    DWORD bytes_transferred = 0;
-    BOOL result = ReadFile(_pipe_handle.get(),      // pipe handle
-                           buffer,                  // buffer to receive reply
-                           buf_capacity,            // size of buffer
-                           &bytes_transferred,      // number of bytes read
-                           NULL);                   // not overlapped
-    if (!result)
+
+    ::boost::system::error_code error;
+    memset(buffer, 0, (uint32_t)buf_capacity);
+    uint32_t bytes_transferred = (uint32_t)_stream_handler.read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity), error);
+
+    if (error)
     {
         char temp[256] = { 0, };
         switch (GetLastError())
@@ -210,29 +231,112 @@ uint32_t win32_named_pipe::read(byte* const buffer, const uint32_t buf_capacity)
         throw vee::exception(temp, (int)system::error_code::buffer_is_too_small);
     }
 
+    //DWORD bytes_transferred = 0;
+    //BOOL result = ReadFile(_stream_handler.native_handle(),      // pipe handle
+    //                       buffer,                  // buffer to receive reply
+    //                       buf_capacity,            // size of buffer
+    //                       &bytes_transferred,      // number of bytes read
+    //                       NULL);                   // not overlapped
+    //if (!result)
+    //{
+    //    char temp[256] = { 0, };
+    //    switch (GetLastError())
+    //    {
+    //    case 109:
+    //        sprintf(temp, "ReadFile from pipe failed. The named pipe stream is closed by host! GLE=%d", GetLastError());
+    //        throw vee::exception(temp, (int)system::error_code::stream_disconnected_by_host);
+    //    default:
+    //        sprintf(temp, "ReadFile from pipe failed. GLE=%d", GetLastError());
+    //        throw vee::exception(temp, (int)system::error_code::stream_send_failure);
+    //    }
+    //}
+    //else if (GetLastError() == ERROR_MORE_DATA)
+    //{
+    //    char temp[256] = { 0, };
+    //    sprintf(temp, "Could not copy all of received data to receive buffer. GLE=%d", GetLastError());
+    //    throw vee::exception(temp, (int)system::error_code::buffer_is_too_small);
+    //}
+
     return bytes_transferred;
+}
+
+void win32_named_pipe::async_read(byte* const buffer, const uint32_t buf_capacity, async_read_callback e) throw(...)
+{
+    auto handle_read = [buffer, buf_capacity, e](const boost::system::error_code& error, size_t bytes_transferred) -> void
+    {
+        operation_result result;
+        if (error)
+        {
+            result.error = error_code::stream_read_failure;
+            result.desc = error.message();
+        }
+        else
+        {
+            result.error = error_code::success;
+            result.desc = error.message();
+        }
+        e(result, buffer, buf_capacity, bytes_transferred);
+    };
+    if (_stream_handler.native_handle() == NULL)
+    {
+        throw vee::exception("invalid connection!", (int)error_code::closed_stream);
+    }
+    _stream_handler.async_read_some(::boost::asio::buffer(buffer, (uint32_t)buf_capacity), handle_read);
 }
 
 uint32_t win32_named_pipe::write(const byte* data, const uint32_t size) throw(...)
 {
-    if (_pipe_handle == (HANDLE)NULL)
+    if (_stream_handler.is_open() == false)
     {
         throw vee::exception("Invalid named pipe stream", (int)system::error_code::closed_stream);
     }
-    DWORD bytes_transferred = 0;
-    BOOL result = WriteFile(_pipe_handle.get(),     // pipe handle
-                            data,                   // data buffer
-                            size,                   // length of data
-                            &bytes_transferred,     // bytes written
-                            NULL);                  // not overlapped
-    if (!result)
+
+    ::boost::system::error_code error;
+    uint32_t bytes_transferred = _stream_handler.write_some(::boost::asio::buffer(data, (uint32_t)size), error);
+    if (error)
     {
         char temp[256] = { 0, };
         sprintf(temp, "WriteFile to pipe failed. GLE=%d", GetLastError());
         throw vee::exception(temp, (int)system::error_code::stream_send_failure);
     }
 
+    //BOOL result = WriteFile(_stream_handler.native_handle(),     // pipe handle
+    //                        data,                   // data buffer
+    //                        size,                   // length of data
+    //                        &bytes_transferred,     // bytes written
+    //                        NULL);                  // not overlapped
+    //if (!result)
+    //{
+    //    char temp[256] = { 0, };
+    //    sprintf(temp, "WriteFile to pipe failed. GLE=%d", GetLastError());
+    //    throw vee::exception(temp, (int)system::error_code::stream_send_failure);
+    //}
+
     return static_cast<uint8_t>(bytes_transferred);
+}
+
+void win32_named_pipe::async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...)
+{
+    auto handle_write = [e](const boost::system::error_code& error, size_t bytes_transferred) -> void
+    {
+        operation_result result;
+        if (error)
+        {
+            result.error = error_code::stream_send_failure;
+            result.desc = error.message();
+        }
+        else
+        {
+            result.error = error_code::success;
+            result.desc = error.message();
+        }
+        e(result, bytes_transferred);
+    };
+    if (_stream_handler.native_handle() == NULL)
+    {
+        throw vee::exception("invalid connection!", (int)error_code::closed_stream);
+    }
+    _stream_handler.async_write_some(::boost::asio::buffer(data, (uint32_t)len), handle_write);
 }
 
 ::std::shared_ptr<named_pipe> create_named_pipe()
