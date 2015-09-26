@@ -112,7 +112,10 @@
       <Filter>vee\voost\asio\net</Filter>
     </ClInclude>
     <ClInclude Include="..\vee\win32.h">
-      <Filter>vee</Filter>
+      <Filter>vee\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vee\voost\win32_pipe.h">
+      <Filter>vee\voost\asio\interprocess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,15 +149,20 @@
     <ClCompile Include="voost\interprocess\xshared_memory.cpp">
       <Filter>vee\voost\asio\interprocess</Filter>
     </ClCompile>
-    <ClCompile Include="voost\interprocess\win32_named_pipe.cpp">
-      <Filter>vee\voost\asio\interprocess</Filter>
-    </ClCompile>
     <ClCompile Include="stream\async_stream.cpp">
       <Filter>vee\stream</Filter>
     </ClCompile>
     <ClCompile Include="voost\net\xwebsocket_stream_impl.cpp">
       <Filter>vee\voost\asio\net</Filter>
     </ClCompile>
-    <ClCompile Include="win32\win32_handle.cpp" />
+    <ClCompile Include="win32\win32_handle.cpp">
+      <Filter>vee\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\interprocess\win32_named_pipe.cpp">
+      <Filter>vee\voost\asio\interprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="voost\interprocess\win32_named_pipe_server.cpp">
+      <Filter>vee\voost\asio\interprocess</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

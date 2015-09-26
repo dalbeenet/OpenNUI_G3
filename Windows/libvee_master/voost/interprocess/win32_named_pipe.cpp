@@ -1,37 +1,41 @@
-#include <vee/voost/pipe.h>
-#include <vee/macro.h>
-#include <vee/exception.h>
-#include <vee/win32.h>
+#include <vee/voost/win32_pipe.h>
+
 #pragma warning(disable:4996)
 namespace vee {
 namespace voost {
 namespace interprocess {
 
-class win32_named_pipe: named_pipe
-{
-    DISALLOW_COPY_AND_ASSIGN(win32_named_pipe);
-public:
-    ~win32_named_pipe();
-    win32_named_pipe();
-    virtual void connect(const char* pipe_name, const creation_option creation_opt, const pipe_read_mode read_mode, const uint32_t time_out_millisec) throw(...) override;
-    virtual uint32_t write(const byte* data, const uint32_t size) throw(...) override;
-    virtual uint32_t read(byte* const buffer, const uint32_t buf_capacity) throw(...) override;
-protected:
-    win32_handle _pipe_handle;
-    string _pipe_name;
-};
-
-win32_named_pipe::~win32_named_pipe()
+win32_named_pipe::~win32_named_pipe() __noexcept
 {
 
 }
 
-win32_named_pipe::win32_named_pipe()
+win32_named_pipe::win32_named_pipe() __noexcept
 {
     
 }
 
-void win32_named_pipe::connect(const char* pipe_name, const creation_option creation_opt, const pipe_read_mode read_mode, const uint32_t time_out_millisec) throw(...)
+win32_named_pipe::win32_named_pipe(win32_handle&& handle) __noexcept:
+_pipe_handle(std::move(handle))
+{
+
+}
+
+win32_named_pipe::win32_named_pipe(win32_named_pipe&& other) __noexcept:
+_pipe_handle(std::move(other._pipe_handle)),
+_pipe_name(std::move(other._pipe_name))
+{
+
+}
+
+win32_named_pipe& win32_named_pipe::operator=(win32_named_pipe&& other) __noexcept
+{
+    _pipe_handle = std::move(other._pipe_handle);
+    _pipe_name = std::move(other._pipe_name);
+    return *this;
+}
+
+void win32_named_pipe::connect(const char* pipe_name, const creation_option creation_opt, const pipe_data_transfer_mode read_mode, const uint32_t time_out_millisec) throw(...)
 {
     if (_pipe_handle.get() != NULL)
         throw vee::exception("pipe is already opened!", (int)error_code::stream_already_connected);
@@ -130,10 +134,10 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
         DWORD win32_pipe_read_mode = NULL;
         switch (read_mode)
         {
-        case pipe_read_mode::readmode_byte:
+        case pipe_data_transfer_mode::iomode_byte:
             win32_pipe_read_mode = PIPE_READMODE_BYTE;
             break;
-        case pipe_read_mode::readmode_message:
+        case pipe_data_transfer_mode::iomode_message:
             win32_pipe_read_mode = PIPE_READMODE_MESSAGE;
             break;
         default:
@@ -155,6 +159,7 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
 
     // pipe stream ready
     _pipe_handle = pipe_handle;
+    _pipe_name = pipe_name;
 }
 
 uint32_t win32_named_pipe::read(byte* const buffer, const uint32_t buf_capacity) throw(...)

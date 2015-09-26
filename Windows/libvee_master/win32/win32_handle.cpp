@@ -16,40 +16,29 @@ _handle(NULL)
 
 }
 
-win32_handle::win32_handle(const win32_handle& other) __noexcept:
-_handle(other._handle)
-{
-    
-}
-
 win32_handle::win32_handle(win32_handle&& other) __noexcept:
 _handle(other._handle)
 {
     other.clear();
 }
 
-win32_handle::win32_handle(const HANDLE& handle) __noexcept:
-_handle(handle)
-{
-
-}
-
 win32_handle::win32_handle(HANDLE&& handle) __noexcept:
 _handle(handle)
 {
-
-}
-
-win32_handle& win32_handle::operator=(const win32_handle& other) __noexcept
-{
-    _handle = other._handle;
-    return *this;
+    handle = NULL;
 }
 
 win32_handle& win32_handle::operator=(win32_handle&& other) __noexcept
 {
     _handle = other._handle;
     other.clear();
+    return *this;
+}
+
+win32_handle& win32_handle::operator=(HANDLE&& handle) __noexcept
+{
+    _handle = _handle;
+    handle = NULL;
     return *this;
 }
 

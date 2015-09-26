@@ -33,6 +33,7 @@
     <ClInclude Include="..\vee\voost\string.h" />
     <ClInclude Include="..\vee\voost\tcp_stream.h" />
     <ClInclude Include="..\vee\voost\timer.h" />
+    <ClInclude Include="..\vee\voost\win32_pipe.h" />
     <ClInclude Include="..\vee\voost\xwebsocket_stream.h" />
     <ClInclude Include="..\vee\voost\xtimer.h" />
     <ClInclude Include="..\vee\win32.h" />
@@ -44,6 +45,7 @@
     <ClCompile Include="voost\asio_impl.cpp" />
     <ClCompile Include="voost\endian\conversion.cpp" />
     <ClCompile Include="voost\interprocess\win32_named_pipe.cpp" />
+    <ClCompile Include="voost\interprocess\win32_named_pipe_server.cpp" />
     <ClCompile Include="voost\interprocess\xshared_memory.cpp" />
     <ClCompile Include="voost\net\net.cpp" />
     <ClCompile Include="voost\net\tcp_stream.cpp" />

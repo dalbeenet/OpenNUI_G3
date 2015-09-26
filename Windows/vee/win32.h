@@ -2,6 +2,7 @@
 #define _VEE_WIN32_H_
 
 #include <vee/exception.h>
+#include <vee/macro.h>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
@@ -10,15 +11,14 @@ namespace vee {
 
 class win32_handle
 {
+    DISALLOW_COPY_AND_ASSIGN(win32_handle);
 public:
     ~win32_handle() __noexcept;
     win32_handle()  __noexcept;
-    win32_handle(const win32_handle&)  __noexcept;
     win32_handle(win32_handle&&) __noexcept;
-    explicit win32_handle(const HANDLE&) __noexcept;
-    explicit win32_handle(HANDLE&&) __noexcept;
-    win32_handle& operator=(const win32_handle&)  __noexcept;
-    win32_handle& operator=(win32_handle&&) __noexcept;
+    win32_handle(HANDLE&&) __noexcept;
+    win32_handle& operator=(win32_handle&&)__noexcept;
+    win32_handle& operator=(HANDLE&&)__noexcept;
     void close() throw(...);
     void close_nothrow() __noexcept;
     inline HANDLE& operator()()
