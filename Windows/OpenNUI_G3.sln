@@ -15,6 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libopennui_master_G3", "lib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_device_template", "opennui_device_template\opennui_device_template.vcxproj", "{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCppClient", "TestCppClient\TestCppClient.vcxproj", "{22F9DF73-2C34-4EE3-B743-E174177AC502}"
+	ProjectSection(ProjectDependencies) = postProject
+		{65A082DC-494F-4576-B661-11BE002FF2E9} = {65A082DC-494F-4576-B661-11BE002FF2E9}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -37,6 +42,10 @@ Global
 		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Debug|Win32.Build.0 = Debug|Win32
 		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Release|Win32.ActiveCfg = Release|Win32
 		{8DA9EB7C-F851-4223-A1D7-CA63E52D35A2}.Release|Win32.Build.0 = Release|Win32
+		{22F9DF73-2C34-4EE3-B743-E174177AC502}.Debug|Win32.ActiveCfg = Debug|Win32
+		{22F9DF73-2C34-4EE3-B743-E174177AC502}.Debug|Win32.Build.0 = Debug|Win32
+		{22F9DF73-2C34-4EE3-B743-E174177AC502}.Release|Win32.ActiveCfg = Release|Win32
+		{22F9DF73-2C34-4EE3-B743-E174177AC502}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

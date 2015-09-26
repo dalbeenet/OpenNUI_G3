@@ -34,17 +34,26 @@ class named_pipe abstract: public sync_stream
 public:
     virtual ~named_pipe() = default;
     virtual void connect(const char* pipe_name, const creation_option creation_opt, const pipe_data_transfer_mode read_mode, const uint32_t time_out_millisec) throw(...) = 0;
+    virtual void disconnect() __noexcept = 0;
 };
 
 class named_pipe_server abstract
 {
 public:
-    using session_t = named_pipe;
-    using session_ptr = ::std::shared_ptr<session_t>;
     virtual ~named_pipe_server() = default;
-    virtual session_ptr accept(const string pipe_name, const pipe_data_transfer_mode transfer_mode) throw(...) = 0;
+    virtual ::std::shared_ptr<named_pipe> accept(const char* pipe_name,
+                                               const pipe_data_transfer_mode mode,
+                                               const uint32_t in_buffer_size,
+                                               const uint32_t out_buffer_size) throw(...) = 0;
     virtual void close() __noexcept = 0;
 };
+
+namespace win32 {
+
+::std::shared_ptr<named_pipe_server> create_named_pipe_server() __noexcept;
+::std::shared_ptr<named_pipe> create_named_pipe() __noexcept;
+
+} // namespace win32
 
 } // namespace interprocess
 } // namespace voost

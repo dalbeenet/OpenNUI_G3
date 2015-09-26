@@ -2,8 +2,6 @@
 
 namespace vee {
 
-
-
 exception::exception(const char* _desc, int _code):
 desc(_desc),
 code(_code)
