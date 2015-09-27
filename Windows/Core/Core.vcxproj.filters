@@ -13,9 +13,6 @@
     <Filter Include="Kernel\Protocol">
       <UniqueIdentifier>{218d184a-e52b-4e74-8aa3-0b8e80bfcc7b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kernel\Layer1">
-      <UniqueIdentifier>{49f187b8-b48f-4e19-974e-5b2fe687c98f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

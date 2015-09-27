@@ -8,6 +8,8 @@ Desc    : Data type definition of OpenNUI
 #ifndef _OPENNUI_SDK_DATADEF_H_
 #define _OPENNUI_SDK_DATADEF_H_
 #include "sdkver.h"
+#include <cinttypes>
+#include <array>
 #include <string>
 
 _OPENNUI_BEGIN
@@ -135,6 +137,95 @@ public:
         virtual bool acquire_color_frame(const _OPENNUI byte* dst) _OVERRIDE_OPENNUI_INTERFACE;\
         virtual bool acquire_depth_frame(const _OPENNUI byte* dst) _OVERRIDE_OPENNUI_INTERFACE;\
         virtual bool acquire_body_frame(const _OPENNUI byte* dst)  _OVERRIDE_OPENNUI_INTERFACE;
+
+namespace body {
+
+enum class joint_type: int32_t
+{
+    null = -1,
+    spine_base = 0,
+    spine_mid = 1,
+    neck = 2,
+    head = 3,
+    shoulder_left = 4,
+    elbow_left = 5,
+    wrist_left = 6,
+    hand_left = 7,
+    shoulder_right = 8,
+    elbow_right = 9,
+    wrist_right = 10,
+    hand_right = 11,
+    hip_left = 12,
+    knee_left = 13,
+    ankle_left = 14,
+    foot_left = 15,
+    hip_right = 16,
+    knee_right = 17,
+    ankle_right = 18,
+    foot_right = 19,
+    spine_shoulder = 20,
+    handtip_left = 21,
+    thumb_left = 22,
+    handtip_right = 23,
+    thumb_right = 24,
+    number_of_joints = 25
+};
+
+enum class tracking_state: uint32_t
+{
+    not_tracked = 0,
+    inferred = 1,
+    tracked = 2,
+};
+
+enum class hand_state: uint16_t
+{
+    unknown = 0,
+    not_tracked = 1,
+    open = 2,
+    closed = 3,
+    point = 4,
+};
+
+struct vector3d
+{
+    double x;
+    double y;
+    double z;
+};
+
+struct vector4f
+{
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+struct joint
+{
+    joint_type type;
+    tracking_state state;
+    vector3d position;
+    vector4f orientation;
+};
+
+static const int JOINT_BLOCK_LENGTH = sizeof(joint);//  (sizeof(__int32) * 2 + sizeof(double) * 3 + sizeof(float) * 4);
+
+#pragma pack(push, 1)
+struct body
+{
+    __int32 tracking_id;
+    __int32 joint_count;
+    bool    is_valid;
+    std::array<joint, 25> joints;
+    hand_state left_hand;
+    hand_state right_hand;
+};
+#pragma pack(pop)
+static const int BODY_BLOCK_LENGTH = sizeof(body);
+
+} // namespace body
 
 _OPENNUI_END
 
