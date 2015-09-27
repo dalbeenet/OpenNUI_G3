@@ -6,28 +6,28 @@
 
 namespace xkernel {
 
-using task_sig = void(void*);
-using task_t = ::vee::delegate<task_sig>;
-
-enum class task_id
-{
-    test = 0,
-};
-
-namespace scheduler {
-
-// Initialize scheduler
-void initialize(unsigned int init_actors = parameters::INITIAL_ACTORS, unsigned int mailbox_size = parameters::ACTOR_MAILBOX_CAPACITY);
-
-// Dispose scheduler
-void dispose();
-
-// Request task to scheduler (Reference delegate)
-void request(task_t& task, void* arg);
-// Request task to scheduler (RReference delegate)
-void request(task_t&& task, void* arg);
-// Request task to scheduler (Function type)
-void request(std::function<task_sig> function, void* arg);
+//using task_sig = void(void*);
+//using task_t = ::vee::delegate<task_sig>;
+//
+//enum class task_id
+//{
+//    test = 0,
+//};
+//
+//namespace scheduler {
+//
+//// Initialize scheduler
+//void initialize(unsigned int init_actors = parameters::INITIAL_ACTORS, unsigned int mailbox_size = parameters::ACTOR_MAILBOX_CAPACITY);
+//
+//// Dispose scheduler
+//void dispose();
+//
+//// Request task to scheduler (Reference delegate)
+//void request(task_t& task, void* arg);
+//// Request task to scheduler (RReference delegate)
+//void request(task_t&& task, void* arg);
+//// Request task to scheduler (Function type)
+//void request(std::function<task_sig> function, void* arg);
 
 } // namespace scheduler
 

@@ -132,20 +132,20 @@ void websocket_echo_server_main()
     }
 }
 
-void scheduler_test_code()
-{
-    printf("Scheduler test\n");
-    xkernel::scheduler::initialize();
-    xkernel::scheduler::request(f1, nullptr);
-    xkernel::scheduler::request(f2, nullptr);
-    getch();
-    print_line();
-    xkernel::scheduler::dispose();
-    {
-        printf("Timer test\npress any key to stop a timer...\n");
-        auto timer = vee::voost::timer::create_timer();
-        timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
-        getch();
-        print_line();
-    }
-}
+//void scheduler_test_code()
+//{
+//    printf("Scheduler test\n");
+//    xkernel::scheduler::initialize();
+//    xkernel::scheduler::request(f1, nullptr);
+//    xkernel::scheduler::request(f2, nullptr);
+//    getch();
+//    print_line();
+//    xkernel::scheduler::dispose();
+//    {
+//        printf("Timer test\npress any key to stop a timer...\n");
+//        auto timer = vee::voost::timer::create_timer();
+//        timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
+//        getch();
+//        print_line();
+//    }
+//}

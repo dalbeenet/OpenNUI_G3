@@ -88,6 +88,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="kernel\protocol\packet_format.cpp" />
+    <ClCompile Include="kernel\session\session_impl.cpp" />
+    <ClCompile Include="kernel\session\win32_session.cpp" />
     <ClCompile Include="kernel\xkernel\scheduler.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
