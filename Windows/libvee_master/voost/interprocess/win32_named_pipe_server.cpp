@@ -42,8 +42,10 @@ win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
     default:
         throw vee::exception("Invalid parameter: pipe io_mode", (int)system::error_code::invalid_parameter);
     }
+    string pipe_real_name = "\\\\.\\pipe\\";
+    pipe_real_name.append(pipe_name);
     win32_handle pipe_handle = CreateNamedPipeA(
-        pipe_name,    // pipe name
+        pipe_real_name.data(),    // pipe name
         PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read and wirte access
         win32_pipe_type_arg | PIPE_WAIT, // pipe mode | blocking_mode
         PIPE_UNLIMITED_INSTANCES,// max. instances
@@ -69,7 +71,7 @@ win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
         throw vee::exception(buffer, (int)system::error_code::server_accept_failure);
     }
 
-    win32_named_pipe pipe(pipe_handle.get(), pipe_name, true);
+    win32_named_pipe pipe(pipe_handle.get(), pipe_real_name.data(), true);
     pipe_handle.clear();
     return pipe;
 }

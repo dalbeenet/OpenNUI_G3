@@ -58,6 +58,10 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
 {
     if (_stream_handler.is_open() == true)
         throw vee::exception("pipe is already opened!", (int)error_code::stream_already_connected);
+    
+    string pipe_real_name = "\\\\.\\pipe\\";
+    pipe_real_name.append(pipe_name);
+    
     HANDLE pipe_handle = NULL;
     {
         DWORD win32_file_craetion_opt = NULL;
@@ -81,9 +85,8 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
         default:
             throw vee::exception("Invalid parameter: creation_option", (int)system::error_code::invalid_parameter);
         }
-
         pipe_handle = CreateFileA(
-            pipe_name, // pipe name
+            pipe_real_name.data(), // pipe name
             GENERIC_READ | GENERIC_WRITE | FILE_FLAG_OVERLAPPED, // read and write access
             0,              // no sharing
             NULL,           // default secuirty attributes
@@ -122,7 +125,7 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
                 time_out_arg = time_out_millisec;
                 break;
             }
-            if (!WaitNamedPipeA(pipe_name, time_out_arg))
+            if (!WaitNamedPipeA(pipe_real_name.data(), time_out_arg))
             {
                 char buffer[256] = { 0, };
                 switch (time_out_millisec)
@@ -175,7 +178,7 @@ void win32_named_pipe::connect(const char* pipe_name, const creation_option crea
     }
 
     // pipe stream is ready
-    _pipe_name = pipe_name;
+    _pipe_name = pipe_real_name;
     _is_server_side = false;
     _stream_handler.assign(pipe_handle);
 }

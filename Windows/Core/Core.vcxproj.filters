@@ -31,6 +31,7 @@
     <ClCompile Include="kernel\session\win32_session.cpp">
       <Filter>Kernel\Session</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\gateway\gateway_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\kernel.h">
@@ -45,5 +46,9 @@
     <ClInclude Include="kernel\session.h">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="kernel\protocol.h" />
+    <ClInclude Include="kernel\gateway.h" />
+    <ClInclude Include="kernel\session\win32_session.h" />
+    <ClInclude Include="kernel\error.h" />
   </ItemGroup>
 </Project>

@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="kernel\gateway\gateway_impl.cpp" />
     <ClCompile Include="kernel\protocol\packet_format.cpp" />
     <ClCompile Include="kernel\session\session_impl.cpp" />
     <ClCompile Include="kernel\session\win32_session.cpp" />
@@ -95,8 +96,12 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="kernel\error.h" />
+    <ClInclude Include="kernel\gateway.h" />
     <ClInclude Include="kernel\kernel.h" />
+    <ClInclude Include="kernel\protocol.h" />
     <ClInclude Include="kernel\session.h" />
+    <ClInclude Include="kernel\session\win32_session.h" />
     <ClInclude Include="kernel\xkernel\parameters.h" />
     <ClInclude Include="kernel\xkernel\taskapi.h" />
   </ItemGroup>

@@ -5,46 +5,20 @@ Date    : 2015-08-01 22:00:54
 Desc    : Entry point of nui framework core
 *******************************************************************/ 
 
+#include <kernel/gateway.h>
 #include <iostream>
-#include <array>
-#include <kernel/kernel.h>
-#include <vee/voost/timer.h>
-#include <vee/voost/net.h>
-#include <vee/voost/pipe.h>
 #include <conio.h>
 #pragma warning(disable:4996)
-
-void print_line()
-{
-    for (int i = 0; i < 80; ++i)
-        printf("-");
-}
-
-void __cdecl f1(void*)
-{
-    puts(__FUNCSIG__);
-}
-
-void __stdcall f2(void*)
-{
-    puts(__FUNCSIG__);
-}
-
-void timer_callback(unsigned int timer_tick)
-{
-    printf("tick: %d\n", timer_tick);
-}
-
-void named_pipe_echo_server();
-
 int main()
 {
-    named_pipe_echo_server();
+    auto gateway = kernel::gateway::get_instance();
     printf("Press any key to exit...\n");
     _getch();
     return 0;
 }
+#if 0 // NAMED_PIPE_TEST_CODe
 
+#include <vee/voost/pipe.h>
 void named_pipe_echo_server()
 {
     {
@@ -89,7 +63,10 @@ void named_pipe_echo_server()
         }
     }
 }
+#endif
 
+#if 0 // WEBSOCKET_TEST_CODE
+#include <vee/voost/net.h>
 void websocket_echo_server_main()
 {
     {
@@ -131,6 +108,7 @@ void websocket_echo_server_main()
         }
     }
 }
+#endif
 
 //void scheduler_test_code()
 //{
