@@ -10,9 +10,9 @@ namespace kernel {
     pipe_name.fill(0);
     sprintf((char*)(pipe_name.data()), "opennui_pipe_%d", sid);
     
-    auto stream_pair = _data_stream_connection(raw_stream, (char*)pipe_name.data());
-    data_stream& cts_stream = stream_pair.first;
-    data_stream& stc_stream = stream_pair.second;
+    auto stream_pair = _message_stream_connection(raw_stream, (char*)pipe_name.data());
+    win32_message_stream& cts_stream = stream_pair.first;
+    win32_message_stream& stc_stream = stream_pair.second;
     
     ::std::shared_ptr<win32_session> session = ::std::make_shared<win32_session>();
     session->_life_stream = std::move(raw_stream);
@@ -32,13 +32,23 @@ win32_session::life_stream win32_session::get_life_stream() const
     return _life_stream;
 }
 
-::std::pair<win32_session::data_stream/*CTS*/, win32_session::data_stream/*STC*/> win32_session::_data_stream_connection(life_stream raw_stream, const char* pipe_name) throw(...)
+win32_session::message_stream win32_session::get_cts_stream() const
+{
+    return ::std::static_pointer_cast<::vee::iostream>(_cts_stream);
+}
+
+win32_session::message_stream win32_session::get_stc_stream() const
+{
+    return ::std::static_pointer_cast<::vee::iostream>(_stc_stream);
+}
+
+::std::pair<win32_session::win32_message_stream/*CTS*/, win32_session::win32_message_stream/*STC*/> win32_session::_message_stream_connection(life_stream raw_stream, const char* pipe_name) throw(...)
 {
     using ::kernel::protocol::stream_constant;
     using ::vee::voost::interprocess::pipe_data_transfer_mode;
-    ::std::pair<data_stream/*CTS*/, data_stream/*STC*/> stream_pair;
-    data_stream& cts_stream = stream_pair.first;
-    data_stream& stc_stream = stream_pair.second;
+    ::std::pair<win32_message_stream/*CTS*/, win32_message_stream/*STC*/> stream_pair;
+    win32_message_stream& cts_stream = stream_pair.first;
+    win32_message_stream& stc_stream = stream_pair.second;
     // Create a pipe stream server
     auto cts_pipe_server = vee::voost::interprocess::win32::create_named_pipe_server();
     auto stc_pipe_server = vee::voost::interprocess::win32::create_named_pipe_server();
@@ -59,7 +69,7 @@ win32_session::life_stream win32_session::get_life_stream() const
 
         protocol::data_frame_header header;
         header.opcode = protocol::opcode::stc_request_pipe_connection;
-        ::std::array<unsigned char, 512> temp_buffer, packet_buffer;
+        ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> temp_buffer, packet_buffer;
         temp_buffer.fill(0);
         packet_buffer.fill(0);
         uint32_t data_length = sizeof(uint32_t)/*STRING_LEN*/ + strlen(pipe_name);

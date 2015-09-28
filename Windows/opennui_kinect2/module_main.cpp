@@ -130,29 +130,25 @@ _OPENNUI_DEVICE state_type ms_kinect2::state() const
     return _state;
 }
 
-_OPENNUI_DEVICE string ms_kinect2::name() const
+void ms_kinect2::name(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("Kinect2");
-    return s;
+    dst = "Kinect2";
 }
 
-_OPENNUI_DEVICE string ms_kinect2::vendor() const
+void ms_kinect2::vendor(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("Microsoft");
-    return s;
+    dst = "Microsoft";
 }
 
 //TODO: implementation
-_OPENNUI_DEVICE string ms_kinect2::uuid() const
+void ms_kinect2::uuid(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("undefined");
-    return s;
+    dst = "Undefined";
 }
 
-_OPENNUI_DEVICE string ms_kinect2::rivision() const
+void ms_kinect2::rivision(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("1409");
-    return s;
+    dst = "1409";
 }
 
 _OPENNUI bitflag ms_kinect2::databits() const
@@ -343,9 +339,9 @@ bool ms_kinect2::acquire_body_frame(const _OPENNUI byte* dst)
     return result;
 }
 
-__declspec(dllexport) _OPENNUI opennui_device* __stdcall on_load()
+__declspec(dllexport) ::std::shared_ptr<_OPENNUI opennui_device> __stdcall on_load()
 {
     ::std::shared_ptr<_OPENNUI opennui_device> device = ::std::make_shared<ms_kinect2>();
     printf("HELLO KINECT2!\n");
-    return device.get();
+    return device;
 }

@@ -43,9 +43,10 @@
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp">
       <Filter>Kernel\Session</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\module\device_manager.cpp">
+    <ClCompile Include="kernel\module\device_manager_impl.cpp">
       <Filter>Kernel\Module</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\protocol\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\kernel.h">
@@ -66,18 +67,20 @@
     <ClInclude Include="kernel\protocol.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\session\win32_session.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="kernel\device_module.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="kernel\gateway.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\session_manager.h" />
     <ClInclude Include="kernel\device_manager.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\session_manager.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\session\win32_session.h">
+      <Filter>Kernel\Session</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

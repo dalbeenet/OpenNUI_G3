@@ -11,6 +11,7 @@ enum class error_code: int
     add_module_failure,
     remove_module_failure,
     add_session_failure,
+    find_module_failure,
 };
 
 }

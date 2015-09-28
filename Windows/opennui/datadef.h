@@ -82,10 +82,10 @@ public:
     virtual _OPENNUI_DEVICE state_type suspend()  _OPENNUI_INTERFACE;
     virtual _OPENNUI_DEVICE state_type release()  _OPENNUI_INTERFACE;
     virtual _OPENNUI_DEVICE state_type state() const _OPENNUI_INTERFACE;
-    virtual _OPENNUI_DEVICE string name()      const _OPENNUI_INTERFACE;
-    virtual _OPENNUI_DEVICE string vendor()    const _OPENNUI_INTERFACE;
-    virtual _OPENNUI_DEVICE string uuid()      const _OPENNUI_INTERFACE;
-    virtual _OPENNUI_DEVICE string rivision()  const _OPENNUI_INTERFACE;
+    virtual void name(string& dst)      const _OPENNUI_INTERFACE;
+    virtual void vendor(string& dst)    const _OPENNUI_INTERFACE;
+    virtual void uuid(string& dst)      const _OPENNUI_INTERFACE;
+    virtual void rivision(string& dst)  const _OPENNUI_INTERFACE;
     virtual _OPENNUI bitflag databits() const _OPENNUI_INTERFACE;
     virtual void get_color_frame_info(_OPENNUI video_frame_info& out)     const _OPENNUI_INTERFACE;
     virtual void get_depth_frame_info(_OPENNUI video_frame_info& out)     const _OPENNUI_INTERFACE;
@@ -126,10 +126,10 @@ public:
         virtual _OPENNUI_DEVICE state_type suspend()  _OVERRIDE_OPENNUI_INTERFACE;\
         virtual _OPENNUI_DEVICE state_type release()  _OVERRIDE_OPENNUI_INTERFACE;\
         virtual _OPENNUI_DEVICE state_type state()  const _OVERRIDE_OPENNUI_INTERFACE;\
-        virtual _OPENNUI_DEVICE string name()       const _OVERRIDE_OPENNUI_INTERFACE;\
-        virtual _OPENNUI_DEVICE string vendor()     const _OVERRIDE_OPENNUI_INTERFACE;\
-        virtual _OPENNUI_DEVICE string uuid()       const _OVERRIDE_OPENNUI_INTERFACE;\
-        virtual _OPENNUI_DEVICE string rivision()   const _OVERRIDE_OPENNUI_INTERFACE;\
+        virtual void name(_OPENNUI_DEVICE string&)       const _OVERRIDE_OPENNUI_INTERFACE;\
+        virtual void vendor(_OPENNUI_DEVICE string&)     const _OVERRIDE_OPENNUI_INTERFACE;\
+        virtual void uuid(_OPENNUI_DEVICE string&)       const _OVERRIDE_OPENNUI_INTERFACE;\
+        virtual void rivision(string&)   const _OVERRIDE_OPENNUI_INTERFACE;\
         virtual _OPENNUI bitflag databits()  const _OVERRIDE_OPENNUI_INTERFACE;\
         virtual void get_color_frame_info(_OPENNUI video_frame_info& out)     const _OVERRIDE_OPENNUI_INTERFACE;\
         virtual void get_depth_frame_info(_OPENNUI video_frame_info& out)     const _OVERRIDE_OPENNUI_INTERFACE;\

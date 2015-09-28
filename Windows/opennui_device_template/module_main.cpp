@@ -36,28 +36,25 @@ _OPENNUI_DEVICE state_type test_device::state() const
     return _state;
 }
 
-_OPENNUI_DEVICE string test_device::name() const
+void test_device::name(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("undefined");
-    return s;
+    dst = "Undefined";
 }
 
-_OPENNUI_DEVICE string test_device::vendor() const
+void test_device::vendor(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("undefined");
-    return s;
+    dst = "Undefined";
 }
 
-_OPENNUI_DEVICE string test_device::uuid() const
+//TODO: implementation
+void test_device::uuid(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("undefined");
-    return s;
+    dst = "Undefined";
 }
 
-_OPENNUI_DEVICE string test_device::rivision() const
+void test_device::rivision(_OPENNUI_DEVICE string& dst) const
 {
-    _OPENNUI_DEVICE string s("undefined");
-    return s;
+    dst = "Undefined";
 }
 
 _OPENNUI bitflag test_device::databits() const

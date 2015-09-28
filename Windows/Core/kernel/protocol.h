@@ -2,9 +2,14 @@
 #define _OPENNUIG3_KERNEL_PROTOCOL_H_
 
 #include <array>
+#include <cinttypes>
 
 namespace kernel {
 namespace protocol {
+
+using device_key_t = uint32_t;
+using session_key_t = uint32_t;
+
 struct stream_constant
 {
     static const int life_socket_port = 8000;
@@ -61,6 +66,15 @@ struct data_frame_header
 uint32_t packet_formatting(unsigned char* dst, data_frame_header& header, const unsigned char* data, uint32_t data_length);
 // Returns parsed data frame header
 data_frame_header packet_parsing(unsigned char* raw_data, unsigned char* data_buffer);
+
+namespace utility {
+
+struct packet_generator abstract
+{
+    static uint32_t stc_new_sensor_online(unsigned char* out_buffer, device_key_t key);
+};
+
+} // namespace utility
 
 } // namespace protocol
 }

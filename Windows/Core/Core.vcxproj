@@ -90,8 +90,9 @@
   <ItemGroup>
     <ClCompile Include="kernel\gateway\gateway_impl.cpp" />
     <ClCompile Include="kernel\module\device_module_impl.cpp" />
-    <ClCompile Include="kernel\module\device_manager.cpp" />
+    <ClCompile Include="kernel\module\device_manager_impl.cpp" />
     <ClCompile Include="kernel\protocol\packet_format.cpp" />
+    <ClCompile Include="kernel\protocol\utility.cpp" />
     <ClCompile Include="kernel\session\session_impl.cpp" />
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp" />
     <ClCompile Include="kernel\session\win32_session.cpp" />

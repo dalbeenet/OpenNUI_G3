@@ -19,21 +19,22 @@ session_manager::session_manager()
 
 }
 
-session_manager::key_t session_manager::add_session(session_ptr sptr) throw(...)
+session_manager::key_t session_manager::add_session(session_ptr s) throw(...)
 {
     ::std::lock_guard<::vee::spin_lock> _guard(_mtx);
-    key_t sid = sptr->get_id();
-    auto result = _sessions.insert(::std::make_pair(sid, sptr));
+    key_t sid = s->get_id();
+    auto result = _sessions.insert(::std::make_pair(sid, s));
     if (result.second == false)
     {
         char buffer[256] = { 0, };
         sprintf(buffer, "Could not add a session [%d]", sid);
         throw vee::exception(buffer, (int)error_code::add_session_failure);
     }
-    auto life_stream = sptr->get_life_stream();
-    life_stream->async_read(sptr->_lifestream_in_buffer.data(), 
-                            sptr->_lifestream_in_buffer.size(), 
-                            ::std::bind(&session_manager::_on_session_disconnect, this, sptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
+    auto life_stream = s->get_life_stream();
+    life_stream->async_read(s->_lifestream_in_buffer.data(), 
+                            s->_lifestream_in_buffer.size(), 
+                            ::std::bind(&session_manager::_on_session_disconnect, this, s, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
+    s->_launch_api_service();
     return sid;
 }
 

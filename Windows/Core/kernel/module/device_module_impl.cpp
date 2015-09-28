@@ -7,6 +7,8 @@ device_module::~device_module()
 {
     if (_module_handle != NULL)
     {
+        while (_device_ptr.use_count() != 1);
+        _device_ptr.reset();
         FreeLibrary(_module_handle);
         _module_handle = NULL;
     }
@@ -15,7 +17,8 @@ device_module::~device_module()
 device_module::device_module(const char* module_name) throw(...):
 _device_ptr(nullptr),
 _module_name("null"),
-_module_handle(NULL)
+_module_handle(NULL),
+_key(0)
 {
     HMODULE module_handle = NULL;
     module_handle = LoadLibraryA(module_name);
@@ -23,7 +26,7 @@ _module_handle(NULL)
     {
         throw vee::exception("Load dll failure!", (int)error_code::load_dll_failure);
     }
-    using entry_point = opennui_device_ptr(_stdcall*)();
+    using entry_point = opennui_device_ptr(__stdcall*)();
     entry_point ep = (entry_point)GetProcAddress(module_handle, "on_load");
     if (ep == NULL)
     {
@@ -32,6 +35,9 @@ _module_handle(NULL)
     _device_ptr = ep();
     _module_name = module_name;
     _module_handle = module_handle;
+    ::std::string name(module_name);
+    ::std::hash<::std::string> hash;
+    _key = hash(name);
 }
 
 device_module::device_module(device_module&& other):
