@@ -19,6 +19,12 @@
     <Filter Include="Kernel\shared_buffer">
       <UniqueIdentifier>{7b6fc734-a157-47b2-be01-b7d611e271e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kernel\Scheduler">
+      <UniqueIdentifier>{5bde6f01-14ef-49e8-95ea-d194221a50e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kernel\Forward unit">
+      <UniqueIdentifier>{4c891bc9-cfbd-4cbc-aa05-c620d305d6d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -48,6 +54,12 @@
     </ClCompile>
     <ClCompile Include="kernel\protocol\utility.cpp">
       <Filter>Kernel\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\scheduler\scheduler_impl.cpp">
+      <Filter>Kernel\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\forward_unit\forward_unit_impl.cpp">
+      <Filter>Kernel\Forward unit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +94,9 @@
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="kernel\scheduler.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\forward_unit.h">
       <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>

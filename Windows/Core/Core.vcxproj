@@ -88,11 +88,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="kernel\forward_unit\forward_unit_impl.cpp" />
     <ClCompile Include="kernel\gateway\gateway_impl.cpp" />
     <ClCompile Include="kernel\module\device_module_impl.cpp" />
     <ClCompile Include="kernel\module\device_manager_impl.cpp" />
     <ClCompile Include="kernel\protocol\packet_format.cpp" />
     <ClCompile Include="kernel\protocol\utility.cpp" />
+    <ClCompile Include="kernel\scheduler\scheduler_impl.cpp" />
     <ClCompile Include="kernel\session\session_impl.cpp" />
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp" />
     <ClCompile Include="kernel\session\win32_session.cpp" />
@@ -100,6 +102,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="kernel\forward_unit.h" />
     <ClInclude Include="kernel\device_module.h" />
     <ClInclude Include="kernel\error.h" />
     <ClInclude Include="kernel\gateway.h" />

@@ -38,6 +38,10 @@ _key(0)
     ::std::string name(module_name);
     ::std::hash<::std::string> hash;
     _key = hash(name);
+
+    _device_ptr->get_color_frame_info(_color_frame_info);
+    _device_ptr->get_depth_frame_info(_depth_frame_info);
+    _device_ptr->get_body_tracking_info(_body_frame_info);
 }
 
 device_module::device_module(device_module&& other):

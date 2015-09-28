@@ -9,6 +9,7 @@ namespace kernel {
 
 class device_manager final
 {
+    friend class forward_unit;
     DISALLOW_COPY_AND_ASSIGN(device_manager);
     DISALLOW_MOVE_AND_ASSIGN(device_manager);
 public:

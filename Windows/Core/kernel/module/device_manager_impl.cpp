@@ -31,6 +31,7 @@ device_manager::key_t device_manager::add_module(const char* module_name) throw(
         sprintf(buffer, "Could not add a module [%s]", module_name);
         throw vee::exception(buffer, (int)error_code::add_module_failure);
     }
+    module->opennui_device_instance()->open();
     return module->key();
 }
 

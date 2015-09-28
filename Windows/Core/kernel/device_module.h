@@ -11,6 +11,7 @@ namespace kernel {
 
 class device_module
 {
+    friend class forward_unit;
     DISALLOW_COPY_AND_ASSIGN(device_module);
     using key_t = protocol::device_key_t;
     using string = ::std::string;
@@ -29,12 +30,26 @@ public:
     {
         return _device_ptr;
     }
-
+    inline const _OPENNUI video_frame_info& color_frame_info()
+    {
+        return _color_frame_info;
+    }
+    inline const _OPENNUI video_frame_info& depth_frame_info()
+    {
+        return _depth_frame_info;
+    }
+    inline const _OPENNUI body_tracking_info& body_frame_info()
+    {
+        return _body_frame_info;
+    }
 public:
     ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> color_buffer_table;
     ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> depth_buffer_table;
     ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> body_buffer_table;
 protected:
+    _OPENNUI video_frame_info   _color_frame_info;
+    _OPENNUI video_frame_info   _depth_frame_info;
+    _OPENNUI body_tracking_info _body_frame_info;
     key_t  _key;
     string _module_name;
     opennui_device_ptr _device_ptr;

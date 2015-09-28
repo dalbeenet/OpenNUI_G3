@@ -166,7 +166,7 @@ void ms_kinect2::get_color_frame_info(_OPENNUI video_frame_info& out) const
     out.width = 1920;
     out.height = 1080;
     out.channel = 4;
-    out.byte_per_pixel = 8;
+    out.byte_per_pixel = 4;
     return;
 }
 
@@ -174,8 +174,8 @@ void ms_kinect2::get_depth_frame_info(_OPENNUI video_frame_info& out) const
 {
     out.width = 512;
     out.height = 424;
-    out.channel = 16;
-    out.byte_per_pixel = 1;
+    out.byte_per_pixel = 2;
+    out.channel = 1;
     return;
 }
 

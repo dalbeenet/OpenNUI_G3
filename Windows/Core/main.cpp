@@ -6,7 +6,7 @@ Desc    : Entry point of nui framework core
 *******************************************************************/ 
 
 #include <kernel/gateway.h>
-#include <kernel/device_manager.h>
+#include <kernel/forward_unit.h>
 #include <iostream>
 #include <conio.h>
 #pragma warning(disable:4996)
@@ -19,6 +19,7 @@ Desc    : Entry point of nui framework core
 
 int main()
 {
+    auto forward_unit = kernel::forward_unit::get_instance();
     auto gateway = kernel::gateway::get_instance();
     auto device_manager = kernel::device_manager::get_instance();
     try

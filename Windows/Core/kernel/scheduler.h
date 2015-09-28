@@ -4,7 +4,7 @@
 
 namespace kernel {
 
-
+extern ::vee::scheduler<void()> scheduler;
 
 } // namespace kernel
 

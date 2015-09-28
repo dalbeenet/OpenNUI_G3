@@ -27,9 +27,14 @@ struct stream_constant
     static const int pipe_in_buffer_capacity = 4096;
     static const int pipe_out_buffer_capacity = 4096;
     static const int shm_lock_block_size = 4;
-    static const int shm_data_time_stamp_size = 4;
     static const int shm_buffering_count = 3;
+    static const int shm_lock_section_size = shm_lock_block_size * shm_buffering_count;
+    static const int shm_time_stamp_block_size = 8;
     static const int temp_g3_body_frame_size = 8196 * 2;
+    static const int temp_g3_color_max_frame_size = 1920 * 1080 * 4;
+    static const int temp_g3_depth_max_frame_size = 640 * 480 * 2;
+    static const int shm_lock_state = 1;
+    static const int shm_idle_state = 0;
 };
 
 enum class opcode: int16_t
