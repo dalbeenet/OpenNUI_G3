@@ -315,7 +315,7 @@ uint32_t win32_named_pipe::write(const byte* data, const uint32_t size) throw(..
     //    throw vee::exception(temp, (int)system::error_code::stream_send_failure);
     //}
 
-    return static_cast<uint8_t>(bytes_transferred);
+    return bytes_transferred;
 }
 
 void win32_named_pipe::async_write(const byte* data, const uint32_t len, async_write_callback e) throw(...)

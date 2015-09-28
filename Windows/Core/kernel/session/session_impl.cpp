@@ -4,14 +4,15 @@
 #pragma warning(disable:4996)
 namespace kernel {
 
-void session::_on_message_received(::vee::system::operation_result& result,
+void session::_on_message_received(session_ptr this_ptr,
+                                   ::vee::system::operation_result& result,
                                    ::vee::byte* const raw_data,
                                    uint32_t buf_capacity,
                                    uint32_t byte_transferred)
 {
     if (result.error != ::vee::system::error_code::success)
     {
-        printf("system> message stream is disconnected by client! (sid: %d)\n", get_id());
+        printf("system> message stream is disconnected by client! (sid: %d)\n", this_ptr->get_id());
         return;
     }
 
@@ -31,11 +32,11 @@ void session::_on_message_received(::vee::system::operation_result& result,
         return key;
     };
 
-    auto generate_unique_name = [this](const char* inital_string, protocol::device_key_t device_key) -> ::std::string
+    auto generate_unique_name = [&](const char* inital_string, protocol::device_key_t device_key) -> ::std::string
     {
         ::std::array<char, 1024> buffer;
         buffer.fill(0);
-        sprintf(buffer.data(), "%s_did[%d]_sid[%d]", inital_string, device_key, get_id());
+        sprintf(buffer.data(), "%s_did[%d]_sid[%d]", inital_string, device_key, this_ptr->get_id());
         ::std::string s(buffer.data());
         return s;
     };
@@ -56,37 +57,58 @@ void session::_on_message_received(::vee::system::operation_result& result,
 
         if (header.opcode == protocol::opcode::cts_request_color_frame)
         {
-            printf("system> session %d requests cts_request_color_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_color_frame\n", this_ptr->get_id());
             _OPENNUI video_frame_info info;
             device->get_color_frame_info(info);
             auto shb = shared_buffer::crate(generate_unique_name("color_shared_buffer", device_key).data(),
                                  calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count),
-                                 device_key, this->get_id(), protocol::transfer_data_type::color_frame);
-            this->color_buffer_table.insert(shb->key(), shb);
+                                 device_key, this_ptr->get_id(), protocol::frame_type::color_frame);
+            this_ptr->color_buffer_table.insert(shb->key(), shb);
             module->color_buffer_table.insert(shb->key(), shb);
             printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
+            // Response
+            {
+                ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
+                buffer.fill(0);
+                uint32_t packet_size = protocol::utility::packet_generator::stc_response_shb_request(protocol::frame_type::color_frame, buffer.data(), device_key, true, shb->name().data());
+                this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t){});
+            }
         }
         else if (header.opcode == protocol::opcode::cts_request_depth_frame)
         {
-            printf("system> session %d requests cts_request_depth_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_depth_frame\n", this_ptr->get_id());
             _OPENNUI video_frame_info info;
             device->get_depth_frame_info(info);
             auto shb = shared_buffer::crate(generate_unique_name("depth_shared_buffer", device_key).data(),
                                             calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count),
-                                            device_key, this->get_id(), protocol::transfer_data_type::depth_frame);
-            this->depth_buffer_table.insert(shb->key(), shb);
+                                            device_key, this_ptr->get_id(), protocol::frame_type::depth_frame);
+            this_ptr->depth_buffer_table.insert(shb->key(), shb);
             module->depth_buffer_table.insert(shb->key(), shb);
             printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
+            // Response
+            {
+                ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
+                buffer.fill(0);
+                uint32_t packet_size = protocol::utility::packet_generator::stc_response_shb_request(protocol::frame_type::depth_frame, buffer.data(), device_key, true, shb->name().data());
+                this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t){});
+            }
         }
         else if (header.opcode == protocol::opcode::cts_request_body_frame)
         {
-            printf("system> session %d requests cts_request_body_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_body_frame\n", this_ptr->get_id());
             auto shb = shared_buffer::crate(generate_unique_name("depth_shared_buffer", device_key).data(),
                                             calculate_shm_size(protocol::stream_constant::temp_g3_body_frame_size, protocol::stream_constant::shm_buffering_count),
-                                            device_key, this->get_id(), protocol::transfer_data_type::depth_frame);
-            this->body_buffer_table.insert(shb->key(), shb);
+                                            device_key, this_ptr->get_id(), protocol::frame_type::depth_frame);
+            this_ptr->body_buffer_table.insert(shb->key(), shb);
             module->body_buffer_table.insert(shb->key(), shb);
             printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
+            // Response
+            {
+                ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
+                buffer.fill(0);
+                uint32_t packet_size = protocol::utility::packet_generator::stc_response_shb_request(protocol::frame_type::body_frame, buffer.data(), device_key, true, shb->name().data());
+                this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result& , uint32_t){});
+            }
         }
         else
         {
@@ -95,12 +117,12 @@ void session::_on_message_received(::vee::system::operation_result& result,
     }
     catch (::vee::exception& e)
     {
-        printf("system> failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this->get_id(), e.what());
+        printf("system> failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
     }
 
-    get_cts_stream()->async_read(_cts_stream_in_buffer.data(),
-                                 _cts_stream_in_buffer.size(),
-                                 ::std::bind(&session::_on_message_received, this, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
+    this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
+                                           this_ptr->_cts_stream_in_buffer.size(),
+                                           ::std::bind(&session::_on_message_received, this_ptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
 }
 
 uint32_t session::make_unique_sid()
@@ -109,7 +131,7 @@ uint32_t session::make_unique_sid()
     return ++counter;
 }
 
-void session::_launch_api_service()
+void session::_launch_api_service(session_ptr this_ptr)
 {
     auto device_mgr = device_manager::get_instance();
     auto device_keys = device_mgr->get_all_keys();
@@ -120,15 +142,15 @@ void session::_launch_api_service()
             ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
             buffer.fill(0);
             uint32_t packet_size = protocol::utility::packet_generator::stc_new_sensor_online(buffer.data(), it);
-            get_stc_stream()->write(buffer.data(), packet_size);
+            this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t){});
         }
-        get_cts_stream()->async_read(_cts_stream_in_buffer.data(),
-                                     _cts_stream_in_buffer.size(),
-                                     ::std::bind(&session::_on_message_received, this, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
+        this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
+                                               this_ptr->_cts_stream_in_buffer.size(),
+                                               ::std::bind(&session::_on_message_received, this_ptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
     }
     catch (::vee::exception& e)
     {
-        printf("system> Failed to launch api service! [sid: %d]\nUnhandled exception: %s\n", get_id(), e.what());
+        printf("system> Failed to launch api service! [sid: %d]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
     }
 }
 

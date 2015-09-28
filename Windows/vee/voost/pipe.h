@@ -23,6 +23,13 @@ enum class creation_option: int
     truncate_existing   // exists -> truncates, does not eixst -> fails
 };
 
+enum class pipe_access_mode: int
+{
+    inbound,
+    outbound,
+    duplex,
+};
+
 enum class pipe_data_transfer_mode: int
 {
     iomode_byte,      // Data is read from pipe as a stream of bytes,  This mode is the default if no read-mode flag is specified.
@@ -42,9 +49,10 @@ class named_pipe_server abstract
 public:
     virtual ~named_pipe_server() = default;
     virtual ::std::shared_ptr<named_pipe> accept(const char* pipe_name,
-                                               const pipe_data_transfer_mode mode,
-                                               const uint32_t in_buffer_size,
-                                               const uint32_t out_buffer_size) throw(...) = 0;
+                                                 const pipe_access_mode access_mode,
+                                                 const pipe_data_transfer_mode mode,
+                                                 const uint32_t in_buffer_size,
+                                                 const uint32_t out_buffer_size) throw(...) = 0;
     virtual void close() __noexcept = 0;
 };
 

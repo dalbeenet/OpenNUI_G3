@@ -11,7 +11,7 @@ using device_key_t = uint32_t;
 using session_key_t = uint32_t;
 using shared_buffer_key_t = uint32_t;
 
-enum class transfer_data_type: uint32_t
+enum class frame_type: uint32_t
 {
     undefined = 0,
     color_frame,
@@ -85,6 +85,7 @@ namespace utility {
 struct packet_generator abstract
 {
     static uint32_t stc_new_sensor_online(unsigned char* out_buffer, device_key_t key);
+    static uint32_t stc_response_shb_request(protocol::frame_type data_type, unsigned char* out_buffer, device_key_t key, bool is_buffer_created, const char* shb_name);
 };
 
 } // namespace utility

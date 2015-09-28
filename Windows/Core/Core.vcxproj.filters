@@ -4,9 +4,6 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{c4182ef6-4e2d-48e7-a309-8db2969517ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kernel\XKernel">
-      <UniqueIdentifier>{5677fecf-af64-4c64-824e-2eb308f9214d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Kernel\Session">
       <UniqueIdentifier>{a5036406-be03-4dfc-9350-a380c6a364f7}</UniqueIdentifier>
     </Filter>
@@ -25,9 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="kernel\xkernel\scheduler.cpp">
-      <Filter>Kernel\XKernel</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\protocol\packet_format.cpp">
       <Filter>Kernel\Protocol</Filter>
     </ClCompile>
@@ -60,12 +54,6 @@
     <ClInclude Include="kernel\kernel.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\xkernel\taskapi.h">
-      <Filter>Kernel\XKernel</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\xkernel\parameters.h">
-      <Filter>Kernel\XKernel</Filter>
-    </ClInclude>
     <ClInclude Include="kernel\session.h">
       <Filter>Kernel</Filter>
     </ClInclude>
@@ -91,6 +79,9 @@
       <Filter>Kernel\Session</Filter>
     </ClInclude>
     <ClInclude Include="kernel\shared_buffer.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\scheduler.h">
       <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,6 +46,7 @@ win32_session::message_stream win32_session::get_stc_stream() const
 {
     using ::kernel::protocol::stream_constant;
     using ::vee::voost::interprocess::pipe_data_transfer_mode;
+    using ::vee::voost::interprocess::pipe_access_mode;
     ::std::pair<win32_message_stream/*CTS*/, win32_message_stream/*STC*/> stream_pair;
     win32_message_stream& cts_stream = stream_pair.first;
     win32_message_stream& stc_stream = stream_pair.second;
@@ -58,13 +59,13 @@ win32_session::message_stream win32_session::get_stc_stream() const
         {
             std::string cts_pipe_name(pipe_name);
             cts_pipe_name.append("_cts");
-            cts_stream = cts_pipe_server->accept(cts_pipe_name.data(), pipe_data_transfer_mode::iomode_byte, stream_constant::pipe_in_buffer_capacity, stream_constant::pipe_out_buffer_capacity);
+            cts_stream = cts_pipe_server->accept(cts_pipe_name.data(), pipe_access_mode::inbound, pipe_data_transfer_mode::iomode_byte, stream_constant::pipe_in_buffer_capacity, stream_constant::pipe_out_buffer_capacity);
         });
         auto stc_connection = std::async(std::launch::async, [&] // STC connection
         {
             std::string stc_pipe_name(pipe_name);
             stc_pipe_name.append("_stc");
-            stc_stream = cts_pipe_server->accept(stc_pipe_name.data(), pipe_data_transfer_mode::iomode_byte, stream_constant::pipe_in_buffer_capacity, stream_constant::pipe_out_buffer_capacity);
+            stc_stream = cts_pipe_server->accept(stc_pipe_name.data(), pipe_access_mode::outbound, pipe_data_transfer_mode::iomode_byte, stream_constant::pipe_in_buffer_capacity, stream_constant::pipe_out_buffer_capacity);
         });
 
         protocol::data_frame_header header;

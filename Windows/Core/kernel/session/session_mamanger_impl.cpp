@@ -36,7 +36,7 @@ session_manager::key_t session_manager::add_session(session_ptr s) throw(...)
     life_stream->async_read(s->_lifestream_in_buffer.data(), 
                             s->_lifestream_in_buffer.size(), 
                             ::std::bind(&session_manager::_on_session_disconnect, this, s, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
-    s->_launch_api_service();
+    s->_launch_api_service(s);
     return sid;
 }
 

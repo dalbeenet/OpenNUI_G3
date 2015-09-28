@@ -26,10 +26,26 @@ win32_named_pipe_acceptor& win32_named_pipe_acceptor::operator=(win32_named_pipe
 }
 
 win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
+                                                   const pipe_access_mode access_type,
                                                    const pipe_data_transfer_mode io_mode,
                                                    const uint32_t in_buffer_size,
                                                    const uint32_t out_buffer_size) throw(...)
 {
+    DWORD win32_pipe_access_type_arg = NULL;
+    switch (access_type)
+    {
+    case pipe_access_mode::inbound:
+        win32_pipe_access_type_arg = PIPE_ACCESS_INBOUND;
+        break;
+    case pipe_access_mode::outbound:
+        win32_pipe_access_type_arg = PIPE_ACCESS_OUTBOUND;
+        break;
+    case pipe_access_mode::duplex:
+        win32_pipe_access_type_arg = PIPE_ACCESS_DUPLEX;
+        break;
+    default:
+        throw vee::exception("Invalid parameter: pipe access type", (int)system::error_code::invalid_parameter);
+    }
     DWORD win32_pipe_type_arg = NULL;
     switch (io_mode)
     {
@@ -40,13 +56,13 @@ win32_named_pipe win32_named_pipe_acceptor::accept(const char* pipe_name,
         win32_pipe_type_arg = PIPE_READMODE_MESSAGE | PIPE_TYPE_MESSAGE;
         break;
     default:
-        throw vee::exception("Invalid parameter: pipe io_mode", (int)system::error_code::invalid_parameter);
+        throw vee::exception("Invalid parameter: pipe io mode", (int)system::error_code::invalid_parameter);
     }
     string pipe_real_name = "\\\\.\\pipe\\";
     pipe_real_name.append(pipe_name);
     win32_handle pipe_handle = CreateNamedPipeA(
         pipe_real_name.data(),    // pipe name
-        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read and wirte access
+        win32_pipe_access_type_arg | FILE_FLAG_OVERLAPPED,  // read and wirte access
         win32_pipe_type_arg | PIPE_WAIT, // pipe mode | blocking_mode
         PIPE_UNLIMITED_INSTANCES,// max. instances
         in_buffer_size,
@@ -98,9 +114,13 @@ win32_named_pipe_server& win32_named_pipe_server::operator=(win32_named_pipe_ser
     return *this;
 }
 
-win32_named_pipe_server::generic_session_ptr win32_named_pipe_server::accept(const char* pipe_name, const pipe_data_transfer_mode mode, const uint32_t in_buffer_size, const uint32_t out_buffer_size) throw(...)
+win32_named_pipe_server::generic_session_ptr win32_named_pipe_server::accept(const char* pipe_name, 
+                                                                             const pipe_access_mode acces_mode, 
+                                                                             const pipe_data_transfer_mode transfer_mode, 
+                                                                             const uint32_t in_buffer_size, 
+                                                                             const uint32_t out_buffer_size) throw(...)
 {
-    generic_session_ptr generic_session = std::make_shared<session_t>(_acceptor.accept(pipe_name, mode, in_buffer_size, out_buffer_size));
+    generic_session_ptr generic_session = std::make_shared<session_t>(_acceptor.accept(pipe_name, acces_mode, transfer_mode, in_buffer_size, out_buffer_size));
     return generic_session;
 }
 

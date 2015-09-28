@@ -48,6 +48,7 @@ public:
     win32_named_pipe_acceptor(win32_named_pipe_acceptor&& other) __noexcept;
     win32_named_pipe_acceptor& operator=(win32_named_pipe_acceptor&& other) __noexcept;
     win32_named_pipe accept(const char* pipe_name,
+                            const pipe_access_mode access_mode,
                             const pipe_data_transfer_mode mode,
                             const uint32_t in_buffer_size,
                             const uint32_t out_buffer_size) throw(...);
@@ -65,6 +66,7 @@ public:
     win32_named_pipe_server(win32_named_pipe_server&&) __noexcept;
     win32_named_pipe_server& operator=(win32_named_pipe_server&&)__noexcept;
     virtual generic_session_ptr     accept(const char* pipe_name,
+                                           const pipe_access_mode access_mode,
                                            const pipe_data_transfer_mode mode,
                                            const uint32_t in_buffer_size,
                                            const uint32_t out_buffer_size) throw(...) override;

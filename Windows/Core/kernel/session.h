@@ -23,9 +23,10 @@ public:
     virtual message_stream get_cts_stream() const = 0;
     virtual message_stream get_stc_stream() const = 0;
 protected:
-    void _launch_api_service();
+    static void _launch_api_service(session_ptr this_ptr);
 private:
-    void _on_message_received(::vee::system::operation_result& result,
+    static void _on_message_received(session_ptr this_ptr,
+                              ::vee::system::operation_result& result,
                               ::vee::byte* const raw_data,
                               uint32_t buf_capacity,
                               uint32_t byte_transferred);

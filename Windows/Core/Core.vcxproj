@@ -97,7 +97,6 @@
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp" />
     <ClCompile Include="kernel\session\win32_session.cpp" />
     <ClCompile Include="kernel\shared_buffer\shared_buffer_impl.cpp" />
-    <ClCompile Include="kernel\xkernel\scheduler.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,12 +106,11 @@
     <ClInclude Include="kernel\kernel.h" />
     <ClInclude Include="kernel\device_manager.h" />
     <ClInclude Include="kernel\protocol.h" />
+    <ClInclude Include="kernel\scheduler.h" />
     <ClInclude Include="kernel\session.h" />
     <ClInclude Include="kernel\session\win32_session.h" />
     <ClInclude Include="kernel\session_manager.h" />
     <ClInclude Include="kernel\shared_buffer.h" />
-    <ClInclude Include="kernel\xkernel\parameters.h" />
-    <ClInclude Include="kernel\xkernel\taskapi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
