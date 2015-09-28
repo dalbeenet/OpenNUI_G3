@@ -3,7 +3,6 @@
 
 #include <kernel/device_module.h>
 #include <vector>
-#include <map>
 #include <vee/lock.h>
 
 namespace kernel {

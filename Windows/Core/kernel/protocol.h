@@ -9,6 +9,7 @@ namespace protocol {
 
 using device_key_t = uint32_t;
 using session_key_t = uint32_t;
+using shared_buffer_key_t = uint32_t;
 
 struct stream_constant
 {
@@ -17,6 +18,9 @@ struct stream_constant
     static const int opennui_packet_maxlen = 1024;
     static const int pipe_in_buffer_capacity = 4096;
     static const int pipe_out_buffer_capacity = 4096;
+    static const int shm_lock_block_size = 4;
+    static const int shm_data_time_stamp_size = 4;
+    static const int shm_buffering_count = 3;
 };
 
 enum class opcode: int16_t

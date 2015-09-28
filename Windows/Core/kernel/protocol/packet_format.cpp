@@ -44,7 +44,7 @@ data_frame_header packet_parsing(unsigned char* raw_data, unsigned char* data_bu
 {
     data_frame_header header;
     header.from_raw_data(raw_data);
-    memmove(data_buffer + header.header_size, raw_data + header.header_size, header.data_size);
+    memmove(data_buffer, raw_data + header.header_size, header.data_size);
     return header;
 }
 

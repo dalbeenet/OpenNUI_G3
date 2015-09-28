@@ -14,6 +14,7 @@
     <ClInclude Include="..\vee\actor.h" />
     <ClInclude Include="..\vee\delegate.h" />
     <ClInclude Include="..\vee\flag.h" />
+    <ClInclude Include="..\vee\key_value_table.h" />
     <ClInclude Include="..\vee\queue.h" />
     <ClInclude Include="..\vee\macro.h" />
     <ClInclude Include="..\vee\lock.h" />

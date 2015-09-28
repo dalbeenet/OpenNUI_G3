@@ -1,7 +1,7 @@
 #include <kernel/session.h>
 #include <kernel/device_manager.h>
 #include <atomic>
-
+#pragma warning(disable:4996)
 namespace kernel {
 
 void session::_on_message_received(::vee::system::operation_result& result,
@@ -23,21 +23,66 @@ void session::_on_message_received(::vee::system::operation_result& result,
     {
     throw vee::exception("Protocol mismatch: invalid identifier", (int)error_code::handshake_failure);
     }*/
-    switch (header.opcode)
+
+    auto parse_device_key = [](unsigned char* pure_data) -> protocol::device_key_t
     {
-    case protocol::opcode::cts_request_color_frame:
-        printf("session %d> cts_request_color_frame\n", get_id());
-        break;
-    case protocol::opcode::cts_request_depth_frame:
-        printf("session %d> cts_request_depth_frame\n", get_id());
-        break;
-    case protocol::opcode::cts_request_body_frame:
-        printf("session %d> cts_request_body_frame\n", get_id());
-        break;
-    default:
-        printf("Invalid request");
-        break;
+        protocol::device_key_t key = 0;
+        memmove(&key, pure_data, sizeof(protocol::device_key_t));
+        return key;
+    };
+
+    auto generate_unique_name = [this](const char* inital_string, protocol::device_key_t device_key) -> ::std::string
+    {
+        ::std::array<char, 1024> buffer;
+        buffer.fill(0);
+        sprintf(buffer.data(), "%s_did[%d]_sid[%d]", inital_string, device_key, get_id());
+        ::std::string s(buffer.data());
+        return s;
+    };
+
+    auto calculate_shm_size = [](uint32_t frame_size, uint32_t buffering_count) -> uint32_t
+    {
+        uint32_t lock_region_size = protocol::stream_constant::shm_lock_block_size * buffering_count;
+        uint32_t data_unit_size = protocol::stream_constant::shm_lock_block_size + frame_size;
+        return lock_region_size + (data_unit_size * buffering_count);
+    };
+
+    try
+    {
+        protocol::device_key_t device_key = parse_device_key(pure_data.data());
+        auto device_manager = device_manager::get_instance();
+        auto module = device_manager->get_module_pointer(device_key);
+        auto device = module->opennui_device_instance();
+
+        if (header.opcode == protocol::opcode::cts_request_color_frame)
+        {
+            printf("session %d> cts_request_color_frame\n", get_id());
+            _OPENNUI video_frame_info info;
+            device->get_color_frame_info(info);
+            auto shb = shared_buffer::crate(generate_unique_name("color_shared_buffer", device_key).data(),
+                                 calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count));
+            this->buffer_table.insert(shb->key(), shb);
+            module->buffer_table.insert(shb->key(), shb);
+            printf("%s is created and regiestered. unique key: %d\n", shb->name(), shb->key());
+        }
+        else if (header.opcode == protocol::opcode::cts_request_depth_frame)
+        {
+            printf("session %d> cts_request_depth_frame\n", get_id());
+        }
+        else if (header.opcode == protocol::opcode::cts_request_body_frame)
+        {
+            printf("session %d> cts_request_body_frame\n", get_id());
+        }
+        else
+        {
+            printf("Invalid request");
+        }
     }
+    catch (::vee::exception& e)
+    {
+        printf("Failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", get_id(), e.what());
+    }
+
     get_cts_stream()->async_read(_cts_stream_in_buffer.data(),
                                  _cts_stream_in_buffer.size(),
                                  ::std::bind(&session::_on_message_received, this, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));

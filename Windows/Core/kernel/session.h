@@ -1,7 +1,8 @@
 #ifndef _OPENNUIG3_KERNEL_SESSION_H_
 #define _OPENNUIG3_KERNEL_SESSION_H_
 #include <vee/voost/net.h>
-#include <kernel/protocol.h>
+#include <vee/key_value_table.h>
+#include <kernel/shared_buffer.h>
 
 namespace kernel {
 
@@ -28,6 +29,9 @@ private:
                               ::vee::byte* const raw_data,
                               uint32_t buf_capacity,
                               uint32_t byte_transferred);
+
+public:
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::std::mutex> buffer_table;
 protected:
     using packet_buffer_t = ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen>;
     packet_buffer_t _lifestream_in_buffer;

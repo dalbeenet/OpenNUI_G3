@@ -3,10 +3,9 @@
 
 #include <vee/macro.h>
 #include <vee/win32.h>
-#include <kernel/protocol.h>
+#include <vee/key_value_table.h>
 #include <opennui/opennui.h>
-#include <memory>
-#include <string>
+#include <kernel/shared_buffer.h>
 
 namespace kernel {
 
@@ -30,6 +29,9 @@ public:
     {
         return _device_ptr;
     }
+
+public:
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::std::mutex> buffer_table;
 protected:
     key_t  _key;
     string _module_name;

@@ -117,6 +117,9 @@
     <ClInclude Include="..\vee\voost\win32_pipe.h">
       <Filter>vee\voost\asio\interprocess</Filter>
     </ClInclude>
+    <ClInclude Include="..\vee\key_value_table.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lock\lock_impl.cpp">

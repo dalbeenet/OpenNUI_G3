@@ -2,7 +2,6 @@
 #define _OPENNUI_G3_KERNEL_SESSION_MANAGER_H_
 
 #include <kernel/session.h>
-#include <map>
 #include <vee/lock.h>
 
 namespace kernel {
