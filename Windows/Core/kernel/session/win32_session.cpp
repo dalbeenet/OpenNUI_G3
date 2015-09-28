@@ -18,7 +18,13 @@ namespace kernel {
     session->_life_stream = std::move(raw_stream);
     session->_cts_stream  = std::move(cts_stream);
     session->_stc_stream  = std::move(stc_stream);
+    session->_session_id  = sid;
     return session;
+}
+
+win32_session::session_id_t win32_session::get_id()
+{
+    return _session_id;
 }
 
 ::std::pair<win32_session::data_stream/*CTS*/, win32_session::data_stream/*STC*/> win32_session::_data_stream_connection(life_stream raw_stream, const char* pipe_name) throw(...)

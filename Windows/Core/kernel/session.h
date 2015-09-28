@@ -11,6 +11,7 @@ public:
     using  session_id_t = uint32_t;
     static session_id_t make_unique_sid();
     virtual ~session() = default;
+    virtual session_id_t get_id() = 0;
 };
 using session_ptr = ::std::shared_ptr<session>;
 

@@ -27,7 +27,13 @@ module_manager::key_t module_manager::add_module(const char* module_name) throw(
     ::std::hash<::std::string> hash;
     key_t key = hash(name);
     ::std::shared_ptr<device_module> module = ::std::make_shared<device_module>(module_name);
-    _modules.insert(::std::make_pair(key, module));
+    auto result = _modules.insert(::std::make_pair(key, module));
+    if (result.second == false)
+    {
+        char buffer[256] = { 0, };
+        sprintf(buffer, "Could not add a module [%s]", module_name);
+        throw vee::exception(buffer, (int)error_code::add_module_failure);
+    }
     return key;
 }
 
@@ -45,7 +51,6 @@ void module_manager::remove_module(key_t key) throw(...)
 
 void module_manager::remove_module(const char* module_name) throw(...)
 {
-    ::std::lock_guard<::vee::spin_lock> _guard(_mtx);
     ::std::string name(module_name);
     ::std::hash<::std::string> hash;
     key_t key = hash(name);
