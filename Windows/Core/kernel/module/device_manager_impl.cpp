@@ -44,7 +44,7 @@ void device_manager::remove_module(key_t key) throw(...)
          sprintf(buffer, "Could not remove a module by key [%d]", key);
          throw vee::exception(buffer, (int)error_code::remove_module_failure);
      }
-     printf("Remove module [%d]\n");
+     printf("system> Remove module [%d]\n");
 }
 
 void device_manager::remove_module(const char* module_name) throw(...)

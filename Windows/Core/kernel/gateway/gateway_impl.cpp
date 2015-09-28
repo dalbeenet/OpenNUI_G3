@@ -24,7 +24,7 @@ void gateway::_accept_handler(operation_result& result, net_stream_ptr stream)
     }
     else
     {
-        printf("The error is occured at the %s\nerror code: %d\nerror desc: %s\n", __FUNCTION__, result.error, result.desc.data());
+        printf("system> The error is occured at the %s\nerror code: %d\nerror desc: %s\n", __FUNCTION__, result.error, result.desc.data());
     }
 }
 
@@ -63,7 +63,7 @@ void gateway::_handshake(net_stream_ptr raw_stream)
             new_session = win32_session::handshake(raw_stream, sid);
             break;
         case kernel::protocol::platform::web:
-            printf("TODO\n");
+            printf("system> TODO\n");
             break;
         default:
             throw vee::exception("Platform mismatch.", (int)error_code::handshake_failure);
@@ -74,7 +74,7 @@ void gateway::_handshake(net_stream_ptr raw_stream)
     }
     catch (vee::exception& e)
     {
-        printf("Unhandled exception: %s\n", e.what());
+        printf("system> Unhandled exception: %s\n", e.what());
     }
 }
 

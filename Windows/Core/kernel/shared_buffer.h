@@ -33,6 +33,14 @@ public:
     {
         return _key;
     }
+    inline protocol::device_key_t device_key()
+    {
+        return _device_key;
+    }
+    inline protocol::session_key_t session_key()
+    {
+        return _session_key;
+    }
 private:
     protocol::device_key_t _device_key;
     protocol::session_key_t _session_key;

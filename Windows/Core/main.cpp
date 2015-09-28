@@ -27,9 +27,9 @@ int main()
     }
     catch (vee::exception& e)
     {
-        printf("Unhandled exception: %s\n", e.what());
+        printf("system> unhandled exception: %s\n", e.what());
     }
-    printf("Press any key to exit...\n");
+    printf("system> press any key to exit...\n");
     _getch();
     return 0;
 }
@@ -39,7 +39,7 @@ int main()
 void named_pipe_echo_server()
 {
     {
-        printf("Named pipe echo server\n");
+        printf("system> Named pipe echo server\n");
         using vee::byte;
         using vee::operation_result;
         using vee::voost::interprocess::creation_option;
@@ -54,7 +54,7 @@ void named_pipe_echo_server()
         {
             auto session = server->accept("\\\\.\\pipe\\opennuipipe2",
                                           pipe_data_transfer_mode::iomode_message, 1024, 1024);
-            printf("Client connected.\n");
+            printf("system> Client connected.\n");
             std::array<byte, 512> buffer;
             // Welcome message
             char welcome_message[] = "Welcome";
@@ -63,20 +63,20 @@ void named_pipe_echo_server()
             while (true)
             {
                 unsigned int bytes_transferred = session->read(buffer.data(), buffer.size());
-                printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
+                printf("system> data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
                 //bytes_transferred = session->write((byte*)buffer.data(), bytes_transferred);
-                //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                //printf("system> echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
                 session->async_write(buffer.data(),
                                      bytes_transferred,
                                      [](operation_result& result, size_t bytes_transferred) -> void
                                      {
-                                        printf("echo send: %dbytes\n", bytes_transferred);
+                                        printf("system> echo send: %dbytes\n", bytes_transferred);
                                     });
             }
         }
         catch (vee::exception& e)
         {
-            printf("exception occured!\nerror_code: %d\nmessage: %s\n", e.code, e.desc.data());
+            printf("system> exception occured!\nerror_code: %d\nmessage: %s\n", e.code, e.desc.data());
         }
     }
 }
@@ -87,7 +87,7 @@ void named_pipe_echo_server()
 void websocket_echo_server_main()
 {
     {
-        printf("Websocket echo server\n");
+        printf("system> Websocket echo server\n");
         using vee::voost::net::byte;
         using vee::voost::net::net_stream;
         using vee::voost::net::error_code;
@@ -107,21 +107,21 @@ void websocket_echo_server_main()
             while (true)
             {
                 unsigned int bytes_transferred = session1->read(buffer.data(), buffer.size());
-                printf("data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
+                printf("system> data recv: %dbytes: %s\n", bytes_transferred, buffer.data());
                 //bytes_transferred = (session1->write(opcode_id::text_frame, buffer.data(), bytes_transferred)).payload_size;
-                //printf("echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
+                //printf("system> echo send: %dbytes: %s\n", bytes_transferred, buffer.data());
                 session1->async_write(opcode_id::text_frame,
                                       buffer.data(),
                                       bytes_transferred,
                                       [](operation_result& result, size_t bytes_transferred) -> void
                 {
-                    printf("echo send: %dbytes\n", bytes_transferred);
+                    printf("system> echo send: %dbytes\n", bytes_transferred);
                 });
             }
         }
         catch (vee::exception& e)
         {
-            printf("exception occured!: %s\n", e.what());
+            printf("system> exception occured!: %s\n", e.what());
         }
     }
 }
@@ -129,7 +129,7 @@ void websocket_echo_server_main()
 
 //void scheduler_test_code()
 //{
-//    printf("Scheduler test\n");
+//    printf("system> Scheduler test\n");
 //    xkernel::scheduler::initialize();
 //    xkernel::scheduler::request(f1, nullptr);
 //    xkernel::scheduler::request(f2, nullptr);
@@ -137,7 +137,7 @@ void websocket_echo_server_main()
 //    print_line();
 //    xkernel::scheduler::dispose();
 //    {
-//        printf("Timer test\npress any key to stop a timer...\n");
+//        printf("system> Timer test\npress any key to stop a timer...\n");
 //        auto timer = vee::voost::timer::create_timer();
 //        timer->run(500, vee::make_delegate<void(unsigned int)>(timer_callback));
 //        getch();

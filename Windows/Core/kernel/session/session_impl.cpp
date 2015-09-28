@@ -11,7 +11,7 @@ void session::_on_message_received(::vee::system::operation_result& result,
 {
     if (result.error != ::vee::system::error_code::success)
     {
-        printf("Message stream is disconnected by client! (sid: %d)\n", get_id());
+        printf("system> message stream is disconnected by client! (sid: %d)\n", get_id());
         return;
     }
 
@@ -56,7 +56,7 @@ void session::_on_message_received(::vee::system::operation_result& result,
 
         if (header.opcode == protocol::opcode::cts_request_color_frame)
         {
-            printf("session %d> cts_request_color_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_color_frame\n", this->get_id());
             _OPENNUI video_frame_info info;
             device->get_color_frame_info(info);
             auto shb = shared_buffer::crate(generate_unique_name("color_shared_buffer", device_key).data(),
@@ -64,30 +64,29 @@ void session::_on_message_received(::vee::system::operation_result& result,
                                  device_key, this->get_id());
             this->buffer_table.insert(shb->key(), shb);
             module->buffer_table.insert(shb->key(), shb);
-            printf("%s is created and regiestered. unique key: %d\n", shb->name(), shb->key());
+            printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
         }
         else if (header.opcode == protocol::opcode::cts_request_depth_frame)
         {
-            printf("session %d> cts_request_depth_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_depth_frame\n", this->get_id());
         }
         else if (header.opcode == protocol::opcode::cts_request_body_frame)
         {
-            printf("session %d> cts_request_body_frame\n", this->get_id());
+            printf("system> session %d requests cts_request_body_frame\n", this->get_id());
         }
         else
         {
-            printf("Invalid request");
+            printf("system> session %d requests invalid request");
         }
     }
     catch (::vee::exception& e)
     {
-        printf("Failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this->get_id(), e.what());
+        printf("system> failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this->get_id(), e.what());
     }
 
     get_cts_stream()->async_read(_cts_stream_in_buffer.data(),
                                  _cts_stream_in_buffer.size(),
                                  ::std::bind(&session::_on_message_received, this, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
-
 }
 
 uint32_t session::make_unique_sid()
@@ -115,7 +114,7 @@ void session::_launch_api_service()
     }
     catch (::vee::exception& e)
     {
-        printf("Failed to launch api service! [sid: %d]\nUnhandled exception: %s\n", get_id(), e.what());
+        printf("system> Failed to launch api service! [sid: %d]\nUnhandled exception: %s\n", get_id(), e.what());
     }
 }
 

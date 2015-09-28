@@ -1,4 +1,5 @@
 #include <kernel/session_manager.h>
+#include <kernel/device_manager.h>
 #include <kernel/error.h>
 #pragma warning(disable:4996)
 namespace kernel {
@@ -30,6 +31,7 @@ session_manager::key_t session_manager::add_session(session_ptr s) throw(...)
         sprintf(buffer, "Could not add a session [%d]", sid);
         throw vee::exception(buffer, (int)error_code::add_session_failure);
     }
+    printf("system> new client connected! sid: %d\n", s->get_id());
     auto life_stream = s->get_life_stream();
     life_stream->async_read(s->_lifestream_in_buffer.data(), 
                             s->_lifestream_in_buffer.size(), 
@@ -64,7 +66,7 @@ void session_manager::_on_session_disconnect(session_ptr s,
 {
     if (result.error == ::vee::system::error_code::success)
     {
-        printf("Protocol mismatch! %d bytes transferred from life stream.\n", byte_transferred);
+        printf("system> Protocol mismatch! %d bytes transferred from life stream.\n", byte_transferred);
         auto life_stream = s->get_life_stream();
         life_stream->async_read(s->_lifestream_in_buffer.data(),
                                 s->_lifestream_in_buffer.size(),
@@ -73,18 +75,31 @@ void session_manager::_on_session_disconnect(session_ptr s,
     }
     try
     {
-        auto shm_keys = s->buffer_table.get_all_keys();
-        
-        for (auto& it : shm_keys)
+        auto device_manager = device_manager::get_instance();
+        printf("system> remove shared buffer process begin...\n");
+        auto removable_buffers = s->buffer_table.get_all_value_copies();
+        for (auto& it : removable_buffers)
         {
-
+            try
+            {
+                auto module = device_manager->get_module_pointer(it->device_key());
+                if(module->buffer_table.remove(it->key()))
+                    printf("system> Success to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                else
+                    printf("system> Failed to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+            }
+            catch (vee::exception& e)
+            {
+                printf("system> Unhandled exception: %s\n", e.what());
+            }
         }
+
         this->remove_session(s->get_id());
-        printf("session %d is disconnected successfully.\n", s->get_id());
+        printf("system> session %d is disconnected successfully.\n", s->get_id());
     }
     catch (vee::exception& e)
     {
-        printf("Unhandled exception: %s\n", e.what());
+        printf("system> Unhandled exception: %s\n", e.what());
     }
 }
 
