@@ -8,6 +8,7 @@ device_module::~device_module()
     if (_module_handle != NULL)
     {
         FreeLibrary(_module_handle);
+        _module_handle = NULL;
     }
 }
 
@@ -22,7 +23,7 @@ _module_handle(NULL)
     {
         throw vee::exception("Load dll failure!", (int)error_code::load_dll_failure);
     }
-    using entry_point = ::std::shared_ptr<_OPENNUI opennui_device>(_stdcall*)();
+    using entry_point = opennui_device_ptr(_stdcall*)();
     entry_point ep = (entry_point)GetProcAddress(module_handle, "on_load");
     if (ep == NULL)
     {

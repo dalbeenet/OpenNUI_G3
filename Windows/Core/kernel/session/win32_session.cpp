@@ -22,9 +22,14 @@ namespace kernel {
     return session;
 }
 
-win32_session::session_id_t win32_session::get_id()
+win32_session::session_id_t win32_session::get_id() const
 {
     return _session_id;
+}
+
+win32_session::life_stream win32_session::get_life_stream() const
+{
+    return _life_stream;
 }
 
 ::std::pair<win32_session::data_stream/*CTS*/, win32_session::data_stream/*STC*/> win32_session::_data_stream_connection(life_stream raw_stream, const char* pipe_name) throw(...)
@@ -70,9 +75,9 @@ win32_session::session_id_t win32_session::get_id()
     }
     // Receive to READY_CONNECTION_ACK from client
     {
-        ::std::array<unsigned char, 256> raw_data;
+        ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> raw_data;
         cts_stream->read(raw_data.data(), raw_data.size());
-        ::std::array<unsigned char, 256> pure_data;
+        ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> pure_data;
         pure_data.fill(0);
         protocol::data_frame_header header = protocol::packet_parsing(raw_data.data(), pure_data.data());
         //TODO: <KNOWN_ISSUE> C# 라이브러리에서 잘못된 ID를을 보내고 있음. 라이브러리 패치 후 서버도 패치해야함

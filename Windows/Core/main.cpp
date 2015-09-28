@@ -6,12 +6,29 @@ Desc    : Entry point of nui framework core
 *******************************************************************/ 
 
 #include <kernel/gateway.h>
+#include <kernel/device_manager.h>
 #include <iostream>
 #include <conio.h>
 #pragma warning(disable:4996)
+
+#ifdef _DEBUG
+#define KINECT2_MODULE_NAME "opennui_kinect2-x32d.nuimodule"
+#else
+#define KINECT2_MODULE_NAME "opennui_kinect2-x32.nuimodule"
+#endif
+
 int main()
 {
     auto gateway = kernel::gateway::get_instance();
+    auto device_manager = kernel::device_manager::get_instance();
+    try
+    {
+        device_manager->add_module(KINECT2_MODULE_NAME);
+    }
+    catch (vee::exception& e)
+    {
+        printf("Unhandled exception: %s\n", e.what());
+    }
     printf("Press any key to exit...\n");
     _getch();
     return 0;

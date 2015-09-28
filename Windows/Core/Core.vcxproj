@@ -90,7 +90,7 @@
   <ItemGroup>
     <ClCompile Include="kernel\gateway\gateway_impl.cpp" />
     <ClCompile Include="kernel\module\device_module_impl.cpp" />
-    <ClCompile Include="kernel\module\module_manager.cpp" />
+    <ClCompile Include="kernel\module\device_manager.cpp" />
     <ClCompile Include="kernel\protocol\packet_format.cpp" />
     <ClCompile Include="kernel\session\session_impl.cpp" />
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp" />
@@ -103,7 +103,7 @@
     <ClInclude Include="kernel\error.h" />
     <ClInclude Include="kernel\gateway.h" />
     <ClInclude Include="kernel\kernel.h" />
-    <ClInclude Include="kernel\module_manager.h" />
+    <ClInclude Include="kernel\device_manager.h" />
     <ClInclude Include="kernel\protocol.h" />
     <ClInclude Include="kernel\session.h" />
     <ClInclude Include="kernel\session\win32_session.h" />

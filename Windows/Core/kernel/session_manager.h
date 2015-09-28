@@ -16,10 +16,15 @@ public:
     using key_t = session::session_id_t;
     static ::std::shared_ptr<session_manager> get_instance();
     ~session_manager();
-    key_t add_session(session_ptr sptr, key_t sid) throw(...);
+    key_t add_session(session_ptr sptr) throw(...);
     void  remove_session(key_t key) throw(...);
     void  remove_session(session_ptr sptr) throw(...);
 private:
+    void _on_session_disconnect(session_ptr s,
+                                ::vee::system::operation_result& result,
+                                ::vee::byte* const buffer,
+                                uint32_t buf_capacity,
+                                uint32_t byte_transferred);
     session_manager();
     mutable mutex_t _mtx;
     ::std::map< key_t, session_ptr > _sessions;

@@ -1,26 +1,26 @@
-#include <kernel/module_manager.h>
+#include <kernel/device_manager.h>
 #include <kernel/error.h>
 #include <algorithm>
 #pragma warning(disable:4996)
 namespace kernel {
 
-::std::shared_ptr<module_manager> module_manager::get_instance()
+::std::shared_ptr<device_manager> device_manager::get_instance()
 {
-    static ::std::shared_ptr<module_manager> instance(new module_manager);
+    static ::std::shared_ptr<device_manager> instance(new device_manager);
     return instance;
 }
 
-module_manager::~module_manager()
+device_manager::~device_manager()
 {
     //TODO: module의 안전한 삭제
 }
 
-module_manager::module_manager()
+device_manager::device_manager()
 {
 
 }
 
-module_manager::key_t module_manager::add_module(const char* module_name) throw(...)
+device_manager::key_t device_manager::add_module(const char* module_name) throw(...)
 {
     ::std::lock_guard<::vee::spin_lock> _guard(_mtx);
     ::std::string name(module_name);
@@ -37,7 +37,7 @@ module_manager::key_t module_manager::add_module(const char* module_name) throw(
     return key;
 }
 
-void module_manager::remove_module(key_t key) throw(...)
+void device_manager::remove_module(key_t key) throw(...)
 {
     ::std::lock_guard<::vee::spin_lock> _guard(_mtx);
      uint32_t number_of_erased = _modules.erase(key);
@@ -49,7 +49,7 @@ void module_manager::remove_module(key_t key) throw(...)
      }
 }
 
-void module_manager::remove_module(const char* module_name) throw(...)
+void device_manager::remove_module(const char* module_name) throw(...)
 {
     ::std::string name(module_name);
     ::std::hash<::std::string> hash;

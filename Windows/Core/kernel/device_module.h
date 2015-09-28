@@ -15,7 +15,7 @@ class device_module
     using string = ::std::string;
 public:
     using opennui_device = _OPENNUI opennui_device;
-    using opennui_device_ptr = ::std::shared_ptr<opennui_device>;
+    using opennui_device_ptr = opennui_device*;
     ~device_module() throw(...);
     device_module(const char* module_name);
     device_module(device_module&& other);

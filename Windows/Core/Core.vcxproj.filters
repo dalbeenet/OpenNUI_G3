@@ -40,11 +40,11 @@
     <ClCompile Include="kernel\module\device_module_impl.cpp">
       <Filter>Kernel\Module</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\module\module_manager.cpp">
-      <Filter>Kernel\Module</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\session\session_mamanger_impl.cpp">
       <Filter>Kernel\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\module\device_manager.cpp">
+      <Filter>Kernel\Module</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,9 +75,9 @@
     <ClInclude Include="kernel\gateway.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\module_manager.h">
+    <ClInclude Include="kernel\session_manager.h" />
+    <ClInclude Include="kernel\device_manager.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\session_manager.h" />
   </ItemGroup>
 </Project>

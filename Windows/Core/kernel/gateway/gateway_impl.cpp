@@ -1,5 +1,6 @@
 #include <kernel/gateway.h>
 #include <kernel/session/win32_session.h>
+#include <kernel/session_manager.h>
 #include <thread>
 
 namespace kernel {
@@ -68,7 +69,8 @@ void gateway::_handshake(net_stream_ptr raw_stream)
             throw vee::exception("Platform mismatch.", (int)error_code::handshake_failure);
             break;
         }
-        printf("TODO: Session 등록 작업\n");
+        auto session_manager = session_manager::get_instance();
+        session_manager->add_session(new_session);
     }
     catch (vee::exception& e)
     {

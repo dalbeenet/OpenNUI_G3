@@ -2,7 +2,6 @@
 #define _OPENNUIG3_KERNEL_SESSION_WIN32_SESSION_H_
 #include <kernel/error.h>
 #include <kernel/session.h>
-#include <vee/voost/net.h>
 #include <vee/voost/pipe.h>
 
 namespace kernel {
@@ -11,11 +10,11 @@ class win32_session: public session
 {
     DISALLOW_COPY_AND_ASSIGN(win32_session);
 public:
-    using life_stream = ::std::shared_ptr<::vee::voost::net::net_stream>;
     using data_stream = ::std::shared_ptr<::vee::voost::interprocess::named_pipe>;
     static ::std::shared_ptr<win32_session> handshake(life_stream raw_stream, session_id_t sid) throw(...);
     virtual ~win32_session();
-    virtual session_id_t get_id();
+    virtual session_id_t get_id() const override;
+    virtual life_stream  get_life_stream() const override;
     win32_session();
     win32_session(win32_session&& other);
     win32_session& operator=(win32_session&& other);
