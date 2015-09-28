@@ -56,22 +56,23 @@ void session::_on_message_received(::vee::system::operation_result& result,
 
         if (header.opcode == protocol::opcode::cts_request_color_frame)
         {
-            printf("session %d> cts_request_color_frame\n", get_id());
+            printf("session %d> cts_request_color_frame\n", this->get_id());
             _OPENNUI video_frame_info info;
             device->get_color_frame_info(info);
             auto shb = shared_buffer::crate(generate_unique_name("color_shared_buffer", device_key).data(),
-                                 calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count));
+                                 calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count),
+                                 device_key, this->get_id());
             this->buffer_table.insert(shb->key(), shb);
             module->buffer_table.insert(shb->key(), shb);
             printf("%s is created and regiestered. unique key: %d\n", shb->name(), shb->key());
         }
         else if (header.opcode == protocol::opcode::cts_request_depth_frame)
         {
-            printf("session %d> cts_request_depth_frame\n", get_id());
+            printf("session %d> cts_request_depth_frame\n", this->get_id());
         }
         else if (header.opcode == protocol::opcode::cts_request_body_frame)
         {
-            printf("session %d> cts_request_body_frame\n", get_id());
+            printf("session %d> cts_request_body_frame\n", this->get_id());
         }
         else
         {
@@ -80,7 +81,7 @@ void session::_on_message_received(::vee::system::operation_result& result,
     }
     catch (::vee::exception& e)
     {
-        printf("Failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", get_id(), e.what());
+        printf("Failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this->get_id(), e.what());
     }
 
     get_cts_stream()->async_read(_cts_stream_in_buffer.data(),

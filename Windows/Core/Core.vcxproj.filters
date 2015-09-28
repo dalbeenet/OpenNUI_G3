@@ -19,6 +19,9 @@
     <Filter Include="Kernel\Module">
       <UniqueIdentifier>{abe5875a-b5c7-4cfe-bbc9-51f82508f429}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kernel\shared_buffer">
+      <UniqueIdentifier>{7b6fc734-a157-47b2-be01-b7d611e271e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -46,8 +49,12 @@
     <ClCompile Include="kernel\module\device_manager_impl.cpp">
       <Filter>Kernel\Module</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\protocol\utility.cpp" />
-    <ClCompile Include="kernel\shared_buffer\shared_buffer_impl.cpp" />
+    <ClCompile Include="kernel\shared_buffer\shared_buffer_impl.cpp">
+      <Filter>Kernel\shared_buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\protocol\utility.cpp">
+      <Filter>Kernel\Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel\kernel.h">

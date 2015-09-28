@@ -2,6 +2,7 @@
 #define _VEE_KEY_VALUE_TABLE_H_
 
 #include <utility>
+#include <vector>
 #include <map>
 #include <vee/lock.h>
 
@@ -95,6 +96,26 @@ public:
         auto ret = _c.find(key);
         if (ret == _c.end()) return false;
         return true;
+    }
+    ::std::vector<_Kty> get_all_keys()
+    {
+        ::std::vector<_Kty> result;
+        ::std::lock_guard<MutexTy> _g(_m);
+        for (auto& it : _c)
+        {
+            result.push_back(it.first);
+        }
+        return result;
+    }
+    ::std::vector<_Ty> get_all_value_copies()
+    {
+        ::std::vector<_Ty> result;
+        ::std::lock_guard<MutexTy> _g(_m);
+        for (auto& it : _c)
+        {
+            result.push_back(it.second);
+        }
+        return result;
     }
     inline container_type& container()
     {

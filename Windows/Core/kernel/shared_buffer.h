@@ -17,9 +17,9 @@ public:
     using key_t = protocol::session_key_t;
     using shm_t = ::vee::voost::shared_memory;
     using shm_ptr = ::std::shared_ptr<shm_t>;
-    static shared_buffer_ptr crate(const char* shm_name, uint32_t size);
+    static shared_buffer_ptr crate(const char* shm_name, uint32_t size, protocol::device_key_t device_key, protocol::session_key_t session_key);
     ~shared_buffer();
-    shared_buffer(const char* shm_name, uint32_t size);
+    shared_buffer(const char* shm_name, uint32_t size, protocol::device_key_t device_key, protocol::session_key_t session_key);
     inline ::std::string name()
     {
         ::std::string s(_shm->get_name());
@@ -34,6 +34,8 @@ public:
         return _key;
     }
 private:
+    protocol::device_key_t _device_key;
+    protocol::session_key_t _session_key;
     key_t   _key;
     shm_ptr _shm;
 };

@@ -73,6 +73,12 @@ void session_manager::_on_session_disconnect(session_ptr s,
     }
     try
     {
+        auto shm_keys = s->buffer_table.get_all_keys();
+        
+        for (auto& it : shm_keys)
+        {
+
+        }
         this->remove_session(s->get_id());
         printf("session %d is disconnected successfully.\n", s->get_id());
     }
