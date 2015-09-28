@@ -31,7 +31,9 @@ private:
                               uint32_t byte_transferred);
 
 public:
-    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::std::mutex> buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> color_buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> depth_buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> body_buffer_table;
 protected:
     using packet_buffer_t = ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen>;
     packet_buffer_t _lifestream_in_buffer;

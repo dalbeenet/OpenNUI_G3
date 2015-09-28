@@ -66,7 +66,7 @@ void session_manager::_on_session_disconnect(session_ptr s,
 {
     if (result.error == ::vee::system::error_code::success)
     {
-        printf("system> Protocol mismatch! %d bytes transferred from life stream.\n", byte_transferred);
+        printf("system> protocol mismatch! %d bytes transferred from life stream.\n", byte_transferred);
         auto life_stream = s->get_life_stream();
         life_stream->async_read(s->_lifestream_in_buffer.data(),
                                 s->_lifestream_in_buffer.size(),
@@ -76,21 +76,61 @@ void session_manager::_on_session_disconnect(session_ptr s,
     try
     {
         auto device_manager = device_manager::get_instance();
-        printf("system> remove shared buffer process begin...\n");
-        auto removable_buffers = s->buffer_table.get_all_value_copies();
-        for (auto& it : removable_buffers)
+        printf("system> remove the color shared buffer process begin...\n");
         {
-            try
+            auto removable_buffers = s->color_buffer_table.get_all_value_copies();
+            for (auto& it : removable_buffers)
             {
-                auto module = device_manager->get_module_pointer(it->device_key());
-                if(module->buffer_table.remove(it->key()))
-                    printf("system> Success to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
-                else
-                    printf("system> Failed to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                try
+                {
+                    auto module = device_manager->get_module_pointer(it->device_key());
+                    if (module->color_buffer_table.remove(it->key()))
+                        printf("system> success to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                    else
+                        printf("system> failed to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                }
+                catch (vee::exception& e)
+                {
+                    printf("system> unhandled exception: %s\n", e.what());
+                }
             }
-            catch (vee::exception& e)
+        }
+        printf("system> remove the depth shared buffer process begin...\n");
+        {
+            auto removable_buffers = s->depth_buffer_table.get_all_value_copies();
+            for (auto& it : removable_buffers)
             {
-                printf("system> Unhandled exception: %s\n", e.what());
+                try
+                {
+                    auto module = device_manager->get_module_pointer(it->device_key());
+                    if (module->depth_buffer_table.remove(it->key()))
+                        printf("system> success to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                    else
+                        printf("system> failed to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                }
+                catch (vee::exception& e)
+                {
+                    printf("system> ynhandled exception: %s\n", e.what());
+                }
+            }
+        }
+        printf("system> remove the body shared buffer process begin...\n");
+        {
+            auto removable_buffers = s->body_buffer_table.get_all_value_copies();
+            for (auto& it : removable_buffers)
+            {
+                try
+                {
+                    auto module = device_manager->get_module_pointer(it->device_key());
+                    if (module->body_buffer_table.remove(it->key()))
+                        printf("system> success to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                    else
+                        printf("system> failed to remove the shared_buffer named %s instance from the table. (did: %d)\n", it->name().data(), module->key());
+                }
+                catch (vee::exception& e)
+                {
+                    printf("system> unhandled exception: %s\n", e.what());
+                }
             }
         }
 
@@ -99,7 +139,7 @@ void session_manager::_on_session_disconnect(session_ptr s,
     }
     catch (vee::exception& e)
     {
-        printf("system> Unhandled exception: %s\n", e.what());
+        printf("system> ynhandled exception: %s\n", e.what());
     }
 }
 

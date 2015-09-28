@@ -61,18 +61,32 @@ void session::_on_message_received(::vee::system::operation_result& result,
             device->get_color_frame_info(info);
             auto shb = shared_buffer::crate(generate_unique_name("color_shared_buffer", device_key).data(),
                                  calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count),
-                                 device_key, this->get_id());
-            this->buffer_table.insert(shb->key(), shb);
-            module->buffer_table.insert(shb->key(), shb);
+                                 device_key, this->get_id(), protocol::transfer_data_type::color_frame);
+            this->color_buffer_table.insert(shb->key(), shb);
+            module->color_buffer_table.insert(shb->key(), shb);
             printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
         }
         else if (header.opcode == protocol::opcode::cts_request_depth_frame)
         {
             printf("system> session %d requests cts_request_depth_frame\n", this->get_id());
+            _OPENNUI video_frame_info info;
+            device->get_depth_frame_info(info);
+            auto shb = shared_buffer::crate(generate_unique_name("depth_shared_buffer", device_key).data(),
+                                            calculate_shm_size(info.size(), protocol::stream_constant::shm_buffering_count),
+                                            device_key, this->get_id(), protocol::transfer_data_type::depth_frame);
+            this->depth_buffer_table.insert(shb->key(), shb);
+            module->depth_buffer_table.insert(shb->key(), shb);
+            printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
         }
         else if (header.opcode == protocol::opcode::cts_request_body_frame)
         {
             printf("system> session %d requests cts_request_body_frame\n", this->get_id());
+            auto shb = shared_buffer::crate(generate_unique_name("depth_shared_buffer", device_key).data(),
+                                            calculate_shm_size(protocol::stream_constant::temp_g3_body_frame_size, protocol::stream_constant::shm_buffering_count),
+                                            device_key, this->get_id(), protocol::transfer_data_type::depth_frame);
+            this->body_buffer_table.insert(shb->key(), shb);
+            module->body_buffer_table.insert(shb->key(), shb);
+            printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
         }
         else
         {

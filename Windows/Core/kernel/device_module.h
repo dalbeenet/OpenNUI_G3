@@ -31,7 +31,9 @@ public:
     }
 
 public:
-    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::std::mutex> buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> color_buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> depth_buffer_table;
+    ::vee::key_value_table<protocol::shared_buffer_key_t, shared_buffer_ptr, ::vee::spin_lock> body_buffer_table;
 protected:
     key_t  _key;
     string _module_name;

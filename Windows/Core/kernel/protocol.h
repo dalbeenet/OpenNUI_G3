@@ -11,6 +11,14 @@ using device_key_t = uint32_t;
 using session_key_t = uint32_t;
 using shared_buffer_key_t = uint32_t;
 
+enum class transfer_data_type: uint32_t
+{
+    undefined = 0,
+    color_frame,
+    depth_frame,
+    body_frame,
+};
+
 struct stream_constant
 {
     static const int life_socket_port = 8000;
@@ -21,6 +29,7 @@ struct stream_constant
     static const int shm_lock_block_size = 4;
     static const int shm_data_time_stamp_size = 4;
     static const int shm_buffering_count = 3;
+    static const int temp_g3_body_frame_size = 8196 * 2;
 };
 
 enum class opcode: int16_t
