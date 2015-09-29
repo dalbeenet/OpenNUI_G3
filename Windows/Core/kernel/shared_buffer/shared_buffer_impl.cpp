@@ -10,7 +10,7 @@ shared_buffer_ptr shared_buffer::crate(const char* shm_name, uint32_t size, prot
 
 shared_buffer::~shared_buffer()
 {
-    puts(__FUNCTION__);
+    //puts(__FUNCTION__);
 }
 
 shared_buffer::shared_buffer(const char* shm_name, uint32_t size, protocol::device_key_t device_key, protocol::session_key_t session_key, protocol::frame_type data_type):

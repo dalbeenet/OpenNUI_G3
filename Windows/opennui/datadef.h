@@ -29,7 +29,7 @@ struct video_frame_info
     }
     inline unsigned int size() const
     {
-        return width * height * byte_per_pixel * channel;
+        return width * height * byte_per_pixel;
     }
     inline unsigned int bit_depth() const
     {

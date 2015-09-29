@@ -50,7 +50,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(ProjectName)-x32d</TargetName>
+    <TargetName>$(ProjectName)-x32</TargetName>
     <TargetExt>.nuimodule</TargetExt>
     <IntDir>$(SolutionDir)\obj\x32\release\$(ProjectName)\</IntDir>
     <OutDir>$(SolutionDir)\bin\x32\release\</OutDir>
@@ -71,6 +71,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Kinect20.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>opennui_exports.def</ModuleDefinitionFile>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -65,7 +65,7 @@ void session::_on_message_received(session_ptr this_ptr,
                                  device_key, this_ptr->get_id(), protocol::frame_type::color_frame);
             this_ptr->color_buffer_table.insert(shb->key(), shb);
             module->color_buffer_table.insert(shb->key(), shb);
-            printf("system> %s is regiestered. shm_key: %d\n", shb->name().data(), shb->key());
+            printf("system> %s is regiestered. shm_key: %ud\n", shb->name().data(), shb->key());
             // Response
             {
                 ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;

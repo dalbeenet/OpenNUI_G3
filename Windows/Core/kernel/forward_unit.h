@@ -21,8 +21,7 @@ private:
     static void _poll_and_forward_once(device_manager::device_module_ptr module, 
                                        ::std::shared_ptr<unsigned char> color_frame_buffer,
                                        ::std::shared_ptr<unsigned char> depth_frame_buffer,
-                                       ::std::shared_ptr<unsigned char> body_frame_buffer,
-                                       timer_tick tick);
+                                       ::std::shared_ptr<unsigned char> body_frame_buffer);
 private:
     timer_ptr _timer;
     timer_t::delegate_t _callback;

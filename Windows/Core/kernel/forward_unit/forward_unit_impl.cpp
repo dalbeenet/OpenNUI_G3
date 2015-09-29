@@ -63,7 +63,7 @@ void forward_unit::_on_timer(timer_tick tick)
         ::std::shared_ptr<unsigned char> color_frame_buffer((unsigned char*)color_frame_pool::malloc(), buffer_deleter<color_frame_pool>());
         ::std::shared_ptr<unsigned char> depth_frame_buffer((unsigned char*)depth_frame_pool::malloc(), buffer_deleter<depth_frame_pool>());
         ::std::shared_ptr<unsigned char> body_frame_buffer((unsigned char*)body_frame_pool::malloc(), buffer_deleter<body_frame_pool>());
-        std::function<void()> bind = ::std::bind(_poll_and_forward_once, module, color_frame_buffer, depth_frame_buffer, body_frame_buffer, tick);
+        std::function<void()> bind = ::std::bind(_poll_and_forward_once, module, color_frame_buffer, depth_frame_buffer, body_frame_buffer);
         scheduler.request(::vee::make_delegate(bind));
     }
 }
@@ -71,15 +71,15 @@ void forward_unit::_on_timer(timer_tick tick)
 void forward_unit::_poll_and_forward_once(device_manager::device_module_ptr module, 
                                           ::std::shared_ptr<unsigned char> color_frame_buffer,
                                           ::std::shared_ptr<unsigned char> depth_frame_buffer,
-                                          ::std::shared_ptr<unsigned char> body_frame_buffer,
-                                          timer_tick tick)
+                                          ::std::shared_ptr<unsigned char> body_frame_buffer)
 {
+    static std::atomic<int64_t> time_stamp = 0;
+
     // Poll
     bool color_ok = module->opennui_device_instance()->acquire_color_frame(color_frame_buffer.get());
     bool depth_ok = module->opennui_device_instance()->acquire_depth_frame(depth_frame_buffer.get());
     bool body_ok  = module->opennui_device_instance()->acquire_body_frame(body_frame_buffer.get());
-
-    uint64_t time_stamp = tick;
+    int64_t current_stamp = time_stamp++;
     
     // Forward color frame
     if (color_ok)
@@ -93,13 +93,9 @@ void forward_unit::_poll_and_forward_once(device_manager::device_module_ptr modu
                 if (InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_lock_state, protocol::stream_constant::shm_idle_state) == protocol::stream_constant::shm_idle_state)
                 {
                     unsigned char* target = (BYTE*)it->addr() + protocol::stream_constant::shm_lock_section_size + ((module->color_frame_info().size() + protocol::stream_constant::shm_time_stamp_block_size) * i);
-                    memmove(target, &time_stamp, protocol::stream_constant::shm_time_stamp_block_size);
+                    memmove(target, &current_stamp, protocol::stream_constant::shm_time_stamp_block_size);
                     memmove(target + protocol::stream_constant::shm_time_stamp_block_size, color_frame_buffer.get(), module->color_frame_info().size());
                     InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_idle_state, protocol::stream_constant::shm_lock_state);
-                    /*for (int j = 0; j < 80; ++j)
-                    {
-                        printf("%4x", (unsigned char)*(color_frame_buffer.get() + j));
-                    }*/
                     break;
                 }
             }
@@ -118,7 +114,7 @@ void forward_unit::_poll_and_forward_once(device_manager::device_module_ptr modu
                 if (InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_lock_state, protocol::stream_constant::shm_idle_state) == protocol::stream_constant::shm_idle_state)
                 {
                     unsigned char* target = (BYTE*)it->addr() + protocol::stream_constant::shm_lock_section_size + ((module->depth_frame_info().size() + protocol::stream_constant::shm_time_stamp_block_size) * i);
-                    memmove(target, &time_stamp, protocol::stream_constant::shm_time_stamp_block_size);
+                    memmove(target, &current_stamp, protocol::stream_constant::shm_time_stamp_block_size);
                     memmove(target + protocol::stream_constant::shm_time_stamp_block_size, depth_frame_buffer.get(), module->depth_frame_info().size());
                     InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_idle_state, protocol::stream_constant::shm_lock_state);
                     break;
@@ -139,7 +135,7 @@ void forward_unit::_poll_and_forward_once(device_manager::device_module_ptr modu
                 if (InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_lock_state, protocol::stream_constant::shm_idle_state) == protocol::stream_constant::shm_idle_state)
                 {
                     unsigned char* target = (BYTE*)it->addr() + protocol::stream_constant::shm_lock_section_size + ((protocol::stream_constant::temp_g3_body_frame_size + protocol::stream_constant::shm_time_stamp_block_size) * i);
-                    memmove(target, &time_stamp, protocol::stream_constant::shm_time_stamp_block_size);
+                    memmove(target, &current_stamp, protocol::stream_constant::shm_time_stamp_block_size);
                     memmove(target + protocol::stream_constant::shm_time_stamp_block_size, body_frame_buffer.get(), protocol::stream_constant::temp_g3_body_frame_size);
                     InterlockedCompareExchange(lock_offset, protocol::stream_constant::shm_idle_state, protocol::stream_constant::shm_lock_state);
                     break;
