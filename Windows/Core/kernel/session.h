@@ -19,9 +19,10 @@ public:
     static  session_id_t make_unique_sid();
     virtual ~session() = default;
     virtual session_id_t get_id() const = 0;
-    virtual life_stream  get_life_stream() const = 0;
-    virtual message_stream get_cts_stream() const = 0;
-    virtual message_stream get_stc_stream() const = 0;
+    virtual life_stream  get_life_stream() = 0;
+    virtual message_stream get_cts_stream() = 0;
+    virtual message_stream get_stc_stream() = 0;
+    virtual protocol::platform get_platform() const = 0;
 protected:
     static void _launch_api_service(session_ptr this_ptr);
 private:

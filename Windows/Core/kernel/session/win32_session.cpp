@@ -27,19 +27,34 @@ win32_session::session_id_t win32_session::get_id() const
     return _session_id;
 }
 
-win32_session::life_stream win32_session::get_life_stream() const
+win32_session::life_stream win32_session::get_life_stream()
 {
     return _life_stream;
 }
 
-win32_session::message_stream win32_session::get_cts_stream() const
+win32_session::message_stream win32_session::get_cts_stream()
 {
     return ::std::static_pointer_cast<::vee::iostream>(_cts_stream);
 }
 
-win32_session::message_stream win32_session::get_stc_stream() const
+win32_session::message_stream win32_session::get_stc_stream()
 {
     return ::std::static_pointer_cast<::vee::iostream>(_stc_stream);
+}
+
+win32_session::win32_message_stream win32_session::get_cts_stream_native()
+{
+    return _cts_stream;
+}
+
+win32_session::win32_message_stream win32_session::get_stc_stream_native()
+{
+    return _stc_stream;
+}
+
+protocol::platform win32_session::get_platform() const
+{
+    return protocol::platform::win32;
 }
 
 ::std::pair<win32_session::win32_message_stream/*CTS*/, win32_session::win32_message_stream/*STC*/> win32_session::_message_stream_connection(life_stream raw_stream, const char* pipe_name) throw(...)

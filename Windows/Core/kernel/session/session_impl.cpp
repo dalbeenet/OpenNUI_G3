@@ -65,7 +65,7 @@ void session::_on_message_received(session_ptr this_ptr,
                                  device_key, this_ptr->get_id(), protocol::frame_type::color_frame);
             this_ptr->color_buffer_table.insert(shb->key(), shb);
             module->color_buffer_table.insert(shb->key(), shb);
-            printf("system> %s is regiestered. shm_key: %ud\n", shb->name().data(), shb->key());
+            printf("system> %s is regiestered. shm_key: %u\n", shb->name().data(), shb->key());
             // Response
             {
                 ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
@@ -117,7 +117,7 @@ void session::_on_message_received(session_ptr this_ptr,
     }
     catch (::vee::exception& e)
     {
-        printf("system> failed to procesing api request! [sid: %d]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
+        printf("system> failed to procesing api request! [sid: %u]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
     }
 
     this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
@@ -137,20 +137,30 @@ void session::_launch_api_service(session_ptr this_ptr)
     auto device_keys = device_mgr->get_all_keys();
     try
     {
-        for (auto& it : device_keys)
+        /*for (auto& it : device_keys)
+        {
+        ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
+        buffer.fill(0);
+        uint32_t packet_size = protocol::utility::packet_generator::stc_new_sensor_online(buffer.data(), it);
+        this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t){});
+        }
+        this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
+        this_ptr->_cts_stream_in_buffer.size(),
+        ::std::bind(&session::_on_message_received, this_ptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));*/
         {
             ::std::array<unsigned char, protocol::stream_constant::opennui_packet_maxlen> buffer;
             buffer.fill(0);
-            uint32_t packet_size = protocol::utility::packet_generator::stc_new_sensor_online(buffer.data(), it);
-            this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t){});
+            uint32_t packet_size = protocol::utility::packet_generator::stc_intial_online_sensors(buffer.data(), device_keys);
+            this_ptr->get_stc_stream()->async_write(buffer.data(), packet_size, [](::vee::system::operation_result&, uint32_t)
+            {});
+            this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
+                                                   this_ptr->_cts_stream_in_buffer.size(),
+                                                   ::std::bind(&session::_on_message_received, this_ptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
         }
-        this_ptr->get_cts_stream()->async_read(this_ptr->_cts_stream_in_buffer.data(),
-                                               this_ptr->_cts_stream_in_buffer.size(),
-                                               ::std::bind(&session::_on_message_received, this_ptr, ::std::placeholders::_1, ::std::placeholders::_2, ::std::placeholders::_3, ::std::placeholders::_4));
     }
     catch (::vee::exception& e)
     {
-        printf("system> Failed to launch api service! [sid: %d]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
+        printf("system> Failed to launch api service! [sid: %u]\nUnhandled exception: %s\n", this_ptr->get_id(), e.what());
     }
 }
 

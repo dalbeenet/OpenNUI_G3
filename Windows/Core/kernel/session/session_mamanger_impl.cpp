@@ -1,5 +1,6 @@
 #include <kernel/session_manager.h>
 #include <kernel/device_manager.h>
+#include <kernel/session/win32_session.h> // For unity exit process compability
 #include <kernel/error.h>
 #pragma warning(disable:4996)
 namespace kernel {
@@ -75,10 +76,21 @@ void session_manager::_on_session_disconnect(session_ptr s,
     }
     try
     {
+        // For unity session exit process compability
+        if (s->get_platform() == protocol::platform::win32)
+        {
+            ::std::shared_ptr<win32_session> win32_session_ptr = ::std::static_pointer_cast<win32_session>(s);
+            win32_session_ptr->get_cts_stream_native()->disconnect();
+            win32_session_ptr->get_stc_stream_native()->disconnect();
+        }
+
         auto device_manager = device_manager::get_instance();
-        printf("system> remove the color shared buffer process begin...\n");
+        
+        // Trying to remove color buffers
         {
             auto removable_buffers = s->color_buffer_table.get_all_value_copies();
+            if (removable_buffers.size() > 0)
+                printf("system> remove the color shared buffer process begin...\n");
             for (auto& it : removable_buffers)
             {
                 try
@@ -95,9 +107,12 @@ void session_manager::_on_session_disconnect(session_ptr s,
                 }
             }
         }
-        printf("system> remove the depth shared buffer process begin...\n");
+        
+        // Trying to remove depth buffers
         {
             auto removable_buffers = s->depth_buffer_table.get_all_value_copies();
+            if (removable_buffers.size() > 0)
+                printf("system> remove the depth shared buffer process begin...\n");
             for (auto& it : removable_buffers)
             {
                 try
@@ -114,9 +129,12 @@ void session_manager::_on_session_disconnect(session_ptr s,
                 }
             }
         }
-        printf("system> remove the body shared buffer process begin...\n");
+
+        // Trying to remove body buffers
         {
             auto removable_buffers = s->body_buffer_table.get_all_value_copies();
+            if (removable_buffers.size() > 0)
+                printf("system> remove the body shared buffer process begin...\n");
             for (auto& it : removable_buffers)
             {
                 try

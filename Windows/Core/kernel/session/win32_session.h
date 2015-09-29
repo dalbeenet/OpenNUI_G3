@@ -14,9 +14,12 @@ public:
     static ::std::shared_ptr<win32_session> handshake(life_stream raw_stream, session_id_t sid) throw(...);
     virtual ~win32_session();
     virtual session_id_t get_id() const override;
-    virtual life_stream  get_life_stream() const override;
-    virtual message_stream get_cts_stream() const override;
-    virtual message_stream get_stc_stream() const override;
+    virtual life_stream  get_life_stream() override;
+    virtual message_stream get_cts_stream() override;
+    virtual message_stream get_stc_stream() override;
+    win32_message_stream get_cts_stream_native();
+    win32_message_stream get_stc_stream_native();
+    virtual protocol::platform get_platform() const override;
     win32_session();
     win32_session(win32_session&& other);
     win32_session& operator=(win32_session&& other);

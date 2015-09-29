@@ -2,6 +2,7 @@
 #define _OPENNUIG3_KERNEL_PROTOCOL_H_
 
 #include <array>
+#include <vector>
 #include <cinttypes>
 
 namespace kernel {
@@ -89,6 +90,7 @@ namespace utility {
 
 struct packet_generator abstract
 {
+    static uint32_t stc_intial_online_sensors(unsigned char* out_buffer, ::std::vector<device_key_t>& keys);
     static uint32_t stc_new_sensor_online(unsigned char* out_buffer, device_key_t key);
     static uint32_t stc_response_shb_request(protocol::frame_type data_type, unsigned char* out_buffer, device_key_t key, bool is_buffer_created, const char* shb_name);
 };
