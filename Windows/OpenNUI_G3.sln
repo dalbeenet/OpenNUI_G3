@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCppClient", "TestCppCli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_kinect2", "opennui_kinect2\opennui_kinect2.vcxproj", "{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_kinect1", "opennui_kinect1\opennui_kinect1.vcxproj", "{CC7DC453-F42B-4F99-BD7B-8E255C71E601}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -53,6 +55,10 @@ Global
 		{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}.Debug|Win32.Build.0 = Debug|Win32
 		{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}.Release|Win32.ActiveCfg = Release|Win32
 		{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}.Release|Win32.Build.0 = Release|Win32
+		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Debug|Win32.Build.0 = Debug|Win32
+		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Release|Win32.ActiveCfg = Release|Win32
+		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

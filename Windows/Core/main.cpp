@@ -13,8 +13,10 @@ Desc    : Entry point of nui framework core
 
 #ifdef _DEBUG
 #define KINECT2_MODULE_NAME "opennui_kinect2-x32d.nuimodule"
+#define KINECT1_MODULE_NAME "opennui_kinect1-x32d.nuimodule"
 #else
 #define KINECT2_MODULE_NAME "opennui_kinect2-x32.nuimodule"
+#define KINECT1_MODULE_NAME "opennui_kinect1-x32.nuimodule"
 #endif
 
 int main()
@@ -25,6 +27,7 @@ int main()
     try
     {
         device_manager->add_module(KINECT2_MODULE_NAME);
+        device_manager->add_module(KINECT1_MODULE_NAME);
     }
     catch (vee::exception& e)
     {
