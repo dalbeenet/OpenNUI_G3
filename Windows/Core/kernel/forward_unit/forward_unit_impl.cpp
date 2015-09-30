@@ -63,6 +63,8 @@ void forward_unit::_on_timer(timer_tick tick)
         ::std::shared_ptr<unsigned char> color_frame_buffer((unsigned char*)color_frame_pool::malloc(), buffer_deleter<color_frame_pool>());
         ::std::shared_ptr<unsigned char> depth_frame_buffer((unsigned char*)depth_frame_pool::malloc(), buffer_deleter<depth_frame_pool>());
         ::std::shared_ptr<unsigned char> body_frame_buffer((unsigned char*)body_frame_pool::malloc(), buffer_deleter<body_frame_pool>());
+        //TODO: 이렇게 하면 모듈이 삭제되는 경우는 안전하지 않다. -> 모듈은 절대 지우지 말자? 좋지않은 해결방법
+        //TODO: 일단 get_all_keys부터 삭제해야함. 전부 값으로 들고와야만 함.
         std::function<void()> bind = ::std::bind(_poll_and_forward_once, module, color_frame_buffer, depth_frame_buffer, body_frame_buffer);
         scheduler.request(::vee::make_delegate(bind));
     }

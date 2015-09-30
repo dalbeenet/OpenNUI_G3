@@ -96,7 +96,7 @@ void session::_on_message_received(session_ptr this_ptr,
         else if (header.opcode == protocol::opcode::cts_request_body_frame)
         {
             printf("system> session %d requests cts_request_body_frame\n", this_ptr->get_id());
-            auto shb = shared_buffer::crate(generate_unique_name("depth_shared_buffer", device_key).data(),
+            auto shb = shared_buffer::crate(generate_unique_name("body_shared_buffer", device_key).data(),
                                             calculate_shm_size(protocol::stream_constant::temp_g3_body_frame_size, protocol::stream_constant::shm_buffering_count),
                                             device_key, this_ptr->get_id(), protocol::frame_type::depth_frame);
             this_ptr->body_buffer_table.insert(shb->key(), shb);
