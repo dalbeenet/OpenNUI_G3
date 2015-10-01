@@ -153,7 +153,6 @@ _OPENNUI_DEVICE state_type ms_kinect1::open()
 
     if (NULL == pSensor || FAILED(hr))
     {
-        printf("No ready Kinect found!\n");
         return _OPENNUI_DEVICE state_type::error;
     }
     this->_state = _OPENNUI_DEVICE state_type::opened;
@@ -222,14 +221,14 @@ void ms_kinect1::get_depth_frame_info(_OPENNUI video_frame_info& out) const
     out.width = 320;
     out.height = 240;
     out.channel = 1;
-    out.byte_per_pixel = 4;
+    out.byte_per_pixel = 2;
     return;
 }
 
 void ms_kinect1::get_body_tracking_info(_OPENNUI body_tracking_info& out) const
 {
     out.maximum_tracking_bodies = NUI_SKELETON_COUNT;
-    out.number_of_joints = 20;
+    out.number_of_joints = 0;
     return;
 }
 
@@ -348,7 +347,8 @@ bool ms_kinect1::acquire_body_frame(const _OPENNUI byte* dst)
             int jointCount = 25;
             memcpy(dest + 4 + index, &jointCount, sizeof(__int32)); index += sizeof(__int32);
 
-            static int jointBlockSize = sizeof(_OPENNUI body::joint);
+
+            //static int jointBlockSize = sizeof(_OPENNUI body::joint);
             // JT
             // TS
             // D * 3
@@ -356,11 +356,10 @@ bool ms_kinect1::acquire_body_frame(const _OPENNUI byte* dst)
 
             for (int j = 0; j < 25; j++)
             {
-
                 memset(dest + 4 + index +
-                       jointBlockSize * j, 0, jointBlockSize);
+                       _OPENNUI body::JOINT_BLOCK_LENGTH * j, 0, _OPENNUI body::JOINT_BLOCK_LENGTH);
                 memcpy(dest + 4 + index +
-                       jointBlockSize * j, &j, sizeof(__int32));
+                       _OPENNUI body::JOINT_BLOCK_LENGTH * j, &j, sizeof(__int32));
             }
 
             for (int j = 0; j < 20; j++)
@@ -370,39 +369,38 @@ bool ms_kinect1::acquire_body_frame(const _OPENNUI byte* dst)
                 if (jointType != -1)
                 {
                     __int32 trackingState = (__int32)skeletonFrame.SkeletonData[i].eSkeletonPositionTrackingState[j];
-                    memcpy(dest + 4 + index + jointBlockSize * jointType + sizeof(__int32), &trackingState, sizeof(__int32));
+                    memcpy(dest + 4 + index + _OPENNUI body::JOINT_BLOCK_LENGTH * jointType + sizeof(__int32), &trackingState, sizeof(__int32));
 
                     double x = skeletonFrame.SkeletonData[i].SkeletonPositions[j].x;
                     memcpy(dest + 4 + index +
-                           jointBlockSize * jointType + sizeof(__int32) * 2, &x, sizeof(double));
+                          ( _OPENNUI body::JOINT_BLOCK_LENGTH * jointType) + sizeof(__int32) * 2, &x, sizeof(double));
 
                     double y = skeletonFrame.SkeletonData[i].SkeletonPositions[j].y;
                     memcpy(dest + 4 + index +
-                           jointBlockSize * jointType + sizeof(__int32) * 2 + sizeof(double), &y, sizeof(double));
+                           (_OPENNUI body::JOINT_BLOCK_LENGTH * jointType) + sizeof(__int32) * 2 + sizeof(double), &y, sizeof(double));
 
                     double z = skeletonFrame.SkeletonData[i].SkeletonPositions[j].z;
                     memcpy(dest + 4 + index +
-                           jointBlockSize * jointType + sizeof(__int32) * 2 + sizeof(double) * 2, &z, sizeof(double));
-
+                           (_OPENNUI body::JOINT_BLOCK_LENGTH * jointType) + sizeof(__int32) * 2 + sizeof(double) * 2, &z, sizeof(double));
                 }
             }
 
-            index += jointBlockSize * 25;
+            index += _OPENNUI body::JOINT_BLOCK_LENGTH * 25;
 
             __int16 unknownStatus = (__int16)_OPENNUI body::hand_state::unknown;
             memcpy(dest + 4 + index, &unknownStatus, sizeof(__int16));
             index += sizeof(__int16);
             memcpy(dest + 4 + index, &unknownStatus, sizeof(__int16));
             index += sizeof(__int16);
+
         }
     }
 
     return count > 0;
 }
 
-__declspec(dllexport) _OPENNUI opennui_device* __stdcall on_load()
+__declspec(dllexport) ::std::shared_ptr<_OPENNUI opennui_device> __stdcall on_load()
 {
     ::std::shared_ptr<_OPENNUI opennui_device> device = ::std::make_shared<ms_kinect1>();
-    printf("HELLO KINECT1!\n");
-    return device.get();
+    return device;
 }

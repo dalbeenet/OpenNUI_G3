@@ -171,7 +171,7 @@ enum class joint_type: int32_t
     number_of_joints = 25
 };
 
-enum class tracking_state: uint32_t
+enum class tracking_state: int32_t
 {
     not_tracked = 0,
     inferred = 1,

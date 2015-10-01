@@ -9,32 +9,110 @@ Desc    : Entry point of nui framework core
 #include <kernel/forward_unit.h>
 #include <iostream>
 #include <conio.h>
+#include <csignal>
 #pragma warning(disable:4996)
+
+void signalHandler(int signum)
+{
+    std::function<int(int)> f;
+    std::cout << "Interrupt signal (" << signum << ") received.\n";
+
+    // cleanup and close up stuff here  
+    // terminate program  
+
+    exit(signum);
+}
+
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+    switch (fdwCtrlType)
+    {
+        // Handle the CTRL-C signal. 
+    case CTRL_C_EVENT:
+        printf("Ctrl-C event\n\n");
+        return(TRUE);
+
+        // CTRL-CLOSE: confirm that the user wants to exit. 
+    case CTRL_CLOSE_EVENT:
+        printf("Ctrl-Close event\n\n");
+        return(TRUE);
+
+        // Pass other signals to the next handler. 
+    case CTRL_BREAK_EVENT:
+        printf("Ctrl-Break event\n\n");
+        return FALSE;
+
+    case CTRL_LOGOFF_EVENT:
+        printf("Ctrl-Logoff event\n\n");
+        return FALSE;
+
+    case CTRL_SHUTDOWN_EVENT:
+        printf("Ctrl-Shutdown event\n\n");
+        return FALSE;
+
+    default:
+        return FALSE;
+    }
+}
 
 #ifdef _DEBUG
 #define KINECT2_MODULE_NAME "opennui_kinect2-x32d.nuimodule"
 #define KINECT1_MODULE_NAME "opennui_kinect1-x32d.nuimodule"
+#define XTION_PRO_LIVE_MODULE_NAME "opennui_xtion_pro_live-x32d.nuimodule"
 #else
 #define KINECT2_MODULE_NAME "opennui_kinect2-x32.nuimodule"
 #define KINECT1_MODULE_NAME "opennui_kinect1-x32.nuimodule"
+#define XTION_PRO_LIVE_MODULE_NAME "opennui_xtion_pro_live-x32.nuimodule"
 #endif
 
 int main()
 {
+    signal(SIGINT, signalHandler);
+    signal(SIGABRT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGFPE, signalHandler);
+    if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE));
+
     auto forward_unit = kernel::forward_unit::get_instance();
     auto gateway = kernel::gateway::get_instance();
     auto device_manager = kernel::device_manager::get_instance();
     try
     {
         device_manager->add_module(KINECT2_MODULE_NAME);
+    }
+    catch (vee::exception& e)
+    {
+        printf("system> Could not add a module %s to device manager, %s\n", KINECT2_MODULE_NAME, e.what());
+    }
+
+    try
+    {
         device_manager->add_module(KINECT1_MODULE_NAME);
     }
     catch (vee::exception& e)
     {
-        printf("system> unhandled exception: %s\n", e.what());
+        printf("system> Could not add a module %s to device manager, %s\n", KINECT1_MODULE_NAME, e.what());
     }
-    printf("system> press any key to exit...\n");
-    _getch();
+
+    try
+    {
+        device_manager->add_module(XTION_PRO_LIVE_MODULE_NAME);
+    }
+    catch (vee::exception& e)
+    {
+        printf("system> Could not add a module %s to device manager, %s\n", XTION_PRO_LIVE_MODULE_NAME, e.what());
+    }
+
+    while (true)
+    {
+        //printf("Press esc key to exit.\r");
+        char c = getch();
+        if (c == 0x27)
+            break;
+    }
+
+    //printf("system> press any key to exit...\n");
+    //_getch();
     return 0;
 }
 #if 0 // NAMED_PIPE_TEST_CODe

@@ -47,7 +47,7 @@ forward_unit::forward_unit()
 {
     _timer = ::vee::voost::timer::create_timer();
     _callback += _on_timer;
-    _timer->run(16, _callback);
+    _timer->run(24, _callback);
     puts(__FUNCTION__);
 }
 

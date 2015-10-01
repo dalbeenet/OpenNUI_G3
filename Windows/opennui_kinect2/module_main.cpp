@@ -342,6 +342,5 @@ bool ms_kinect2::acquire_body_frame(const _OPENNUI byte* dst)
 __declspec(dllexport) ::std::shared_ptr<_OPENNUI opennui_device> __stdcall on_load()
 {
     ::std::shared_ptr<_OPENNUI opennui_device> device = ::std::make_shared<ms_kinect2>();
-    printf("HELLO KINECT2!\n");
     return device;
 }

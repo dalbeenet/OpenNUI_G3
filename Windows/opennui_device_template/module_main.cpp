@@ -108,9 +108,9 @@ bool test_device::acquire_body_frame(const _OPENNUI byte* dst)
     return false;
 }
 
-__declspec(dllexport) _OPENNUI opennui_device* __stdcall on_load()
+__declspec(dllexport) ::std::shared_ptr<_OPENNUI opennui_device> __stdcall on_load()
 {
     ::std::shared_ptr<_OPENNUI opennui_device> device = ::std::make_shared<test_device>();
     printf("HELLO KINECT2!\n");
-    return device.get();
+    return device;
 }

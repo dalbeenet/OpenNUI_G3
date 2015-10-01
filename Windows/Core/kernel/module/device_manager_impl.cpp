@@ -24,14 +24,26 @@ device_manager::key_t device_manager::add_module(const char* module_name) throw(
 {
     ::std::lock_guard<::vee::spin_lock> _guard(_mtx);
     ::std::shared_ptr<device_module> module = ::std::make_shared<device_module>(module_name);
-    auto result = _modules.insert(::std::make_pair(module->key(), module));
-    if (result.second == false)
+    
     {
-        char buffer[256] = { 0, };
-        sprintf(buffer, "Could not add a module [%s]", module_name);
-        throw vee::exception(buffer, (int)error_code::add_module_failure);
+        auto result = module->opennui_device_instance()->open();
+        if (result != _OPENNUI_DEVICE state_type::opened)
+        {
+            char buffer[256] = { 0, };
+            sprintf(buffer, "Could not open a module [%s]", module_name);
+            throw vee::exception(buffer, (int)error_code::add_module_failure);
+        }
     }
-    module->opennui_device_instance()->open();
+
+    {
+        auto result = _modules.insert(::std::make_pair(module->key(), module));
+        if (result.second == false)
+        {
+            char buffer[256] = { 0, };
+            sprintf(buffer, "Could not add a module [%s]", module_name);
+            throw vee::exception(buffer, (int)error_code::add_module_failure);
+        }
+    }
     return module->key();
 }
 

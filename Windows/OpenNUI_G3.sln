@@ -5,8 +5,10 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{5937DDDA-99B7-4D4F-A3C8-908A5F8ADE60}"
 	ProjectSection(ProjectDependencies) = postProject
+		{CC7DC453-F42B-4F99-BD7B-8E255C71E601} = {CC7DC453-F42B-4F99-BD7B-8E255C71E601}
 		{37346467-4A72-4E8E-B942-6E31638707A2} = {37346467-4A72-4E8E-B942-6E31638707A2}
 		{65A082DC-494F-4576-B661-11BE002FF2E9} = {65A082DC-494F-4576-B661-11BE002FF2E9}
+		{00481DE8-C51B-4051-8D7A-7D5BE761CD88} = {00481DE8-C51B-4051-8D7A-7D5BE761CD88}
 		{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4} = {42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}
 	EndProjectSection
 EndProject
@@ -24,6 +26,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_kinect2", "opennui_kinect2\opennui_kinect2.vcxproj", "{42CD8DFD-961C-46FC-B4DD-CAD85241A6A4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_kinect1", "opennui_kinect1\opennui_kinect1.vcxproj", "{CC7DC453-F42B-4F99-BD7B-8E255C71E601}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opennui_xtion_pro_live", "opennui_xtion_pro_live\opennui_xtion_pro_live.vcxproj", "{00481DE8-C51B-4051-8D7A-7D5BE761CD88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,10 @@ Global
 		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Debug|Win32.Build.0 = Debug|Win32
 		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Release|Win32.ActiveCfg = Release|Win32
 		{CC7DC453-F42B-4F99-BD7B-8E255C71E601}.Release|Win32.Build.0 = Release|Win32
+		{00481DE8-C51B-4051-8D7A-7D5BE761CD88}.Debug|Win32.ActiveCfg = Debug|Win32
+		{00481DE8-C51B-4051-8D7A-7D5BE761CD88}.Debug|Win32.Build.0 = Debug|Win32
+		{00481DE8-C51B-4051-8D7A-7D5BE761CD88}.Release|Win32.ActiveCfg = Release|Win32
+		{00481DE8-C51B-4051-8D7A-7D5BE761CD88}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
