@@ -84,11 +84,14 @@ gateway::~gateway()
 }
 
 gateway::gateway():
-_server(nullptr)
+_server(nullptr),
+_webserver(nullptr)
 {
     puts(__FUNCTION__);
-    _server = ::vee::voost::net::tcp::create_server(protocol::stream_constant::life_socket_port);
+    _server = ::vee::voost::net::tcp::create_server(protocol::stream_constant::win32_life_socket_port);
     _server->async_accept(::std::bind(&gateway::_accept_handler, this, ::std::placeholders::_1, ::std::placeholders::_2));
+    _webserver = ::vee::voost::net::websocket::create_server(protocol::stream_constant::web_life_socket_port);
+    //TODO: WEB SESSION ACCEPTOR
 }
 
 } // namespace 

@@ -22,7 +22,8 @@ enum class frame_type: uint32_t
 
 struct stream_constant
 {
-    static const int life_socket_port = 8000;
+    static const int win32_life_socket_port = 8000;
+    static const int web_life_socket_port = 8001;
     static const int opennui_packet_identifier = 0xFD42;
     static const int opennui_packet_maxlen = 1024;
     static const int pipe_in_buffer_capacity = 4096;

@@ -12,6 +12,9 @@ class gateway final
 public:
     using net_stream = ::vee::voost::net::net_stream;
     using net_server = ::vee::voost::net::net_server;
+    using websocket_stream = ::vee::voost::net::websocket::websocket_stream;
+    using websocket_server = ::vee::voost::net::websocket::websocket_server;
+    using websocket_server_ptr = ::std::shared_ptr<websocket_server>;
     using net_stream_ptr = ::std::shared_ptr<net_stream>;
     using net_server_ptr = ::std::shared_ptr<net_server>;
     using byte = ::vee::voost::net::byte;
@@ -27,6 +30,7 @@ private:
 // Private member variables
 private:
     net_server_ptr _server;
+    net_server_ptr _webserver;
 };
 
 } // namespace kernel
